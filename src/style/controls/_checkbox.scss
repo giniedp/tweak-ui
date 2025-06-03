@@ -1,6 +1,8 @@
+@use "../utils";
+
 .twui-checkbox {
-  min-height: $line-height - 2 * $spacer;
-  line-height: $line-height - 2 * $spacer;
+  min-height: calc(var(--twui-size) - 2 * var(--twui-gap));
+  line-height: calc(var(--twui-size) - 2 * var(--twui-gap));
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -10,7 +12,9 @@
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
 
-  &:hover { @include color(background-color, secondary); }
+  &:hover {
+    background-color: utils.color(secondary);
+  }
 
   input {
     margin-right: 1ch;

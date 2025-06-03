@@ -1,8 +1,0 @@
-{
-  "watch": true,
-  "server": {
-    "baseDir": "dist",
-    "index": "index.html"
-  },
-  "reloadDebounce": 2000
-}

@@ -245,7 +245,7 @@ export class Builder {
     }))
   }
 
-  public checkbox(opts: Partial<CheckboxModel>): CheckboxModel
+  public checkbox<T>(opts: Partial<CheckboxModel<T>>): CheckboxModel<T>
   public checkbox<T>(target: T, property: keyof T): CheckboxModel<T>
   public checkbox<T>(target: T, property: keyof T, opts: Partial<CheckboxModel<T>>): CheckboxModel<T>
   public checkbox(): CheckboxModel {
@@ -255,7 +255,7 @@ export class Builder {
     )
   }
 
-  public text(opts: Partial<TextModel>): TextModel
+  public text<T>(opts: Partial<TextModel<T>>): TextModel<T>
   public text<T>(target: T, property: keyof T): TextModel<T>
   public text<T>(target: T, property: keyof T, opts: Partial<TextModel<T>>): TextModel<T>
   public text(): TextModel {
@@ -265,7 +265,7 @@ export class Builder {
     )
   }
 
-  public number(opts: Partial<NumberModel>): NumberModel
+  public number<T>(opts: Partial<NumberModel<T>>): NumberModel<T>
   public number<T>(target: T, property: keyof T): NumberModel<T>
   public number<T>(target: T, property: keyof T, opts: Partial<NumberModel<T>>): NumberModel<T>
   public number(): NumberModel {
@@ -275,7 +275,7 @@ export class Builder {
     )
   }
 
-  public slider(opts: Partial<NumberModel>): NumberModel
+  public slider<T>(opts: Partial<NumberModel<T>>): NumberModel<T>
   public slider<T>(target: T, property: keyof T): NumberModel<T>
   public slider<T>(target: T, property: keyof T, opts: Partial<NumberModel<T>>): NumberModel<T>
   public slider(): NumberModel {
@@ -285,7 +285,7 @@ export class Builder {
     )
   }
 
-  public position(opts: Partial<PositionModel>): PositionModel
+  public position<T>(opts: Partial<PositionModel<T>>): PositionModel<T>
   public position<T>(target: T, property: keyof T): PositionModel<T>
   public position<T>(target: T, property: keyof T, opts: Partial<PositionModel<T>>): PositionModel<T>
   public position(): PositionModel {
@@ -294,7 +294,7 @@ export class Builder {
       assign(opts, { type: 'position' }),
     )
   }
-  public select(opts: Partial<SelectModel>): SelectModel
+  public select<T>(opts: Partial<SelectModel<T>>): SelectModel<T>
   public select<T>(target: T, property: keyof T): SelectModel<T>
   public select<T>(target: T, property: keyof T, opts: Partial<SelectModel<T>>): SelectModel<T>
   public select(): SelectModel {
@@ -304,7 +304,7 @@ export class Builder {
     )
   }
 
-  public color(opts: Partial<ColorModel>): ColorModel
+  public color<T>(opts: Partial<ColorModel<T>>): ColorModel<T>
   public color<T>(target: T, property: keyof T): ColorModel<T>
   public color<T>(target: T, property: keyof T, opts: Partial<ColorModel<T>>): ColorModel<T>
   public color(): ColorModel {
@@ -314,7 +314,7 @@ export class Builder {
     )
   }
 
-  public colorPicker(opts: Partial<ColorPickerModel>): ColorPickerModel
+  public colorPicker<T>(opts: Partial<ColorPickerModel<T>>): ColorPickerModel<T>
   public colorPicker<T>(target: T, property: keyof T): ColorPickerModel<T>
   public colorPicker<T>(target: T, property: keyof T, opts: Partial<ColorPickerModel<T>>): ColorPickerModel<T>
   public colorPicker(): ColorPickerModel {
@@ -324,7 +324,7 @@ export class Builder {
     )
   }
 
-  public point(opts: Partial<PointModel>): PointModel
+  public point<T>(opts: Partial<PointModel<T>>): PointModel<T>
   public point<T>(target: T, property: keyof T): PointModel<T>
   public point<T>(target: T, property: keyof T, opts: Partial<PointModel<T>>): PointModel<T>
   public point(): PointModel {
@@ -334,7 +334,7 @@ export class Builder {
     )
   }
 
-  public spherical(opts: Partial<SphericalModel>): SphericalModel
+  public spherical<T>(opts: Partial<SphericalModel<T>>): SphericalModel<T>
   public spherical<T>(target: T, property: keyof T): SphericalModel<T>
   public spherical<T>(target: T, property: keyof T, opts: Partial<SphericalModel<T>>): SphericalModel<T>
   public spherical(): SphericalModel {
@@ -344,7 +344,7 @@ export class Builder {
     )
   }
 
-  public angle(opts: Partial<AngleModel>): AngleModel
+  public angle<T>(opts: Partial<AngleModel<T>>): AngleModel<T>
   public angle<T>(target: T, property: keyof T): AngleModel<T>
   public angle<T>(target: T, property: keyof T, opts: Partial<AngleModel<T>>): AngleModel<T>
   public angle(): AngleModel {
@@ -352,6 +352,59 @@ export class Builder {
     return this.add<AngleModel>(
       assign(opts, { type: 'angle' }),
     )
+  }
+
+  public object<T>(label: string, target: T, config: ObjectConfig<T> = {}) {
+    return this.group(label, (ui) => {
+      for (const key in target) {
+        if (!config[key]) {
+          const value = target[key]
+          switch (typeof value) {
+            case 'number':
+              ui.number(target, key);
+              break
+            case 'string':
+              ui.text(target, key);
+              break
+            case 'boolean':
+              ui.checkbox(target, key);
+              break
+          }
+          continue
+        }
+        switch (config[key].type) {
+          case 'text':
+            ui.text(target, key, config[key]);
+            break;
+          case 'number':
+            ui.number(target, key, config[key]);
+            break;
+          case 'checkbox':
+            ui.checkbox(target, key, config[key]);
+            break;
+          case 'select':
+            ui.select(target, key, config[key]);
+            break;
+          case 'color':
+            ui.color(target, key, config[key]);
+            break;
+          case 'color-picker':
+            ui.colorPicker(target, key, config[key]);
+            break;
+          case 'point':
+            ui.point(target, key, config[key]);
+            break;
+          case 'spherical':
+            ui.spherical(target, key, config[key]);
+            break;
+          case 'angle':
+            ui.angle(target, key, config[key]);
+            break;
+          default:
+            //
+        }
+      }
+    })
   }
 
   /**
@@ -433,4 +486,17 @@ export class Builder {
     )
     return def
   }
+}
+
+export type ObjectConfig<T> = {
+  [K in keyof T]?:
+    TextModel<T> |
+    NumberModel<T> |
+    CheckboxModel<T> |
+    SelectModel<T> |
+    ColorModel<T> |
+    ColorPickerModel<T> |
+    PointModel<T> |
+    SphericalModel<T> |
+    AngleModel<T>
 }

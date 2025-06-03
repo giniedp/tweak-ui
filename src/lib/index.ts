@@ -22,11 +22,11 @@ export * from './components'
 export * from './core'
 export * from './mount'
 
-declare const VERSION_STRING: string
+// declare const VERSION_STRING: string
 
-/**
- * The version string
- *
- * @public
- */
-export const VERSION = VERSION_STRING
+// /**
+//  * The version string
+//  *
+//  * @public
+//  */
+// export const VERSION = VERSION_STRING

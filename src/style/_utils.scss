@@ -1,24 +1,4 @@
-$colorMap: (
-  "primary": $color-primary,
-  "primary-dark": $color-primary-dark,
-  "primary-light": $color-primary-light,
-  "secondary": $color-secondary,
-  "secondary-dark": $color-secondary-dark,
-  "secondary-light": $color-secondary-light,
-  "on-primary": $color-on-primary,
-  "on-secondary": $color-on-secondary,
-  "accent": $color-accent,
-);
 
-@function getColor($colorName) {
-  @return map-get($colorMap, $colorName);
-}
-
-@function getColorVar($colorName) {
-  @return var(--twui-color-#{$colorName}, getColor($colorName));
-}
-
-@mixin color($property, $colorName) {
-  #{$property}: getColor($colorName);
-  #{$property}: getColorVar($colorName);
+@function color($colorName) {
+  @return var(--twui-color-#{$colorName});
 }

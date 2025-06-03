@@ -1,3 +1,5 @@
+@use "../utils";
+
 .twui-number,
 .twui-slider {
   display: flex;
@@ -13,13 +15,13 @@
   .twui-progress {
     flex: 1;
     display: flex;
-    margin: $spacer;
+    margin: var(--twui-gap);
     cursor: ew-resize;
     transition: background-color 0.2s ease-in-out;
 
-    @include color(background-color, secondary);
+    background-color: utils.color(secondary);
     &:hover {
-      @include color(background-color, secondary-dark);
+      background-color: utils.color(secondary-dark);
     }
   }
 
@@ -28,7 +30,7 @@
   }
 
   .twui-progress-bar {
-    @include color(background-color, secondary-light);
+    background-color: utils.color(secondary-light);
   }
 
   input[type="number"] {

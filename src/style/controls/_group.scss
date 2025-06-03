@@ -1,18 +1,21 @@
+@use "../utils";
+
 .twui-group {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
 
-  @include color(border-color, primary-dark);
+  border-color: utils.color(primary-dark);
 }
 
 .twui-group-title {
   margin: 0;
   width: auto;
-  height: $line-height;
-  line-height: $line-height;
-  @include color(background-color, primary-dark);
-  padding-left: 2 * $spacer;
+  height: var(--twui-size);
+  line-height: var(--twui-size);
+  background-color: utils.color(primary-dark);
+  padding-left: calc(2 * var(--twui-gap));
+  font-weight: bold;;
 }
 
 .twui-group-collapsible .twui-group-title {
@@ -21,41 +24,40 @@
 }
 
 .twui-group-collapsible > .twui-group-title::before {
-  content: '▶';
+  content: '🗁';
   display: inline-block;
-  width: $line-height;
-  height: $line-height;
+  width: var(--twui-size);
+  height: var(--twui-size);
   text-align: center;
   transition: transform 0.1s ease-in-out;
-  transform: rotateZ(90deg);
 }
 
 .twui-group-inset,
 .twui-group-collapsible > .twui-group-collapsible {
   border-left: 0.25rem solid;
-  @include color(border-left-color, primary-light);
+  border-left-color: utils.color(primary-light);
 }
 
 .twui-group-collapsed > .twui-group-title::before {
-  transform: rotateZ(0deg);
+  content: '🗀';
 }
 
 .twui-group-control {
   display: flex;
   flex-flow: row nowrap;
   align-items: stretch;
-  min-height: $line-height;
+  min-height: var(--twui-size);
   box-sizing: border-box;
 
   > label:first-child {
     flex: none;
     box-sizing: border-box;
-    width: $label-width - 2 * $label-pad-x;
-    min-width: $label-width - 2 * $label-pad-x;
-    min-height: $line-height - 2 * $spacer;
-    line-height: $line-height - 2 * $spacer;
-    padding: $label-pad-y $label-pad-x;
-    margin: $spacer;
+    width: calc(var(--twui-label-width) - 2 * var(--twui-label-pad-x));
+    min-width: calc(var(--twui-label-width) - 2 * var(--twui-label-pad-x));
+    min-height: calc(var(--twui-size) - 2 * var(--twui-gap));
+    line-height: calc(var(--twui-size) - 2 * var(--twui-gap));
+    padding: var(--twui-label-pad-y) var(--twui-label-pad-x);
+    margin: var(--twui-gap);
 
     overflow: hidden;
   }

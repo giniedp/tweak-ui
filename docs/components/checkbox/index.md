@@ -1,0 +1,5 @@
+# Checkbox
+
+<Example/>
+
+<ExampleCode/>

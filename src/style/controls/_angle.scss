@@ -1,3 +1,5 @@
+@use "../utils";
+
 .twui-angle {
   display: flex;
   flex-direction: row;
@@ -22,8 +24,8 @@
 
   label {
     text-align: right;
-    line-height: $input-height;
-    padding: 0 $label-pad-x;
+    line-height: var(--twui-input-height);
+    padding: 0 var(--twui-label-pad-x);
   }
   input[type=number] {
     width: 3.5rem;
@@ -42,9 +44,9 @@
       top: 1rem;
       border: 1px solid;
       border-radius: 50%;
-      @include color(border-color, primary-light);
+      border-color: utils.color(primary-light);
       box-sizing: border-box;
-      background-image: conic-gradient(getColorVar(primary-light) var(--angle-percent), transparent 0);
+      background-image: conic-gradient(utils.color(primary-light) var(--angle-percent), transparent 0);
       transform: scaleX(-1) rotate(180deg);
     }
   }
@@ -52,13 +54,13 @@
   .angle-knob {
     border: 0px solid transparent;
     border-radius: 100%;
-    @include color(background-color, primary-light);
+    background-color: utils.color(primary-light);
 
     &:hover {
-      @include color(background-color, secondary-light);
+      background-color: utils.color(secondary-light);
     }
   }
   .angle-pane.is-dragging .angle-knob {
-    @include color(background-color, accent);
+    background-color: utils.color(accent);
   }
 }

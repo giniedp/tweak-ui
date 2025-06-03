@@ -1,12 +1,63 @@
-.twui-root {
-  @include color(background-color, primary);
-  @include color(color, on-primary);
+@use "utils";
 
-  font-family: $font-family-base;
-  font-size: $font-size-base;
+:root {
+  --twui-gap: 0.0625rem;
+  --twui-size: 1.5rem;
+  --twui-label-width: 7rem;
+  --twui-label-pad-x: 0.25rem;
+  --twui-label-pad-y: 0.0rem;
+  --twui-input-height: var(--twui-size);
+  --twui-input-pad-x: 0.375rem;
+  --twui-input-pad-y: 0.0rem;
+  --twui-button-height: var(--twui-size);
+  --twui-button-pad-x: 0.5rem;
+  --twui-button-pad-y: 0.25rem;
+
+  --twui-color-primary: #344955;
+  --twui-color-primary-dark: #0b222c;
+  --twui-color-primary-light: #5f7481;
+  --twui-color-secondary: #4A6572;
+  --twui-color-secondary-dark: #203b47;
+  --twui-color-secondary-light: #7793a1;
+  --twui-color-on-primary: #E0E5E7;
+  --twui-color-on-secondary: #E0E5E7;
+  --twui-color-accent: #f9AA33;
+}
+
+.twui-dark {
+  --twui-color-primary: #263238;
+  --twui-color-primary-dark: #000a12;
+  --twui-color-primary-light: #4f5b62;
+  --twui-color-secondary: #37474f;
+  --twui-color-secondary-dark: #102027;
+  --twui-color-secondary-light: #62727b;
+  --twui-color-on-primary: #fff;
+  --twui-color-on-secondary: #fff;
+  --twui-color-accent: #f9AA33;
+}
+
+.twui-light {
+  --twui-color-primary: #fafafa;
+  --twui-color-primary-dark: #c7c7c7;
+  --twui-color-primary-light: #ffffff;
+  --twui-color-secondary: #cfd8dc;
+  --twui-color-secondary-dark: #9ea7aa;
+  --twui-color-secondary-light: #ffffff;
+  --twui-color-on-primary: #000000;
+  --twui-color-on-secondary: #000000;
+  --twui-color-accent: #2196f3;
+}
+
+.twui-root {
+  text-shadow: 1px 1px 1px #000000;
+  background-color: var(--twui-color-primary);
+  color: var(--twui-color-on-primary);
+
+  font-family: var(--twui-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol");
+  font-size: var(--twui-font-size, 12px);
   padding: 0;
   margin: 0;
-  width: 20rem;
+  width: var(--twui-width, 20rem);
   flex: auto 0 0; // dont resize in flex context
   overflow: auto;
   overflow-x: hidden;
@@ -21,19 +72,19 @@
   }
 
   &::-webkit-scrollbar-track {
-    @include color(background-color, primary);
+    background-color: utils.color(primary);
   }
 
   &::-webkit-scrollbar-thumb {
     border-width: 1px;
     border-style: solid;
     transition: background-color 0.2s ease-in-out;
-    @include color(background-color, primary);
-    @include color(border-color, primary-dark);
+    background-color: utils.color(primary);
+    border-color: utils.color(primary-dark);
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    @include color(background-color, secondary);
+    background-color: utils.color(secondary);
   }
 
   //
@@ -42,6 +93,7 @@
 
   label {
     user-select: none;
+    font-weight: 500;
   }
 
   select, button, a {
@@ -51,8 +103,8 @@
   input:not([type="checkbox"]),
   button,
   select {
-    @include color(background-color, secondary);
-    @include color(color, on-secondary);
+    background-color: utils.color(secondary);
+    color: utils.color(on-secondary);
 
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -62,37 +114,40 @@
     border: none;
     box-sizing: border-box;
 
-    height: $line-height - 2 * $spacer;
-    line-height: $line-height - 2 * $spacer;
-    padding: $input-pad-y $input-pad-x;
-    margin: $spacer;
+    height: calc(var(--twui-size) - 2 * var(--twui-gap));
+    line-height: calc(var(--twui-size) - 2 * var(--twui-gap));
+    padding: var(--twui-input-pad-y) var(--twui-input-pad-x);
+    margin: var(--twui-gap);
   }
 
   button {
-    line-height: $line-height - 2 * $spacer - 2 * $button-pad-y;
-    padding: $button-pad-y $button-pad-x;
-    margin: $spacer;
+    line-height: calc(var(--twui-size) - 2 * var(--twui-gap) - 2 * var(--twui-button-pad-y));
+    padding: var(--twui-button-pad-y) var(--twui-button-pad-x);
+    margin: var(--twui-gap);
 
-    font-weight: 400;
+    font-weight: bold;
     text-align: center;
     white-space: nowrap;
+  }
+  button:active {
+    transform: translateY(1px)
   }
 
   button, select, input:not([type="checkbox"]), .twui-progress {
     border-bottom: 1px solid;
-    @include color(border-color, primary-dark);
+    border-color: utils.color(primary-dark);
     transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 
     &:hover,
     &.checked {
-      @include color(background-color, secondary-light);
-      @include color(border-color, secondary-dark);
+      background-color: utils.color(secondary-light);
+      border-color: utils.color(secondary-dark);
     }
 
     &:focus,
     &.checked {
       outline: none;
-      @include color(border-color, accent);
+      border-color: utils.color(accent);
     }
 
     &:disabled,
@@ -109,12 +164,29 @@
 
   select, input:not([type="checkbox"]) {
     &:focus {
-      @include color(color, accent);
+      color: utils.color(accent);
     }
   }
 
   input[type="number"] {
     padding-right: 0;
+  }
+  input[type="checkbox"] {
+    margin: 0;
+    appearance: none;
+    width: calc(var(--twui-size) - 2 * var(--twui-gap));
+    height: calc(var(--twui-size) - 2 * var(--twui-gap));;
+    text-align: center;
+    cursor: pointer;
+  }
+  input[type="checkbox"]::before {
+    content: "✔";
+    opacity: 0.125;
+    font-weight: bold;
+  }
+  input[type="checkbox"]:checked::before {
+    content: "✔";
+    opacity: 1;
   }
 }
 

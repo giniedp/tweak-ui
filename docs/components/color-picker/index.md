@@ -1,0 +1,53 @@
+# Color Picker
+
+<Example/>
+
+<ExampleCode/>
+
+The Color control has a `format` option which describes how the color value
+should be parsed and encoded. It consists of 2 sections. The prefix specifies whether the color value is a
+
+- `#` hex string
+- `0x` a number
+- `[]` an array
+- `{}` an object
+
+The suffix specifies the order of the color components. It may be any combinarion of
+`r`, `g`, `b` and `a` Here are some examples
+
+<!--
+table.table.table-borderless.table-sm
+  thead
+    tr
+      th format
+      th value (r: 255, g: 128, b: 0, a: 1)
+      th description
+  tbody
+    tr
+      td <code>"#rgb"</code>
+      td <code>"#FF8000"</code>
+      td Hex string with red green and blue coded from left to right
+    tr
+      td <code>"#bgr"</code>
+      td <code>"#0080FF"</code>
+      td Hex string with red green and blue coded from right to left
+    tr
+      td <code>"0xrgb"</code>
+      td <code>16744448</code>
+      td number Hex string with red green and blue coded from right to left
+    tr
+      td <code>"[]rgb"</code>
+      td <code>[255, 128, 0]</code>
+      td number array with red green and blue coded from right to left
+    tr
+      td <code>"{}rgb"</code>
+      td <code>{ r: 255, g: 128, b: 0 }</code>
+      td object red green and blue components
+    tr
+      td <code>"[n]rgb"</code>
+      td <code>[1, 0.5, 0]</code>
+      td number array with all components normalized to range [0:1]
+    tr
+      td <code>"{n}rgb"</code>
+      td <code>{ r: 1, g: 0.5, b: 0 }</code>
+      td object red green and blue components normalized to range [0:1] -->

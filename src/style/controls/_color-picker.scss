@@ -1,3 +1,5 @@
+@use "../utils";
+
 
 .twui-color-picker {
   flex: auto 1 1;
@@ -7,7 +9,7 @@
   .color-picker-panel {
     flex: 1;
     position: relative;
-    margin: $spacer;
+    margin: var(--twui-gap);
   }
 
   .color-picker-inputs {
@@ -43,7 +45,7 @@
   .color-picker-a {
     &:focus {
       outline: none;
-      @include color(border-color, accent);
+      border-color: utils.color(accent);
     }
   }
 
@@ -55,7 +57,7 @@
     cursor: crosshair;
     z-index: 1;
     border-bottom: 1px solid;
-    @include color(border-color, primary-dark);
+    border-color: utils.color(primary-dark);
   }
   .color-picker-sv-bg {
     position: absolute;
@@ -82,9 +84,9 @@
     height: 1rem;
     box-sizing: border-box;
     cursor: ew-resize;
-    margin-top: $spacer * 2;
+    margin-top: calc(var(--twui-gap) * 2);
     border-bottom: 1px solid;
-    @include color(border-color, primary-dark);
+    border-color: utils.color(primary-dark);
   }
 
   .color-picker-h-cursor,
@@ -119,6 +121,6 @@
   .color-picker-sv,
   .color-picker-h,
   .color-picker-a {
-    @include color(border-color, primary-dark);
+    border-color: utils.color(primary-dark);
   }
 }

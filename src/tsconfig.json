@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "declaration": true,
+    "declarationMap": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "outDir": "../dist",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "rootDir": ".",
+    "sourceMap": true,
+    "inlineSourceMap": false,
+    "inlineSources": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "target": "ES6",
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["../node_modules/@types"]
+  }
+}
