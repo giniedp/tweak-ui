@@ -1,4 +1,0 @@
-
-@function color($colorName) {
-  @return var(--twui-color-#{$colorName});
-}

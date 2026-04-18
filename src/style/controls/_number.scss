@@ -1,40 +1,23 @@
-@use "../utils";
-
-.twui-number,
-.twui-slider {
+.twui-number {
   display: flex;
-  flex-flow: row nowrap;
-  align-items: stretch;
-}
+  gap: var(--twui-gap);
 
-.twui-number input {
-  flex: 1;
-}
-
-.twui-slider {
-  .twui-progress {
+  input {
+    min-width: 0;
+  }
+  input[type='range'] {
     flex: 1;
-    display: flex;
-    margin: var(--twui-gap);
-    cursor: ew-resize;
-    transition: background-color 0.2s ease-in-out;
-
-    background-color: utils.color(secondary);
-    &:hover {
-      background-color: utils.color(secondary-dark);
-    }
+    margin: 0;
+    accent-color: var(--twui-color-base-content);
+    height: var(--twui-size);
   }
 
-  .twui-progress.disabled {
-    cursor: not-allowed;
+  input[type='number'] {
+    text-align: right;
+    width: 100%;
   }
-
-  .twui-progress-bar {
-    background-color: utils.color(secondary-light);
-  }
-
-  input[type="number"] {
+  input[type='range'] + input[type='number'] {
+    width: 5rem;
     flex: none;
-    width: 3.5rem;
   }
 }

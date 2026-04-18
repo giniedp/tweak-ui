@@ -1,76 +1,63 @@
-import m, { FactoryComponent } from 'mithril'
-
-import {
-  getValue,
-  component,
-  setValue,
-  ValueSource,
-  ComponentAttrs,
-  ComponentModel,
-} from '../../core'
-import { call, twuiClass, cssClass, viewFn } from '../../core/utils'
-
-/**
- * Checkbox component attrs
- * @public
- */
-export type CheckboxAttrs = ComponentAttrs<CheckboxModel>
+import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import { ControlValue, getControlValue, setControlValue } from '../../core'
+import { call, twuiClass } from '../../core/utils'
+import { ControlAttrs, ControlComponent } from './control'
 
 /**
  * Describes a checkbox control
  * @public
  */
-export interface CheckboxModel<T = unknown>
-  extends ComponentModel,
-    ValueSource<T, boolean> {
-  /**
-   * The type name of the control
-   */
-  type: 'checkbox'
+export interface ChecboxAttrs<T = unknown> extends ControlValue<T, boolean>, ControlAttrs {
   /**
    * This is called when the control value changes
    */
-  onChange?: (model: CheckboxModel, value: unknown) => void
+  onChange?: (model: T, value: boolean) => void
+
   /**
-   * Text behind the checkbox or inside the buttn
+   * Text behind the checkbox or inside the button
    */
   text?: string
+
   /**
    * Disables the control input
    */
   disabled?: boolean
 }
 
-const TYPE = 'checkbox'
-const CheckboxComponent: FactoryComponent<CheckboxAttrs> = (node) => {
-  function onChange(e: Event) {
-    const data = node.attrs.data
-    const checked = (e.target as HTMLInputElement).checked
-    const written = setValue(data, checked)
-    call(data.onChange, data, written)
-  }
-  return {
-    view: viewFn((data) => {
-      const checked = getValue(data) === true
-      return m(
-        'label',
-        {
-          class: cssClass({
-            [twuiClass(TYPE)]: true,
-            checked: checked,
-            disabled: data.disabled,
-          }),
-        },
-        m('input', {
-          type: 'checkbox',
-          checked: checked,
-          onchange: onChange,
-          disabled: data.disabled,
-        }),
-        data.text,
-      )
-    }),
-  }
+export function uiCheckbox<T>(attrs: ChecboxAttrs<T>, children?: Children): Vnode<ChecboxAttrs<T>> {
+  return m(CheckboxComponent as any, attrs as any, children)
 }
 
-component(TYPE, CheckboxComponent)
+export const CheckboxComponent: FactoryComponent<ChecboxAttrs> = () => {
+  let attrs: ChecboxAttrs
+
+  function onChange(e: Event) {
+    const value = (e.target as HTMLInputElement).checked
+    setControlValue(attrs, value)
+    call(attrs.onChange, attrs.value, value)
+  }
+  return {
+    view: (node) => {
+      attrs = node.attrs
+      const checked = getControlValue(attrs) === true
+      return m(
+        ControlComponent,
+        {
+          label: attrs.label,
+          description: attrs.description,
+          class: [twuiClass('checkbox'), { checked, disabled: !!attrs.disabled }],
+          style: attrs.style,
+        },
+        m('span', {}, [
+          attrs.text,
+          m('input', {
+            type: 'checkbox',
+            checked: checked,
+            onchange: onChange,
+            disabled: attrs.disabled,
+          }),
+        ]),
+      )
+    },
+  }
+}

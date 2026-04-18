@@ -1,10 +1,10 @@
-import { ArrayColorFormat } from './array-format';
+import { describe, expect, it } from 'vitest'
+import { ArrayColorCodec } from './array-format'
 
 describe('ArrayColorFormat', () => {
-
   describe('parse normalized', () => {
     it('rgb', () => {
-      expect(new ArrayColorFormat(['r', 'g', 'b'], true).parse([0.25, 0.5, 0.75])).toEqual({
+      expect(new ArrayColorCodec(['r', 'g', 'b'], true).toControl([0.25, 0.5, 0.75])).toEqual({
         r: 0.25,
         g: 0.5,
         b: 0.75,
@@ -13,7 +13,9 @@ describe('ArrayColorFormat', () => {
     })
 
     it('rgba', () => {
-      expect(new ArrayColorFormat(['r', 'g', 'b', 'a'], true).parse([0.25, 0.5, 0.75, 0.8])).toEqual({
+      expect(
+        new ArrayColorCodec(['r', 'g', 'b', 'a'], true).toControl([0.25, 0.5, 0.75, 0.8]),
+      ).toEqual({
         r: 0.25,
         g: 0.5,
         b: 0.75,
@@ -24,7 +26,7 @@ describe('ArrayColorFormat', () => {
 
   describe('parse non normalized', () => {
     it('rgb', () => {
-      expect(new ArrayColorFormat(['r', 'g', 'b'], false).parse([10, 20, 30])).toEqual({
+      expect(new ArrayColorCodec(['r', 'g', 'b'], false).toControl([10, 20, 30])).toEqual({
         r: 10 / 255,
         g: 20 / 255,
         b: 30 / 255,
@@ -33,7 +35,7 @@ describe('ArrayColorFormat', () => {
     })
 
     it('rgba', () => {
-      expect(new ArrayColorFormat(['r', 'g', 'b', 'a'], false).parse([10, 20, 30, 40])).toEqual({
+      expect(new ArrayColorCodec(['r', 'g', 'b', 'a'], false).toControl([10, 20, 30, 40])).toEqual({
         r: 10 / 255,
         g: 20 / 255,
         b: 30 / 255,
@@ -44,41 +46,49 @@ describe('ArrayColorFormat', () => {
 
   describe('format normalized', () => {
     it('rgb', () => {
-      expect(new ArrayColorFormat(['r', 'g', 'b'], true).format({
-        r: 0.25,
-        g: 0.5,
-        b: 0.75,
-        a: 1,
-      })).toEqual([0.25, 0.5, 0.75])
+      expect(
+        new ArrayColorCodec(['r', 'g', 'b'], true).fromControl({
+          r: 0.25,
+          g: 0.5,
+          b: 0.75,
+          a: 1,
+        }),
+      ).toEqual([0.25, 0.5, 0.75])
     })
 
     it('rgba', () => {
-      expect(new ArrayColorFormat(['r', 'g', 'b', 'a'], true).format({
-        r: 0.25,
-        g: 0.5,
-        b: 0.75,
-        a: 0.8,
-      })).toEqual([0.25, 0.5, 0.75, 0.8])
+      expect(
+        new ArrayColorCodec(['r', 'g', 'b', 'a'], true).fromControl({
+          r: 0.25,
+          g: 0.5,
+          b: 0.75,
+          a: 0.8,
+        }),
+      ).toEqual([0.25, 0.5, 0.75, 0.8])
     })
   })
 
   describe('format non normalized', () => {
     it('rgb', () => {
-      expect(new ArrayColorFormat(['r', 'g', 'b'], false).format({
-        r: 10 / 255,
-        g: 20 / 255,
-        b: 30 / 255,
-        a: 1,
-      })).toEqual([10, 20, 30])
+      expect(
+        new ArrayColorCodec(['r', 'g', 'b'], false).fromControl({
+          r: 10 / 255,
+          g: 20 / 255,
+          b: 30 / 255,
+          a: 1,
+        }),
+      ).toEqual([10, 20, 30])
     })
 
     it('rgba', () => {
-      expect(new ArrayColorFormat(['r', 'g', 'b', 'a'], false).format({
-        r: 10 / 255,
-        g: 20 / 255,
-        b: 30 / 255,
-        a: 40 / 255,
-      })).toEqual([10, 20, 30, 40])
+      expect(
+        new ArrayColorCodec(['r', 'g', 'b', 'a'], false).fromControl({
+          r: 10 / 255,
+          g: 20 / 255,
+          b: 30 / 255,
+          a: 40 / 255,
+        }),
+      ).toEqual([10, 20, 30, 40])
     })
   })
 })

@@ -1,94 +1,26 @@
-import type { FactoryComponent, ClassComponent } from 'mithril'
+import type { ClassComponent, FactoryComponent } from 'mithril'
 
 /**
- * @public
- */
-export type ComponentType<T = any> = FactoryComponent<T> | ClassComponent<T>
-
-/**
- * Base model for a component with children
+ * A UI component, which can be either a Mithril factory component or a Mithril class component.
  *
  * @public
  */
-export interface ComponentGroupModel<T extends ComponentModel = ComponentModel>
-  extends ComponentModel {
-  /**
-   * Collection of child components
-   */
-  children?: T[]
-}
+export type Component<Attr extends Object> = FactoryComponent<Attr> | ClassComponent<Attr>
 
 /**
- * Base model for a component
+ * A descriptor for a component, which includes the component itself, its attributes, and optionally its children.
  *
- * @public
+ * @internal
  */
-export interface ComponentModel {
-  /**
-   * The type name of the component
-   */
-  type: string
-  /**
-   * If true, the component will not be rendered
-   *
-   * @remarks
-   * This is a convenience property that allows to hide a component
-   * without removing it from the component data model.
-   */
-  hidden?: boolean | (() => boolean)
-  /**
-   * The label for this component when rendered as a control
-   *
-   * @remarks
-   * This is only evaluated when rendered as a child of a panel component
-   */
-  label?: string
+export type ComponentDescriptor<Attr extends Object> = {
+  component: Component<Attr>
+  attributes: Attr
+  children?: Array<ComponentDescriptor<any>>
 }
 
 /**
- * Common component attributes
+ * A schema for a set of components, which is an array of component descriptors.
  *
- * @public
+ * @internal
  */
-export type ComponentAttrs<T extends ComponentModel> = {
-  data: T
-}
-
-export type KeyMatchingType<T, V> = { [K in keyof T]: T[K] extends V ? K : never }[keyof T]
-
-/**
- * Utility to convert a value type
- *
- * @public
- */
-export type ValueCodec<Encoded, Decoded> = {
-  decode: (value: Encoded) => Decoded
-  encode: (value: Decoded) => Encoded
-}
-
-export type ValueSource<T, V, I = unknown> = {
-  /**
-   * The object which is holding a control value
-   *
-   * @remarks
-   * Requires the `property` option to be set.
-   */
-  target?: T
-  /**
-   * The property name in `target` where the control value is stored
-   *
-   * @remarks
-   * Requires the `target` option to be set.
-   */
-  property?: keyof T
-  /**
-   * If `target` and `property` are not set, then this is used as the control value
-   */
-  value?: V | I
-  codec?: ValueCodec<I, V>,
-}
-
-/**
- * @public
- */
-export type ArrayOrSingleOf<T> = T | T[]
+export type ComponentSchema = Array<ComponentDescriptor<any>>

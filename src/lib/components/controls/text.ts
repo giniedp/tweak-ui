@@ -1,71 +1,68 @@
-import m from 'mithril'
-
-import {
-  getValue,
-  component,
-  setValue,
-  ComponentModel,
-  ValueSource,
-  ComponentAttrs,
-} from '../../core'
-import { call, twuiClass, viewFn } from '../../core/utils'
-
-/**
- * Text component attributes
- * @public
- */
-export type TextAttrs = ComponentAttrs<TextModel>
+import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import { ControlValue, getControlValue, setControlValue } from '../../core'
+import { call, twuiClass } from '../../core/utils'
+import { ControlAttrs, ControlComponent } from './control'
 
 /**
  * Text component model
  * @public
  */
-export interface TextModel<T = unknown>
-  extends ComponentModel,
-    ValueSource<T, string> {
-  /**
-   * The type name of the control
-   */
-  type: 'text'
+export interface TextAttrs<T = unknown> extends ControlValue<T, string>, ControlAttrs {
   /**
    * The placeholder text
    */
   placeholder?: string
+
   /**
    * This is called when the control value has been changed.
    */
-  onInput?: (model: TextModel<T>, value: unknown) => void
+  onInput?: (model: T, value: string) => void
+
   /**
    * This is called once the control value is committed by the user.
    *
    * @remarks
    * Unlike the `onInput` callback, this is not necessarily called for each value change.
    */
-  onChange?: (model: TextModel<T>, value: unknown) => void
+  onChange?: (model: T, value: string) => void
+
   /**
    * Disables the control input
    */
   disabled?: boolean
 }
 
-component<TextAttrs>('text', (node) => {
+export function uiText<T>(attrs: TextAttrs<T>, children?: Children): Vnode<TextAttrs<T>> {
+  return m(TextComponent as any, attrs as any, children)
+}
+
+export const TextComponent: FactoryComponent<TextAttrs> = () => {
+  let attrs: TextAttrs
   function onChange(e: Event) {
     const el = e.target as HTMLInputElement
-    const data = node.attrs.data
-    const written = setValue(data, el.value)
-    call(e.type === 'input' ? data.onInput : data.onChange, data, written)
+    const value = el.value
+    setControlValue(attrs, value)
+    call(e.type === 'input' ? attrs.onInput : attrs.onChange, attrs.value, value)
   }
 
   return {
-    view: viewFn((data) => {
-      return m("input[type='text']", {
-        class: twuiClass(data.type),
-        value: getValue(data),
-        oninput: onChange,
-        onchange: onChange,
-        placeholder: data.placeholder,
-        disabled: data.disabled,
-      })
-    }),
+    view: (node) => {
+      attrs = node.attrs
+      return m(
+        ControlComponent,
+        {
+          label: attrs.label,
+          description: attrs.description,
+          class: twuiClass('text'),
+        },
+        m("input[type='text']", {
+          value: getControlValue(attrs),
+          oninput: onChange,
+          onchange: onChange,
+          placeholder: attrs.placeholder,
+          disabled: attrs.disabled,
+        }),
+      )
+    },
   }
-})
+}

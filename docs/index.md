@@ -33,7 +33,7 @@ npm install tweak-ui
 Import
 
 ```ts
-import * as TweakUi from "tweak-ui"
+import { mountUi } from "tweak-ui"
 ```
 
 Find stylehseets
@@ -51,7 +51,7 @@ Create an HTML container where Tweak UI should render.
 Mount your controls
 
 ```ts
-TweakUi.mount(".my-element", (b) => {
+mountUi(".my-element", (b) => {
   // ... builder function
 })
 ```

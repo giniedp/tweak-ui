@@ -1,14 +1,16 @@
-import { ObjectColorFormat } from './object-format'
+import { ObjectColorCodec } from './object-format'
+import { describe, expect, it } from 'vitest'
 
 describe('ObjectColorFormat', () => {
-
   describe('parse normalized', () => {
     it('rgb', () => {
-      expect(new ObjectColorFormat(['r', 'g', 'b'], true).parse({
-        r: 0.25,
-        g: 0.5,
-        b: 0.75,
-      })).toEqual({
+      expect(
+        new ObjectColorCodec(['r', 'g', 'b'], true).toControl({
+          r: 0.25,
+          g: 0.5,
+          b: 0.75,
+        }),
+      ).toEqual({
         r: 0.25,
         g: 0.5,
         b: 0.75,
@@ -17,12 +19,14 @@ describe('ObjectColorFormat', () => {
     })
 
     it('rgba', () => {
-      expect(new ObjectColorFormat(['r', 'g', 'b', 'a'], true).parse({
-        r: 0.25,
-        g: 0.5,
-        b: 0.75,
-        a: 0.8,
-      })).toEqual({
+      expect(
+        new ObjectColorCodec(['r', 'g', 'b', 'a'], true).toControl({
+          r: 0.25,
+          g: 0.5,
+          b: 0.75,
+          a: 0.8,
+        }),
+      ).toEqual({
         r: 0.25,
         g: 0.5,
         b: 0.75,
@@ -33,11 +37,13 @@ describe('ObjectColorFormat', () => {
 
   describe('parse non normalized', () => {
     it('rgb', () => {
-      expect(new ObjectColorFormat(['r', 'g', 'b'], false).parse({
-        r: 10,
-        g: 20,
-        b: 30,
-      })).toEqual({
+      expect(
+        new ObjectColorCodec(['r', 'g', 'b'], false).toControl({
+          r: 10,
+          g: 20,
+          b: 30,
+        }),
+      ).toEqual({
         r: 10 / 255,
         g: 20 / 255,
         b: 30 / 255,
@@ -46,12 +52,14 @@ describe('ObjectColorFormat', () => {
     })
 
     it('rgba', () => {
-      expect(new ObjectColorFormat(['r', 'g', 'b', 'a'], false).parse({
-        r: 10,
-        g: 20,
-        b: 30,
-        a: 40,
-      })).toEqual({
+      expect(
+        new ObjectColorCodec(['r', 'g', 'b', 'a'], false).toControl({
+          r: 10,
+          g: 20,
+          b: 30,
+          a: 40,
+        }),
+      ).toEqual({
         r: 10 / 255,
         g: 20 / 255,
         b: 30 / 255,
@@ -62,12 +70,14 @@ describe('ObjectColorFormat', () => {
 
   describe('format normalized', () => {
     it('rgb', () => {
-      expect(new ObjectColorFormat(['r', 'g', 'b'], true).format({
-        r: 0.25,
-        g: 0.5,
-        b: 0.75,
-        a: 1,
-      })).toEqual({
+      expect(
+        new ObjectColorCodec(['r', 'g', 'b'], true).fromControl({
+          r: 0.25,
+          g: 0.5,
+          b: 0.75,
+          a: 1,
+        }),
+      ).toEqual({
         r: 0.25,
         g: 0.5,
         b: 0.75,
@@ -75,12 +85,14 @@ describe('ObjectColorFormat', () => {
     })
 
     it('rgba', () => {
-      expect(new ObjectColorFormat(['r', 'g', 'b', 'a'], true).format({
-        r: 0.25,
-        g: 0.5,
-        b: 0.75,
-        a: 0.8,
-      })).toEqual({
+      expect(
+        new ObjectColorCodec(['r', 'g', 'b', 'a'], true).fromControl({
+          r: 0.25,
+          g: 0.5,
+          b: 0.75,
+          a: 0.8,
+        }),
+      ).toEqual({
         r: 0.25,
         g: 0.5,
         b: 0.75,
@@ -91,12 +103,14 @@ describe('ObjectColorFormat', () => {
 
   describe('format non normalized', () => {
     it('rgb', () => {
-      expect(new ObjectColorFormat(['r', 'g', 'b'], false).format({
-        r: 10 / 255,
-        g: 20 / 255,
-        b: 30 / 255,
-        a: 1,
-      })).toEqual({
+      expect(
+        new ObjectColorCodec(['r', 'g', 'b'], false).fromControl({
+          r: 10 / 255,
+          g: 20 / 255,
+          b: 30 / 255,
+          a: 1,
+        }),
+      ).toEqual({
         r: 10,
         g: 20,
         b: 30,
@@ -104,12 +118,14 @@ describe('ObjectColorFormat', () => {
     })
 
     it('rgba', () => {
-      expect(new ObjectColorFormat(['r', 'g', 'b', 'a'], false).format({
-        r: 10 / 255,
-        g: 20 / 255,
-        b: 30 / 255,
-        a: 40 / 255,
-      })).toEqual({
+      expect(
+        new ObjectColorCodec(['r', 'g', 'b', 'a'], false).fromControl({
+          r: 10 / 255,
+          g: 20 / 255,
+          b: 30 / 255,
+          a: 40 / 255,
+        }),
+      ).toEqual({
         r: 10,
         g: 20,
         b: 30,

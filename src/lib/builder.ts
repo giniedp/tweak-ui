@@ -1,60 +1,32 @@
-
-// tslint:disable: unified-signatures
-
-import { ComponentModel, ComponentGroupModel, ValueSource } from './core'
-
+import { Children } from 'mithril'
 import {
-  AccordeonModel,
-  AngleModel,
-  ButtonModel,
-  CheckboxModel,
-  ContainerModel,
-  ColorModel,
-  ColorPickerModel,
-  ContentModel,
-  GroupModel,
-  ImageModel,
-  NumberModel,
-  PointModel,
-  SelectModel,
-  SphericalModel,
-  TabsModel,
-  TextModel,
-  PositionModel,
+  AngleComponent,
+  ButtonAttrs,
+  ButtonComponent,
+  CheckboxComponent,
+  ColorControl,
+  ColorPicker,
+  ControlAttrs,
+  ControlComponent,
+  Divider,
+  Graph,
+  GraphAttrs,
+  GridComponent,
+  GroupAttrs,
+  GroupComponent,
+  ImageAttrs,
+  ImageComponent,
+  ListComponent,
+  NumberComponent,
+  PointComponent,
+  SelectComponent,
+  SphericalComponent,
+  Tabs,
+  TextComponent,
+  VectorComponent,
 } from './components'
+import { Component, ComponentDescriptor, ComponentSchema, ControlValue } from './core'
 import { isFunction, isObject, isString } from './core/utils'
-import { Child } from 'mithril'
-
-/**
- *
- * @public
- */
-export interface Removable {
-  remove?: () => void
-}
-
-/**
- * Union type of all build in models
- * @public
- */
-export type BuildInComponent =
- | AccordeonModel
- | AngleModel
- | ButtonModel
- | CheckboxModel
- | ColorModel
- | ColorPickerModel
- | ContainerModel
- | ContentModel
- | GroupModel
- | ImageModel
- | NumberModel
- | PointModel
- | SelectModel
- | SphericalModel
- | TabsModel
- | TextModel
- | PositionModel
 
 /**
  * @public
@@ -69,94 +41,38 @@ export type TabsBuilderFn = (b: TabsBuilder) => void
 /**
  * @public
  */
-export type AccordeonBuilderFn = (b: AccordeonBuilder) => void
-
-/**
- * @public
- */
 export interface TabsBuilder {
-  group(label: string, builder: BuilderFn): GroupModel & Removable
+  group(label: string, builder: BuilderFn): GroupAttrs
 }
 
-/**
- * @public
- */
-export interface AccordeonBuilder {
-  /**
-   * Adds a control group
-   *
-   * @param title - The group label
-   * @param builder - A callback allowing to build sub controls
-   */
-  group(title: string, builder: BuilderFn): GroupModel & Removable
-  /**
-   * Adds a control group
-   *
-   * @param title - The group label
-   * @param opts - Additional control options
-   * @param builder - A callback allowing to build sub controls
-   */
-  group(title: string, opts: Partial<GroupModel>, builder?: BuilderFn): GroupModel & Removable
-  group(title: string, builder: BuilderFn): GroupModel & Removable
-}
+function groupOptions<T extends Object>(b: Builder, args: IArguments) {
+  let title: string | null = null
+  let options: T & { title?: string } = {} as T
+  let cb: BuilderFn | null = null
 
-function assign<T extends ComponentModel, E>(partial: T, overrides: E): T & E
-function assign<T extends ComponentModel>(partial: Partial<T>, overrides: T): T
-function assign<T extends ComponentModel>(partial: Partial<T>, overrides: T): T {
-  Object.keys(overrides).forEach((key: string) => {
-    partial[key as keyof T] = overrides[key as keyof T]
-  })
-  return partial as T
-}
-
-function buildGroup<T extends ComponentGroupModel>(this: Builder): Partial<T> {
-  let label: string = null
-  let opts: Partial<T> = {}
-  let cb: BuilderFn
-
-  // tslint:disable-next-line: prefer-for-of
-  for (let i = 0; i < arguments.length; i++) {
-    const arg = arguments[i]
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]
     if (isString(arg)) {
-      label = arg
+      title = arg
     } else if (isObject(arg)) {
-      opts = arg
+      options = arg as T
     } else if (isFunction(arg)) {
       cb = arg
     }
   }
 
-  if (label) {
-    opts.label = label
+  if (title) {
+    options.title = title
   }
 
+  const children: Builder['schema'] = []
   if (cb) {
-    const controls = this.controls
-    this.controls = []
-    cb(this)
-    opts.children = this.controls
-    this.controls = controls
+    const controls = b.schema
+    b.schema = children
+    cb(b)
+    b.schema = controls
   }
-  return opts
-}
-
-
-function buildControl<T extends ValueSource<any, any> & ComponentModel>(): Partial<T> {
-  let opts: Partial<T> = {}
-
-  if (arguments.length > 1) {
-    opts = arguments[2] || opts
-    opts.target = arguments[0]
-    opts.property = arguments[1]
-    if (opts.label === undefined) {
-      opts.label = String(opts.property || '')
-    }
-  }
-  if (arguments.length === 1) {
-    opts = arguments[0] || opts
-  }
-
-  return opts
+  return { options, children }
 }
 
 /**
@@ -164,339 +80,158 @@ function buildControl<T extends ValueSource<any, any> & ComponentModel>(): Parti
  * @public
  */
 export class Builder {
-  /**
-   * Collection of created controls
-   */
-  public controls: ComponentModel[] = []
-
-  public group(builder: BuilderFn): GroupModel & Removable
-  public group(opts: Partial<GroupModel>): GroupModel & Removable
-  public group(opts: Partial<GroupModel>, builder: BuilderFn): GroupModel & Removable
-  public group(label: string, builder: BuilderFn): GroupModel & Removable
-  public group(label: string, opts: Partial<GroupModel>): GroupModel & Removable
-  public group(label: string, opts: Partial<GroupModel>, builder: BuilderFn): GroupModel & Removable
-  public group(): GroupModel & Removable {
-    const opts: Partial<GroupModel> = buildGroup.apply(this, arguments)
-    return this.add<GroupModel>(assign(opts, {
-      type: 'group',
-      children: opts.children,
-      label: null,
-      title: opts.label,
-    }))
+  public static build(fn: BuilderFn) {
+    const builder = new Builder()
+    fn(builder)
+    return builder.close()
   }
 
-  public collapsible(builder: BuilderFn): GroupModel & Removable
-  public collapsible(opts: Partial<GroupModel>): GroupModel & Removable
-  public collapsible(opts: Partial<GroupModel>, builder: BuilderFn): GroupModel & Removable
-  public collapsible(label: string, builder: BuilderFn): GroupModel & Removable
-  public collapsible(label: string, opts: Partial<GroupModel>): GroupModel & Removable
-  public collapsible(label: string, opts: Partial<GroupModel>, builder: BuilderFn): GroupModel & Removable
-  public collapsible(): GroupModel & Removable {
-    const opts: Partial<GroupModel> = buildGroup.apply(this, arguments)
-    return this.add<GroupModel>(assign(opts, {
-      type: 'group',
-      children: opts.children,
-      collapsible: true,
-      label: null,
-      title: opts.label,
-    }))
+  public schema: ComponentSchema = []
+
+  public close() {
+    const result = this.schema
+    this.schema = []
+    return result
   }
 
-  public container(builder: BuilderFn): ContainerModel & Removable
-  public container(opts: Partial<ContainerModel>): ContainerModel & Removable
-  public container(opts: Partial<ContainerModel>, builder: BuilderFn): ContainerModel & Removable
-  public container(label: string, builder: BuilderFn): ContainerModel & Removable
-  public container(label: string, opts: Partial<ContainerModel>): ContainerModel & Removable
-  public container(label: string, opts: Partial<ContainerModel>, builder: BuilderFn): ContainerModel & Removable
-  public container(): ContainerModel & Removable {
-    const opts: Partial<ContainerModel> = buildGroup.apply(this, arguments)
-    return this.add<ContainerModel>(assign(opts, {
-      type: 'container',
-      children: opts.children,
-    }))
+  public group = this.createGroup(GroupComponent)
+  public list = this.createGroup(ListComponent)
+  public grid = this.createGroup(GridComponent)
+  public tabs = this.createGroup(Tabs)
+
+  public checkbox = this.createControl(CheckboxComponent)
+  public text = this.createControl(TextComponent)
+  public number = this.createControl(NumberComponent)
+  public vector = this.createControl(VectorComponent)
+  public select = this.createControl(SelectComponent)
+  public color = this.createControl(ColorControl)
+  public colorPicker = this.createControl(ColorPicker)
+  public point = this.createControl(PointComponent)
+  public spherical = this.createControl(SphericalComponent)
+  public angle = this.createControl(AngleComponent)
+
+  public button(text: string, opts: ButtonAttrs = {}) {
+    opts.text = text
+    return this.push(ButtonComponent, opts)
   }
 
-  public tabs(builder: TabsBuilderFn): TabsModel & Removable
-  public tabs(opts: Partial<TabsModel>): TabsModel & Removable
-  public tabs(opts: Partial<TabsModel>, builder: TabsBuilderFn): TabsModel & Removable
-  public tabs(label: string, builder: TabsBuilderFn): TabsModel & Removable
-  public tabs(label: string, opts: Partial<TabsModel>): TabsModel & Removable
-  public tabs(label: string, opts: Partial<TabsModel>, builder: TabsBuilderFn): TabsModel & Removable
-  public tabs(): TabsModel & Removable {
-    const opts: Partial<TabsModel> = buildGroup.apply(this, arguments)
-    return this.add<TabsModel>(assign(opts, {
-      type: 'tabs',
-      active: opts.active || 0,
-      children: opts.children,
-    }))
+  public graph(opts: Partial<GraphAttrs>): void
+  public graph(label: string, opts: Partial<GraphAttrs>): void
+  public graph() {
+    const { options } = groupOptions<GraphAttrs>(this, arguments)
+    return this.push(Graph, options)
   }
 
-  public accordion(builder: AccordeonBuilderFn): AccordeonModel & Removable
-  public accordion(opts: Partial<AccordeonModel>): AccordeonModel & Removable
-  public accordion(opts: Partial<AccordeonModel>, builder: AccordeonBuilderFn): AccordeonModel & Removable
-  public accordion(label: string, builder: AccordeonBuilderFn): AccordeonModel & Removable
-  public accordion(label: string, opts: Partial<AccordeonModel>): AccordeonModel & Removable
-  public accordion(label: string, opts: Partial<AccordeonModel>, builder: AccordeonBuilderFn): AccordeonModel & Removable
-  public accordion(): AccordeonModel & Removable {
-    const opts: Partial<AccordeonModel> = buildGroup.apply(this, arguments)
-    return this.add<AccordeonModel>(assign(opts, {
-      type: 'accordion',
-      children: opts.children,
-    }))
+  public image(opts: Partial<ImageAttrs>): void
+  public image(label: string, opts: Partial<ImageAttrs>): void
+  public image() {
+    const { options } = groupOptions<ImageAttrs>(this, arguments)
+    return this.push(ImageComponent, options)
   }
 
-  public checkbox<T>(opts: Partial<CheckboxModel<T>>): CheckboxModel<T>
-  public checkbox<T>(target: T, property: keyof T): CheckboxModel<T>
-  public checkbox<T>(target: T, property: keyof T, opts: Partial<CheckboxModel<T>>): CheckboxModel<T>
-  public checkbox(): CheckboxModel {
-    const opts: Partial<CheckboxModel> = buildControl.apply(this, arguments)
-    return this.add<CheckboxModel>(
-      assign(opts, { type: 'checkbox' }),
-    )
-  }
-
-  public text<T>(opts: Partial<TextModel<T>>): TextModel<T>
-  public text<T>(target: T, property: keyof T): TextModel<T>
-  public text<T>(target: T, property: keyof T, opts: Partial<TextModel<T>>): TextModel<T>
-  public text(): TextModel {
-    const opts: Partial<TextModel> = buildControl.apply(this, arguments)
-    return this.add<TextModel>(
-      assign(opts, { type: 'text' }),
-    )
-  }
-
-  public number<T>(opts: Partial<NumberModel<T>>): NumberModel<T>
-  public number<T>(target: T, property: keyof T): NumberModel<T>
-  public number<T>(target: T, property: keyof T, opts: Partial<NumberModel<T>>): NumberModel<T>
-  public number(): NumberModel {
-    const opts: Partial<NumberModel> = buildControl.apply(this, arguments)
-    return this.add<NumberModel>(
-      assign(opts, { type: 'number' }),
-    )
-  }
-
-  public slider<T>(opts: Partial<NumberModel<T>>): NumberModel<T>
-  public slider<T>(target: T, property: keyof T): NumberModel<T>
-  public slider<T>(target: T, property: keyof T, opts: Partial<NumberModel<T>>): NumberModel<T>
-  public slider(): NumberModel {
-    const opts: Partial<NumberModel> = buildControl.apply(this, arguments)
-    return this.add<NumberModel>(
-      assign(opts, { type: 'slider' }),
-    )
-  }
-
-  public position<T>(opts: Partial<PositionModel<T>>): PositionModel<T>
-  public position<T>(target: T, property: keyof T): PositionModel<T>
-  public position<T>(target: T, property: keyof T, opts: Partial<PositionModel<T>>): PositionModel<T>
-  public position(): PositionModel {
-    const opts: Partial<PositionModel> = buildControl.apply(this, arguments)
-    return this.add<PositionModel>(
-      assign(opts, { type: 'position' }),
-    )
-  }
-  public select<T>(opts: Partial<SelectModel<T>>): SelectModel<T>
-  public select<T>(target: T, property: keyof T): SelectModel<T>
-  public select<T>(target: T, property: keyof T, opts: Partial<SelectModel<T>>): SelectModel<T>
-  public select(): SelectModel {
-    const opts: Partial<SelectModel> = buildControl.apply(this, arguments)
-    return this.add<SelectModel>(
-      assign(opts, { type: 'select' }),
-    )
-  }
-
-  public color<T>(opts: Partial<ColorModel<T>>): ColorModel<T>
-  public color<T>(target: T, property: keyof T): ColorModel<T>
-  public color<T>(target: T, property: keyof T, opts: Partial<ColorModel<T>>): ColorModel<T>
-  public color(): ColorModel {
-    const opts: Partial<ColorModel> = buildControl.apply(this, arguments)
-    return this.add<ColorModel>(
-      assign(opts, { type: 'color' }),
-    )
-  }
-
-  public colorPicker<T>(opts: Partial<ColorPickerModel<T>>): ColorPickerModel<T>
-  public colorPicker<T>(target: T, property: keyof T): ColorPickerModel<T>
-  public colorPicker<T>(target: T, property: keyof T, opts: Partial<ColorPickerModel<T>>): ColorPickerModel<T>
-  public colorPicker(): ColorPickerModel {
-    const opts: Partial<ColorPickerModel> = buildControl.apply(this, arguments)
-    return this.add<ColorPickerModel>(
-      assign(opts, { type: 'color-picker' }),
-    )
-  }
-
-  public point<T>(opts: Partial<PointModel<T>>): PointModel<T>
-  public point<T>(target: T, property: keyof T): PointModel<T>
-  public point<T>(target: T, property: keyof T, opts: Partial<PointModel<T>>): PointModel<T>
-  public point(): PointModel {
-    const opts: Partial<PointModel> = buildControl.apply(this, arguments)
-    return this.add<PointModel>(
-      assign(opts, { type: 'point' }),
-    )
-  }
-
-  public spherical<T>(opts: Partial<SphericalModel<T>>): SphericalModel<T>
-  public spherical<T>(target: T, property: keyof T): SphericalModel<T>
-  public spherical<T>(target: T, property: keyof T, opts: Partial<SphericalModel<T>>): SphericalModel<T>
-  public spherical(): SphericalModel {
-    const opts: Partial<SphericalModel> = buildControl.apply(this, arguments)
-    return this.add<SphericalModel>(
-      assign(opts, { type: 'spherical' }),
-    )
-  }
-
-  public angle<T>(opts: Partial<AngleModel<T>>): AngleModel<T>
-  public angle<T>(target: T, property: keyof T): AngleModel<T>
-  public angle<T>(target: T, property: keyof T, opts: Partial<AngleModel<T>>): AngleModel<T>
-  public angle(): AngleModel {
-    const opts: Partial<AngleModel> = buildControl.apply(this, arguments)
-    return this.add<AngleModel>(
-      assign(opts, { type: 'angle' }),
-    )
-  }
-
-  public object<T>(label: string, target: T, config: ObjectConfig<T> = {}) {
-    return this.group(label, (ui) => {
-      for (const key in target) {
-        if (!config[key]) {
-          const value = target[key]
-          switch (typeof value) {
-            case 'number':
-              ui.number(target, key);
-              break
-            case 'string':
-              ui.text(target, key);
-              break
-            case 'boolean':
-              ui.checkbox(target, key);
-              break
-          }
-          continue
-        }
-        switch (config[key].type) {
-          case 'text':
-            ui.text(target, key, config[key]);
-            break;
-          case 'number':
-            ui.number(target, key, config[key]);
-            break;
-          case 'checkbox':
-            ui.checkbox(target, key, config[key]);
-            break;
-          case 'select':
-            ui.select(target, key, config[key]);
-            break;
-          case 'color':
-            ui.color(target, key, config[key]);
-            break;
-          case 'color-picker':
-            ui.colorPicker(target, key, config[key]);
-            break;
-          case 'point':
-            ui.point(target, key, config[key]);
-            break;
-          case 'spherical':
-            ui.spherical(target, key, config[key]);
-            break;
-          case 'angle':
-            ui.angle(target, key, config[key]);
-            break;
-          default:
-            //
-        }
+  public control(content: Children | (() => Children)): void
+  public control(label: string, content: Children | (() => Children)): void
+  public control(opts: Partial<ControlAttrs>, content: Children | (() => Children)): void
+  public control() {
+    let options: Partial<ControlAttrs> = {}
+    if (arguments.length === 1) {
+      options.content = arguments[0]
+    } else if (arguments.length === 2) {
+      if (isString(arguments[0])) {
+        options.label = arguments[0]
+      } else {
+        options = arguments[0]
       }
+      options.content = arguments[1]
+    }
+
+    return this.push(ControlComponent, options)
+  }
+
+  public pre(content: Children | (() => Children)): void
+  public pre(label: string, content: Children | (() => Children)): void
+  public pre() {
+    let label: string | undefined
+    let content: Children | (() => Children)
+
+    if (arguments.length === 1) {
+      content = arguments[0]
+    } else if (arguments.length === 2) {
+      label = arguments[0]
+      content = arguments[1]
+    }
+    return this.push(ControlComponent, {
+      label,
+      content,
+      style: {
+        whiteSpace: 'pre',
+        fontFamily: 'monospace',
+      },
     })
   }
 
-  /**
-   * Adds a button control
-   *
-   * @param text - The button text
-   * @param opts - Additional options for the control
-   */
-   public button(text: string, opts: Partial<ButtonModel> = {}) {
-    return this.add<ButtonModel>(
-      assign(opts, {
-        type: 'button',
-        text: text,
-      }),
-    )
+  public divider(text?: string) {
+    this.push(Divider, { text })
   }
 
-  /**
-   * Adds an image control
-   *
-   * @param label - The control label
-   * @param opts - Additional options for the control
-   */
-  public image(opts: Partial<ImageModel>): ImageModel & Removable
-  public image(label: string, opts: Partial<ImageModel>): ImageModel & Removable
-  public image() {
-    const opts: Partial<ImageModel> = buildGroup.apply(this, arguments)
-    return this.add<ImageModel>(assign(opts, {
-      type: 'image',
-    }))
+  public push<Attrs extends Object>(
+    component: Component<Attrs>,
+    attributes: Attrs,
+    children?: Array<ComponentDescriptor<any>>,
+  ) {
+    if (this.schema) {
+      this.schema.push({ component, attributes, children })
+    } else {
+      throw new Error('Cannot use control builder after it was closed')
+    }
   }
 
-  /**
-   * Adds a description text
-   *
-   * @param label - The control label
-   * @param text - The text message
-   * @param opts - Additional options for the control
-   */
-  public content(label: string, content: Child, opts: Partial<ContentModel> = {}) {
-    return this.add<ContentModel>(
-      assign(opts, {
-        type: 'content',
-        label: label,
-        content: content,
-      }),
-    )
+  private createControl<Attrs extends ControlValue<any, any>>(
+    component: Component<Attrs>,
+  ): AddControlFn<Attrs> {
+    return function (this: Builder) {
+      this.push(component, valueControlOptions<Attrs>(arguments))
+    }.bind(this)
   }
 
-
-
-  /**
-   * Adds a build in control
-   *
-   * @param def - The control definition
-   */
-  public add<T extends BuildInComponent>(def: T): T & Removable
-  /**
-   * Adds a control
-   *
-   * @param def - The control definition
-   */
-  public add<T extends ComponentModel>(def: T): T & Removable
-  /**
-   * Adds a control
-   *
-   * @param def - The control definition
-   */
-  public add<T extends ComponentModel>(def: T): T & Removable {
-    this.controls.push(
-      assign(def, {
-        remove: () => {
-          const i = this.controls.indexOf(def)
-          if (i >= 0) {
-            this.controls.splice(i, 1)
-          }
-        },
-      }),
-    )
-    return def
+  private createGroup<Attrs extends Object>(component: Component<Attrs>): AddGroupFn<Attrs> {
+    return function (this: Builder) {
+      const { options, children } = groupOptions<Attrs>(this, arguments)
+      this.push(component, options, children)
+    }.bind(this)
   }
 }
 
-export type ObjectConfig<T> = {
-  [K in keyof T]?:
-    TextModel<T> |
-    NumberModel<T> |
-    CheckboxModel<T> |
-    SelectModel<T> |
-    ColorModel<T> |
-    ColorPickerModel<T> |
-    PointModel<T> |
-    SphericalModel<T> |
-    AngleModel<T>
+// prettier-ignore
+export type AddControlFn<T extends ControlValue<any, any>> =
+  ((opts: T) => void) &
+  (<V>(target: V, property: keyof V) => void) &
+  (<V>(target: V, property: keyof V, opts: Omit<T, 'value' | 'key'>) => void)
+
+export type AddGroupFn<T extends Object> = ((builder: BuilderFn) => void) &
+  ((opts: Partial<T>) => void) &
+  ((opts: Partial<T>, builder: BuilderFn) => void) &
+  ((label: string, builder: BuilderFn) => void) &
+  ((label: string, opts: Partial<T>) => void) &
+  ((label: string, opts: Partial<T>, builder: BuilderFn) => void)
+
+function valueControlOptions<T extends ControlValue<any, any> & ControlAttrs>(args: IArguments): T {
+  let attr: T
+
+  if (args.length === 1) {
+    // 1. case: ui.control(opts)
+    return args[0] || {}
+  }
+  if (args.length > 1) {
+    attr = args[2] || {}
+    attr.value = args[0]
+    attr.prop = args[1]
+    if (attr.label === undefined) {
+      attr.label = String(attr.prop || '')
+    }
+  } else {
+    attr = {} as T
+  }
+
+  return attr
 }

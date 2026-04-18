@@ -1,82 +1,125 @@
-import m, { FactoryComponent } from 'mithril'
-
-import {
-  component,
-  getValue,
-  renderModel,
-  setValue,
-  ComponentModel,
-  ValueSource,
-  ComponentAttrs,
-  ValueCodec,
-} from '../../core'
-import { call, clamp, cssClass, dragUtil, getTouchInTarget, twuiClass } from '../../core/utils'
-import type { NumberModel } from './number'
-import { Direction } from './spherical'
-
-/**
- * Spherical component attributes
- * @public
- */
-export type AngleAttrs = ComponentAttrs<AngleModel>
+import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import { ControlValue, getControlValue, setControlValue } from '../../core'
+import { call, cssClass, dragUtil, getTouchInTarget, twuiClass } from '../../core/utils'
+import { ControlAttrs, uiControl } from './control'
 
 /**
  * Spherical component model
  * @public
  */
-export interface AngleModel<T = unknown> extends ComponentModel, ValueSource<T, number> {
-  /**
-   * The type name of the control
-   */
-  type: 'angle'
+export interface AngleAttrs<T = unknown> extends ControlValue<T, number>, ControlAttrs {
   /**
    * Whether to use degrees instead of radians
    */
   degree?: boolean
+
+  /**
+   * The min value in degrees
+   */
+  min?: number
+
+  /**
+   * The max value in degrees
+   */
+  max?: number
+
+  /**
+   * The step value in degrees
+   */
+  step?: number
+
   /**
    * This is called when the control value has been changed.
    */
-  onInput?: (model: AngleModel<T>, value: unknown) => void
+  onInput?: (target: T, value: number) => void
+
   /**
    * This is called once the control value is committed by the user.
    *
    * @remarks
    * Unlike the `onInput` callback, this is not necessarily called for each value change.
    */
-  onChange?: (model: AngleModel<T>, value: unknown) => void
+  onChange?: (target: T, value: number) => void
 }
 
-const TYPE = 'angle'
-const AngleComponent: FactoryComponent<AngleAttrs> = (vnode) => {
-  let angle = 0
-  let dragged = false
+export function uiAngle<T>(attrs: AngleAttrs<T>, children?: Children): Vnode<AngleAttrs<T>> {
+  return m(AngleComponent as any, attrs as any, children)
+}
+
+export const AngleComponent: FactoryComponent<AngleAttrs> = () => {
+  let angle = 0 // in radians
+  let dragging = false
   let pos = [0, 0]
+  let paneElement: HTMLElement
+  let knobElement: HTMLElement
+  let min: number
+  let max: number
+  let step: number | undefined
+  let attrs: AngleAttrs
 
-  function toDeg(value: number) {
-    return value * (180 / Math.PI)
-  }
-  function toRad(value: number) {
-    return value * (Math.PI / 180)
-  }
-  function toScreen(value: number) {
-    return clamp((value / 2 + 0.5) * 100, 0, 100)
+  const RAD_TO_DEG = 180 / Math.PI
+  const DEG_TO_RAD = Math.PI / 180
+  const TAU = 2 * Math.PI
+
+  function clampAndSnapAngle(angle: number) {
+    if (min != null && max != null) {
+      if (min <= max) {
+        if (angle < min) {
+          angle = min
+        } else if (angle > max) {
+          angle = max
+        }
+      } else if (!(angle >= min || angle <= max)) {
+        const dMin = Math.abs(angle - min)
+        const dMax = Math.abs(angle - max)
+        angle = dMin < dMax ? min : max
+      }
+    } else if (min != null) {
+      if (angle < min) {
+        angle = min
+      }
+    } else if (max != null) {
+      if (angle > max) {
+        angle = max
+      }
+    }
+
+    if (step != null) {
+      angle = Math.round(angle / step) * step
+    }
+    return angle
   }
 
-  function fetchValue(node: m.Vnode<AngleAttrs>) {
-    const data = node.attrs.data
-    angle = getValue(data) ?? angle
-    if (data.degree) {
-      angle = toRad(angle)
+  function wrapDegrees(angle: number) {
+    angle = angle % 360
+    if (angle < 0) {
+      angle += 360
+    }
+    return angle
+  }
+
+  function updateState(node: Vnode<AngleAttrs>) {
+    attrs = node.attrs
+
+    min = attrs.min!
+    max = attrs.max!
+    step = attrs.step!
+    min = min != null ? wrapDegrees(min) * DEG_TO_RAD : null!
+    max = max != null ? wrapDegrees(max) * DEG_TO_RAD : null!
+    step = step != null ? wrapDegrees(step) * DEG_TO_RAD : null!
+    console.log({ min, max, step })
+    angle = getControlValue(attrs) ?? angle
+    if (attrs.degree) {
+      angle = angle * DEG_TO_RAD
     }
     updatePositions()
   }
 
-  function onChange(type: 'change' | 'input') {
+  function onEvent(type: 'change' | 'input') {
     updatePositions()
-    const data = vnode.attrs.data
-    const value = data.degree ? toRad(angle) : angle
-    const written = setValue(data, value)
-    call(type === 'input' ? data.onInput : data.onChange, data, written)
+    const value = attrs.degree ? angle * RAD_TO_DEG : angle
+    setControlValue(attrs, value)
+    call(type === 'input' ? attrs.onInput : attrs.onChange, attrs.value, value)
   }
 
   function updatePositions() {
@@ -84,8 +127,8 @@ const AngleComponent: FactoryComponent<AngleAttrs> = (vnode) => {
     pos[1] = Math.sin(angle)
   }
 
-  function onStartPhi(e: MouseEvent) {
-    dragged = true
+  function onDragStart(e: MouseEvent) {
+    dragging = true
     drag.activate(e)
   }
 
@@ -93,203 +136,113 @@ const AngleComponent: FactoryComponent<AngleAttrs> = (vnode) => {
   const drag = dragUtil({
     onStart: (e) => {
       const touch = getTouchInTarget(e)
-      touchOffset = [
-        -(touch.x - touch.width / 2),
-        -(touch.y - touch.height / 2),
-      ]
-      drag.onMove(e)
+      touchOffset = [-(touch.x - touch.width / 2), -(touch.y - touch.height / 2)]
     },
     onMove: (e) => {
       e.preventDefault()
-
-      const position = getTouchInTarget(e, drag.target.parentElement, touchOffset)
+      const position = getTouchInTarget(e, paneElement, touchOffset)
       const px = position.normalizedX - 0.5
       const py = position.normalizedY - 0.5
-      if (dragged) {
-        // [-PI;PI]
-        angle = Math.atan2(px, py)
-        // convert to range [0;2PI]
-        angle += angle < 0 ? 2 * Math.PI : 0
+      if (dragging) {
+        angle = Math.atan2(px, -py)
+
+        // ensure angle is always positive for better UX
+        if (angle < 0) {
+          angle += 2 * Math.PI
+        }
       }
-      onChange('input')
+      angle = clampAndSnapAngle(angle)
+      onEvent('input')
       m.redraw()
     },
-    onEnd: (e) => {
+    onEnd: () => {
       drag.deactivate()
-      dragged = false
-      onChange('change')
+      dragging = false
+      onEvent('change')
       m.redraw()
     },
   })
-
-  function onPhiInput(model: unknown, value: number) {
-    angle = toRad(value)
-    onChange('input')
-  }
-  function onPhiChange(model: unknown, value: number) {
-    angle = toRad(value)
-    onChange('change')
-  }
 
   return {
     onremove: () => {
       drag.deactivate()
     },
     oninit: (node) => {
-      fetchValue(node)
+      updateState(node)
     },
     onupdate: (node) => {
-      fetchValue(node)
+      updateState(node)
     },
-    view: () => {
-      return m(
-        'div',
+    view: ({ attrs }) => {
+      return uiControl(
         {
-          class: twuiClass(TYPE),
+          label: attrs.label,
+          description: attrs.description,
+          class: twuiClass('angle'),
           style: {
-            '--angle-value': `${toDeg(-angle) + 90}deg`,
-            '--angle-percent': `${(toDeg(angle) / 360) * 100}%`,
+            '--angle-value': `${angle * RAD_TO_DEG}`,
           },
         },
-        m(
-          'div.left-container',
+        [
           m(
-            'div.pane',
+            'div',
             {
-              style: {
-                position: 'relative',
-                width: '100%',
-                'padding-top': '100%',
-              },
+              class: twuiClass('angle-content'),
             },
-            m(
-              'div.angle-pane',
-              {
-                class: cssClass({
-                  'is-dragging': dragged,
-                }),
-                style: {
-                  position: 'absolute',
-                  top: '0.5rem',
-                  left: '0.5rem',
-                  width: 'calc(100% - 1rem)',
-                  height: 'calc(100% - 1rem)',
+            [
+              m(
+                'div',
+                {
+                  class: twuiClass('angle-label'),
                 },
-              },
-              m('div.angle-knob', {
-                onmousedown: onStartPhi,
-                ontouchstart: onStartPhi,
-                style: {
-                  position: 'absolute',
-                  width: '15px',
-                  height: '15px',
-                  top: `calc(${toScreen(pos[0])}% - 7px)`,
-                  left: `calc(${toScreen(pos[1])}% - 7px)`,
+                `${(angle * RAD_TO_DEG).toFixed(1)}° / ${angle.toFixed(2)} rad`,
+              ),
+              m(
+                'div',
+                {
+                  oncreate: (vnode) => (paneElement = vnode.dom as HTMLElement),
+                  class: cssClass(twuiClass('angle-pane'), {
+                    'is-dragging': dragging,
+                  }),
+                  style: {
+                    aspectRatio: '1',
+                    display: 'flex',
+                    'align-items': 'center',
+                    'justify-content': 'center',
+                    position: 'relative',
+                  },
                 },
-              }),
-            ),
+                m(
+                  'div',
+                  {
+                    class: twuiClass('angle-arm'),
+                    style: {
+                      width: '50%', // gives us the radius
+                      display: 'flex',
+                      justifyContent: 'flex-end', // push knob to edge
+                      alignItems: 'center',
+                      // offset -90deg to make 0° point up
+                      transform: `translateX(50%) rotate(${angle - Math.PI / 2}rad)`,
+                      transformOrigin: 'left center',
+                    },
+                  },
+                  m('div', {
+                    class: twuiClass('angle-knob'),
+                    oncreate: (vnode) => (knobElement = vnode.dom as HTMLElement),
+                    onmousedown: onDragStart,
+                    ontouchstart: onDragStart,
+                    tabIndex: 0,
+                    style: {
+                      aspectRatio: '1',
+                      transform: 'translateX(50%)',
+                    },
+                  }),
+                ),
+              ),
+            ],
           ),
-        ),
-        m(
-          'div.right-container',
-          m('label', m.trust('&alpha;')),
-          renderModel<NumberModel>({
-            type: 'number',
-            min: 0,
-            max: 360,
-            step: 0.1,
-            value: toDeg(angle),
-            onInput: onPhiInput,
-            onChange: onPhiChange,
-          }),
-        ),
+        ],
       )
-    },
-  }
-}
-
-component<AngleAttrs>(TYPE, AngleComponent)
-
-export interface AngleCodecOptions<T> {
-  /**
-   * Maps object keys to cartesian axes. Defaults to `{ x: 'right', y: 'up' }`
-   */
-  axes?: Record<string | number, Direction>
-  /**
-   * The vector length (circle radius). Defaults to `1`
-   */
-  length?: number | (() => number)
-  /**
-   * Gets the objec where the result should be stored. May return a new instance.
-   */
-  result?: () => T
-}
-
-export function angleCodec(): ValueCodec<{ x: number; y: number }, number>
-export function angleCodec<T>(options: AngleCodecOptions<T>): ValueCodec<T, number>
-export function angleCodec({ axes, length, result }: AngleCodecOptions<any> = {}): ValueCodec<
-  any,
-  number
-> {
-  axes = axes || { x: 'right', y: 'up'}
-  const keys = Object.keys(axes)
-  const radius = () => {
-    return (typeof length === 'function' ? length() : length) || 1
-  }
-  return {
-    decode: (value: any) => {
-      let x: number = 0
-      let y: number = 0
-      for (const key of keys) {
-        switch (axes[key]) {
-          case 'right':
-            y = value[key]
-            break
-          case 'left':
-            y = -value[key]
-            break
-          case 'up':
-          case 'front':
-            x = -value[key]
-            break
-          case 'down':
-          case 'back':
-            x = value[key]
-          default:
-            break
-        }
-      }
-      const r = radius()
-      x /= r
-      y /= r
-      return Math.atan2(y, x) || 0
-    },
-    encode: (angle) => {
-      const r = radius()
-      const x = r * Math.cos(angle)
-      const y = r * Math.sin(angle)
-      const value = result() || {}
-      for (const key of keys) {
-        switch (axes[key]) {
-          case 'right':
-            value[key] = y
-            break
-          case 'left':
-            value[key] = -y
-            break
-          case 'up':
-          case 'front':
-            value[key] = -x
-            break
-          case 'down':
-          case 'back':
-            value[key] = x
-            break
-          default:
-            break
-        }
-      }
-      return value
     },
   }
 }

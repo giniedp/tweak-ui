@@ -1,40 +1,24 @@
-@use "../utils";
-
-
 .twui-tabs {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: stretch;
-
-  border-color: utils.color(primary-dark);
-}
-
-.twui-tabs-list {
   display: flex;
   flex-flow: row wrap;
   align-items: stretch;
+  border-color: var(--twui-color-base-300);
+  gap: var(--twui-gap);
 }
 
-.twui-tabs-list > button {
-  flex: auto 1 11;
-  border: 0;
-  border-top: 1px solid;
-  margin: 0;
+button.twui-tab {
+  order: 0;
+  flex: 1;
+  background-color: var(--twui-color-base-100);
+}
+button.twui-tab.active {
+  background-color: var(--twui-color-base-200);
+}
+button.twui-tab.active:not(:focus) {
+  outline-color: var(--twui-color-base-200);
+}
 
-  height: var(--twui-size);
-  line-height: calc(var(--twui-size) - 2 * var(--twui-button-pad-y)) ;
-
-  background-color: utils.color(primary-dark);
-  border-color: utils.color(primary);
-  color: utils.color(on-primary);
-
-  &:hover {
-    background-color: utils.color(primary);
-    border-color: utils.color(primary-dark);
-  }
-
-  &.is-active {
-    background-color: utils.color(primary);
-    border-color: utils.color(accent);
-  }
+.twui-tab-content {
+  order: 1;
+  width: 100%;
 }

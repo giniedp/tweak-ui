@@ -1,13 +1,19 @@
-.twui-container {
-  display: flex;
+.twui-list {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
+  gap: var(--twui-gap);
 }
 
-.twui-container-horizontal {
+.twui-list-horizontal {
   flex-direction: row;
+  gap: var(--twui-gap);
   > * {
     flex: 1;
   }
+}
+
+.twui-grid {
+  display: grid;
+  gap: var(--twui-gap);
 }

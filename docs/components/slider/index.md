@@ -1,5 +1,0 @@
-# Slider
-
-<Example/>
-
-<ExampleCode/>

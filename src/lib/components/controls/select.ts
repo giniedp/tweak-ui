@@ -1,14 +1,8 @@
-import m, { Child } from 'mithril'
+import m, { Children, FactoryComponent, Vnode } from 'mithril'
 
-import {
-  getValue,
-  component,
-  setValue,
-  ComponentModel,
-  ValueSource,
-  ComponentAttrs,
-} from '../../core'
-import { call, isNumber, isString, twuiClass, viewFn } from '../../core/utils'
+import { ControlValue, getControlValue, setControlValue } from '../../core'
+import { call, isNumber, isString, twuiClass } from '../../core/utils'
+import { ControlAttrs, ControlComponent } from './control'
 
 const emptyArray: any[] = []
 
@@ -23,9 +17,7 @@ export type SelectOption = {
 /**
  * @public
  */
-export type SelectOptionArray = Array<
-  SelectOption | SelectOptionGroup | string | number
->
+export type SelectOptionArray = Array<SelectOption | SelectOptionGroup | string | number>
 /**
  * @public
  */
@@ -48,30 +40,20 @@ export type SelectOptionGroup<T = SelectOptionArray | SelectOptionsObject> = {
 export type SelectModelOptions = SelectOptionArray | SelectOptionsObject
 
 /**
- * Select component attributes
- * @public
- */
-export type SelectAttrs = ComponentAttrs<SelectModel>
-
-/**
  * Select component model
  * @public
  */
-export interface SelectModel<T = unknown, V = any>
-  extends ComponentModel,
-    ValueSource<T, V> {
-  /**
-   * The type name of the control
-   */
-  type: 'select'
+export interface SelectAttrs<T = unknown, V = any> extends ControlValue<T, V>, ControlAttrs {
   /**
    * The select options
    */
   options?: SelectModelOptions
+
   /**
    * This is called once the control value is committed by the user.
    */
-  onChange?: (model: SelectModel<T>, value: unknown) => void
+  onChange?: (model: T, value: V) => void
+
   /**
    * Disables the control input
    */
@@ -124,7 +106,7 @@ function optionsFromObject(obj: SelectOptionsObject): Array<SelectOption> {
 function getOptions(
   node: m.Vnode<SelectAttrs>,
 ): Array<SelectOption | SelectOptionGroup<SelectOption[]>> {
-  const options = node.attrs.data.options
+  const options = node.attrs.options
 
   if (!options) {
     return emptyArray
@@ -136,12 +118,16 @@ function getOptions(
   return optionsFromObject(options)
 }
 
-component<SelectAttrs>('select', (node) => {
+export function uiSelect<T>(attrs: SelectAttrs<T>, children?: Children): Vnode<SelectAttrs<T>> {
+  return m(SelectComponent as any, attrs as any, children)
+}
+
+export const SelectComponent: FactoryComponent<SelectAttrs> = () => {
+  let attrs: SelectAttrs
   let options: Array<SelectOption | SelectOptionGroup<SelectOption[]>>
 
   function getSelectedIndex() {
-    const data = node.attrs.data
-    const value = getValue(data)
+    const value = getControlValue(attrs)
     let i = 0
     for (const o0 of options) {
       if ('options' in o0) {
@@ -182,40 +168,47 @@ component<SelectAttrs>('select', (node) => {
 
   function onChange(e: Event) {
     const el = e.target as HTMLSelectElement
-    const data = node.attrs.data
     const value = getSelectionAt(el.selectedIndex)
-    const written = setValue(data, value)
-    call(data.onChange, data, written)
+    const written = setControlValue(attrs, value)
+    call(attrs.onChange, attrs, written)
   }
 
   return {
-    view: viewFn((data) => {
+    view: (node) => {
+      attrs = node.attrs
       options = getOptions(node)
       return m(
-        'select',
+        ControlComponent,
         {
-          class: twuiClass(data.type),
-          selectedIndex: getSelectedIndex(),
-          onchange: onChange,
-          disabled: data.disabled,
+          label: attrs.label,
+          description: attrs.description,
         },
-        options.map((it) => {
-          if ('options' in it) {
-            return m(
-              'optgroup',
-              {
-                disabled: !!it.disabled,
-                label: it.label || '',
-              },
-              it.options.map(option),
-            )
-          }
-          return option(it)
-        }),
+        m(
+          'select',
+          {
+            class: twuiClass('select'),
+            selectedIndex: getSelectedIndex(),
+            onchange: onChange,
+            disabled: attrs.disabled,
+          },
+          options.map((it) => {
+            if ('options' in it) {
+              return m(
+                'optgroup',
+                {
+                  disabled: !!it.disabled,
+                  label: it.label || '',
+                },
+                it.options.map(option),
+              )
+            }
+            return option(it)
+          }),
+        ),
       )
-    }),
+    },
   }
-})
+}
 
 function option(it: SelectOption) {
   return m(

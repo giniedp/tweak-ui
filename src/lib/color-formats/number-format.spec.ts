@@ -1,10 +1,10 @@
-import { NumberColorFormat } from './number-format'
+import { NumberColorCodec } from './number-format'
+import { describe, expect, it } from 'vitest'
 
 describe('NumberColorFormat', () => {
-
-  describe('parse', () => {
+  describe('decode', () => {
     it('rgb', () => {
-      expect(new NumberColorFormat(['r', 'g', 'b']).parse(0x00102030)).toEqual({
+      expect(new NumberColorCodec(['r', 'g', 'b']).toControl(0x00102030)).toEqual({
         r: 0x30 / 255,
         g: 0x20 / 255,
         b: 0x10 / 255,
@@ -13,7 +13,7 @@ describe('NumberColorFormat', () => {
     })
 
     it('rgba', () => {
-      expect(new NumberColorFormat(['r', 'g', 'b', 'a']).parse(0x40102030)).toEqual({
+      expect(new NumberColorCodec(['r', 'g', 'b', 'a']).toControl(0x40102030)).toEqual({
         r: 0x30 / 255,
         g: 0x20 / 255,
         b: 0x10 / 255,
@@ -22,23 +22,27 @@ describe('NumberColorFormat', () => {
     })
   })
 
-  describe('format', () => {
+  describe('encode', () => {
     it('rgb', () => {
-      expect(new NumberColorFormat(['r', 'g', 'b']).format({
-        r: 0x10 / 255,
-        g: 0x20 / 255,
-        b: 0x30 / 255,
-        a: 1,
-      })).toEqual(0x00302010)
+      expect(
+        new NumberColorCodec(['r', 'g', 'b']).fromControl({
+          r: 0x10 / 255,
+          g: 0x20 / 255,
+          b: 0x30 / 255,
+          a: 1,
+        }),
+      ).toEqual(0x00302010)
     })
 
     it('rgba', () => {
-      expect(new NumberColorFormat(['r', 'g', 'b', 'a']).format({
-        r: 0x10 / 255,
-        g: 0x20 / 255,
-        b: 0x30 / 255,
-        a: 1,
-      })).toEqual(0xFF302010)
+      expect(
+        new NumberColorCodec(['r', 'g', 'b', 'a']).fromControl({
+          r: 0x10 / 255,
+          g: 0x20 / 255,
+          b: 0x30 / 255,
+          a: 1,
+        }),
+      ).toEqual(0xff302010)
     })
   })
 })

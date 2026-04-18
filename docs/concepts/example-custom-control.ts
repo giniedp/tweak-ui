@@ -1,28 +1,30 @@
-import * as TweakUi from 'tweak-ui'
+import { Vnode } from 'mithril'
+import { h, mountUi } from 'tweak-ui'
 
-TweakUi.component<any>("embed", (node) => {
-  const data = node.attrs.data
+type EmbedAttrs = {
+  src: string
+  width: number
+}
+const embed = () => {
   return {
-    view: () => {
-      return TweakUi.h('embed', {
-        src: data.src,
-        width: data.width,
-        height: data.height
+    view: (node: Vnode<EmbedAttrs>) => {
+      const attrs = node.attrs
+      return h('embed', {
+        src: attrs.src,
+        width: attrs.width,
       })
-    }
+    },
   }
-})
+}
 
 export default (element: HTMLElement) => {
-
-  TweakUi.mount(element, [{
-    type: "embed",
-    label: "Youtube",
-    width: 220,
-    src: [
-      "https://www.youtube.com/embed/2yJgwwDcgV8",
-      "?rel=0&amp;autoplay=0&mute=1"
-    ].join("")
-  }])
-
+  mountUi(element, (ui) => {
+    ui.control('Custom Control', () => {
+      // breaks out of the builder pattern, this is pure mithriljs now
+      return h(embed, {
+        width: 220,
+        src: 'https://www.youtube.com/embed/2yJgwwDcgV8?rel=0&amp;autoplay=0&mute=1',
+      })
+    })
+  })
 }

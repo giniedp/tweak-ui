@@ -1,10 +1,10 @@
-import { HexStringFormat } from './hex-string-format'
+import { HexColorCodec } from './hex-string-format'
+import { describe, expect, it } from 'vitest'
 
 describe('HexStringFormat', () => {
-
-  describe('parse', () => {
+  describe('decode', () => {
     it('rgb #102030', () => {
-      expect(new HexStringFormat(['r', 'g', 'b']).parse('#102030')).toEqual({
+      expect(new HexColorCodec(['r', 'g', 'b']).toControl('#102030')).toEqual({
         r: 0x10 / 255,
         g: 0x20 / 255,
         b: 0x30 / 255,
@@ -13,7 +13,7 @@ describe('HexStringFormat', () => {
     })
 
     it('rgb #123', () => {
-      expect(new HexStringFormat(['r', 'g', 'b']).parse('#123')).toEqual({
+      expect(new HexColorCodec(['r', 'g', 'b']).toControl('#123')).toEqual({
         r: 0x11 / 255,
         g: 0x22 / 255,
         b: 0x33 / 255,
@@ -22,7 +22,7 @@ describe('HexStringFormat', () => {
     })
 
     it('rgba #10203040', () => {
-      expect(new HexStringFormat(['r', 'g', 'b', 'a']).parse('#10203040')).toEqual({
+      expect(new HexColorCodec(['r', 'g', 'b', 'a']).toControl('#10203040')).toEqual({
         r: 0x10 / 255,
         g: 0x20 / 255,
         b: 0x30 / 255,
@@ -31,23 +31,27 @@ describe('HexStringFormat', () => {
     })
   })
 
-  describe('format', () => {
+  describe('encode', () => {
     it('rgb', () => {
-      expect(new HexStringFormat(['r', 'g', 'b']).format({
-        r: 0x10 / 255,
-        g: 0x20 / 255,
-        b: 0x30 / 255,
-        a: 1,
-      })).toEqual('#102030')
+      expect(
+        new HexColorCodec(['r', 'g', 'b']).fromControl({
+          r: 0x10 / 255,
+          g: 0x20 / 255,
+          b: 0x30 / 255,
+          a: 1,
+        }),
+      ).toEqual('#102030')
     })
 
     it('rgba', () => {
-      expect(new HexStringFormat(['r', 'g', 'b', 'a']).format({
-        r: 0x10 / 255,
-        g: 0x20 / 255,
-        b: 0x30 / 255,
-        a: 0x40 / 255,
-      })).toEqual('#10203040')
+      expect(
+        new HexColorCodec(['r', 'g', 'b', 'a']).fromControl({
+          r: 0x10 / 255,
+          g: 0x20 / 255,
+          b: 0x30 / 255,
+          a: 0x40 / 255,
+        }),
+      ).toEqual('#10203040')
     })
   })
 })

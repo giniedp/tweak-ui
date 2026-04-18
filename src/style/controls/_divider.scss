@@ -1,0 +1,17 @@
+.twui-divider {
+  display: flex;
+  align-items: center;
+  padding: 0 calc(var(--twui-size) / 2);
+  &:not(:empty) {
+    gap: calc(var(--twui-size) / 2);
+  }
+  height: var(--twui-size);
+}
+.twui-divider::before,
+.twui-divider::after {
+  content: '';
+  background-color: var(--twui-color-neutral);
+  flex-grow: 1;
+  width: 100%;
+  height: 0.125rem;
+}

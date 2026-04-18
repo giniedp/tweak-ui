@@ -1,3 +1,5 @@
+import { ControlValueAdapter } from '../core'
+
 /**
  * Describes a HSV color value
  * @public
@@ -90,6 +92,8 @@ export interface RGBA extends RGB {
    */
   a: number
 }
+
+export type ColorCodec<T> = ControlValueAdapter<T, RGBA>
 
 /**
  * An implementation to parse and format specific color format

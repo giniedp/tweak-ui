@@ -5,56 +5,61 @@
 This library is based on [mithril](https://mithril.js.org/). All key concepts of mithril
 also apply to this library. Check mithril documentation when writing custom controls for Tweak UI
 
+## UI Builder
+
+Tweak UI adds a UI builder on top of mithril to improve the developer experience for this specific use case.
+This is how you can create a UI with Tweak UI:
+
+```ts
+import { mountUi } from 'tweak-ui'
+
+mountUi('.your-selector', (ui) => {
+  ui.button('Click me')
+})
+```
+
+Mention there is no `return` statement. All control definitions are captured by the builder and rendered into a mithril component. This happens only ince when you call `mountUi`, hence you can not dynamically add or remove controls.
+
 ## Value binding
 
-There are several ways how to provide and retreive input values.
+There are several ways how to provide input valiuse to controls. All of them use the `value` property.
+For a simple, static use case it would be enough to just set the `value` property to a primitive value.
 
-Use the `value` property to set the inital value and then listen for change
-
-```js
-TweakUi.mount("#container", [{
-  type: "text",
-  label: "My text",
-  value: "i have a label",
-  onInput: (it, value) => { console.log(it, value) }
-}])
+```ts
+ui.number({
+  value: 50,
+})
 ```
 
-Use getters and setters
+The `value` may also be a getter and optionally a setter.
 
-```js
-TweakUi.mount("#container", [{
-  type: "text",
-  label: "Page Title",
-  get value() { return window.document.title },
-  set value(v) { window.document.title = v },
-  onInput: (it, value) => { console.log(it, value) }
-}])
+```ts
+ui.number({
+  get value() {
+    return value
+  },
+  set value(newValue) {
+    value = newValue
+  },
+})
 ```
 
-Use a `target` object and provide a `property` name to get and set the value
+And finally, the value may be an object and a property name to get and set the value.
 
-```js
-TweakUi.mount("#container", [{
-  type: "text",
-  label: "Page Title",
-  target: window.document,
-  property: "title"
-}])
+```ts
+const object = {
+  myValue: 50,
+}
+// ...
+ui.number({
+  value: object,
+  prop: 'myValue',
+})
+// or better
+ui.number(object, 'myValue', {
+  // other options
+})
 ```
-
-## Labels
-
-The main container has a fixed width of `20rem` which is `320px` on this page.
-All controlls are stacked vertically. The default stylesheet uses the <code>flex-box</code> layout model
-which should render just fine on <a href="https://caniuse.com/#feat=flexbox" target="_blank"> all modern browsers </a>
-
-Almost all controls have a label to their left side. Hhowever this is only rendered if the <code>label</code> option
-is actually set. If you want to alignt the controls vertically you have to set the <code>label</code> option
-at least to an empty string.
-
-<Example name="example-labels.ts"/>
-<ExampleCode name="example-labels.ts"/>
 
 ## Custom controls
 

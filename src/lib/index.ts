@@ -10,23 +10,13 @@
  * {@link https://github.com/dataarts/dat.gui | dat.GUI}
  * {@link https://github.com/automat/controlkit.js | controlkit}
  * {@link https://github.com/colejd/guify | guify}
+ * {@link https://tweakpane.github.io/docs/ | tweakpane}
  *
  * @packageDocumentation
  */
-
-import './components'
 
 export * from './builder'
 export * from './color-formats'
 export * from './components'
 export * from './core'
 export * from './mount'
-
-// declare const VERSION_STRING: string
-
-// /**
-//  * The version string
-//  *
-//  * @public
-//  */
-// export const VERSION = VERSION_STRING

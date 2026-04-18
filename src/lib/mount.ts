@@ -1,9 +1,7 @@
-import type { ComponentModel } from './core/types'
-import { default as m } from 'mithril'
+import m, { ChildArray } from 'mithril'
 import { Builder, BuilderFn } from './builder'
-import { isFunction } from './core/utils'
-import { renderModel } from './core'
-import { GroupModel } from './components'
+import { GroupComponent } from './components'
+import { renderSchema } from './core'
 
 /**
  * Mithril's hyperscript function.
@@ -15,50 +13,21 @@ import { GroupModel } from './components'
 export const h = m
 
 /**
- * Runs the function through a builder system and returns the created controls
- *
- * @param fn - The builder function
- * @returns
- */
-export function build(fn: BuilderFn) {
-  const builder = new Builder()
-  fn(builder)
-  return builder.controls
-}
-
-/**
  * Mounts a ui to the given element
- *
- * @public
- * @param el - The ui host element
- * @param data - The ui definition object
  */
-export function mount<T extends ComponentModel>(el: Element | string, data: T | Array<T> | BuilderFn) {
-  el = typeof el === 'string' ? document.querySelector(el) : el
+export function mountUi(target: Element | string, data: ChildArray | BuilderFn) {
+  const el = typeof target === 'string' ? document.querySelector(target)! : target
   el.classList.add('twui-root')
   if (!data) {
     m.mount(el, null)
   } else if (Array.isArray(data)) {
+    m.mount(el, { view: () => m(GroupComponent, {}, data) })
+  } else if (data) {
+    const schema = Builder.build(data)
     m.mount(el, {
-      view: () =>
-        renderModel<GroupModel>({
-          type: 'group',
-          children: data,
-        }),
-    })
-  } else if (isFunction(data)) {
-    const builder = new Builder()
-    data(builder)
-    m.mount(el, {
-      view: () =>
-        renderModel<GroupModel>({
-          type: 'group',
-          children: builder.controls,
-        }),
-    })
-  } else {
-    m.mount(el, {
-      view: () => renderModel(data),
+      view: () => {
+        return m(GroupComponent, {}, renderSchema(schema))
+      },
     })
   }
 }
@@ -69,8 +38,8 @@ export function mount<T extends ComponentModel>(el: Element | string, data: T | 
  * @public
  * @param el - The ui host element
  */
-export function unmount(el: Element | string) {
-  el = typeof el === 'string' ? document.querySelector(el) : el
+export function unmountUi(target: Element | string) {
+  const el = typeof target === 'string' ? document.querySelector(target)! : target
   m.mount(el, null)
 }
 
@@ -85,6 +54,6 @@ export function unmount(el: Element | string) {
  * However if the ui description object is changed from outside the qui callback
  * then this method must be called in order to update the visual state.
  */
-export function redraw() {
+export function redrawUi() {
   m.redraw()
 }

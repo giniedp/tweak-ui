@@ -1,10 +1,10 @@
-import { CssStringFormat } from './css-string-format'
+import { describe, expect, it } from 'vitest'
+import { CssColorCodec } from './css-string-format'
 
 describe('CssStringFormat', () => {
-
-  describe('parse', () => {
+  describe('decode', () => {
     it('rgb', () => {
-      expect(new CssStringFormat(['r', 'g', 'b']).parse('rgb(10, 20, 30)')).toEqual({
+      expect(new CssColorCodec(['r', 'g', 'b']).toControl('rgb(10, 20, 30)')).toEqual({
         r: 10 / 255,
         g: 20 / 255,
         b: 30 / 255,
@@ -13,7 +13,7 @@ describe('CssStringFormat', () => {
     })
 
     it('rgba', () => {
-      expect(new CssStringFormat(['r', 'g', 'b', 'a']).parse('rgba(10, 20, 30, 0.5)')).toEqual({
+      expect(new CssColorCodec(['r', 'g', 'b', 'a']).toControl('rgba(10, 20, 30, 0.5)')).toEqual({
         r: 10 / 255,
         g: 20 / 255,
         b: 30 / 255,
@@ -22,23 +22,27 @@ describe('CssStringFormat', () => {
     })
   })
 
-  describe('format', () => {
+  describe('encode', () => {
     it('rgb', () => {
-      expect(new CssStringFormat(['r', 'g', 'b']).format({
-        r: 10 / 255,
-        g: 20 / 255,
-        b: 30 / 255,
-        a: 0.5,
-      })).toEqual('rgb(10, 20, 30)')
+      expect(
+        new CssColorCodec(['r', 'g', 'b']).fromControl({
+          r: 10 / 255,
+          g: 20 / 255,
+          b: 30 / 255,
+          a: 0.5,
+        }),
+      ).toEqual('rgb(10, 20, 30)')
     })
 
     it('rgba', () => {
-      expect(new CssStringFormat(['r', 'g', 'b', 'a']).format({
-        r: 10 / 255,
-        g: 20 / 255,
-        b: 30 / 255,
-        a: 0.5,
-      })).toEqual('rgba(10, 20, 30, 0.5)')
+      expect(
+        new CssColorCodec(['r', 'g', 'b', 'a']).fromControl({
+          r: 10 / 255,
+          g: 20 / 255,
+          b: 30 / 255,
+          a: 0.5,
+        }),
+      ).toEqual('rgba(10, 20, 30, 0.5)')
     })
   })
 })

@@ -1,35 +1,35 @@
-@use "../utils";
-
-
-.twui-point {
-  background-color: utils.color(secondary);
-  border-color: utils.color(primary-dark);
+.twui-point .point-area {
+  background-color: var(--twui-color-base-100);
+  border-color: var(--twui-color-base-300);
   background-image:
-    linear-gradient(utils.color(primary-light) 1px, transparent 1px),
-    linear-gradient(90deg, utils.color(primary-light) 1px, transparent 1px);
-  background-size: 10% 10%, 10% 10%;
-  transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    linear-gradient(var(--twui-color-base-200) 1px, transparent 1px),
+    linear-gradient(90deg, var(--twui-color-base-200) 1px, transparent 1px);
+  background-size:
+    10% 10%,
+    10% 10%;
+  transition:
+    border-color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
 
-  position: relative;
+  aspect-ratio: 1;
   width: 100%;
-  padding-top: 100%;
+  position: relative;
   box-sizing: border-box;
   cursor: crosshair;
   z-index: 1;
-  // border-bottom: 1px solid;
   overflow: visible;
 
   .point-x-axis,
   .point-y-axis {
-    background-color: utils.color(primary-dark);
+    background-color: var(--twui-color-base-300);
   }
 
   &:focus {
     .point-x-axis,
     .point-y-axis {
-      background-color: utils.color(accent);
+      background-color: var(--twui-color-accent);
     }
-    border-color: utils.color(accent);
+    border-color: var(--twui-color-accent);
     outline: none;
   }
 }

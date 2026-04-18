@@ -1,13 +1,12 @@
-// tslint:disable:no-bitwise
 import { padLeft } from '../core/utils'
-import { ColorFormatter, RGBA } from './types'
+import { ColorCodec, RGBA } from './types'
 
-export class NumberColorFormat implements ColorFormatter<number> {
+export class NumberColorCodec implements ColorCodec<number> {
   private componentsRev: string[]
   constructor(private components: string[]) {
     this.componentsRev = components.slice().reverse()
   }
-  public parse(v: number) {
+  public toControl(v: number) {
     v = v || 0
     const result: RGBA = { r: 0, g: 0, b: 0, a: 1 }
     this.components.forEach((key, i) => {
@@ -16,11 +15,9 @@ export class NumberColorFormat implements ColorFormatter<number> {
     return result
   }
 
-  public format(rgba: RGBA) {
+  public fromControl(rgba: RGBA) {
     const val = this.componentsRev
-      .map((key) =>
-        padLeft(Math.round(rgba[key] * 255 || 0).toString(16), 2, '0'),
-      )
+      .map((key) => padLeft(Math.round(rgba[key] * 255 || 0).toString(16), 2, '0'))
       .join('')
     return parseInt('0x' + val, 16)
   }

@@ -1,8 +1,13 @@
-import { ColorFormatter, RGBA } from './types'
+import { ColorCodec, RGBA } from './types'
 
-export class CssStringFormat implements ColorFormatter<string> {
-  constructor(private components: string[]) {}
-  public parse(value: string) {
+export class CssColorCodec implements ColorCodec<string> {
+  private components: string[] = ['r', 'g', 'b', 'a']
+
+  public constructor(components: string[]) {
+    this.components = components
+  }
+
+  public toControl(value: string) {
     value = value || 'rgba(0, 0, 0)'
     const result: RGBA = { r: 0, g: 0, b: 0, a: 1 }
     const values = value
@@ -15,7 +20,7 @@ export class CssStringFormat implements ColorFormatter<string> {
     return result
   }
 
-  public format(rgba: RGBA) {
+  public fromControl(rgba: RGBA) {
     return (
       this.components.join('') +
       '(' +
