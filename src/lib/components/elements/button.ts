@@ -1,25 +1,23 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
-import { call, twuiClass } from '../../core/utils'
+import { EventAttrs } from '../../core'
+import { uiClass } from '../../core/utils'
 
 /**
  * Button component model
  * @public
  */
-export interface ButtonAttrs {
-  /**
-   * The button text
-   */
-  text?: string
+export interface ButtonAttrs extends EventAttrs {
+  [key: string]: any
 
   /**
-   * This is callend when the control is clicked
+   * Whether the button square
    */
-  onClick?: (ctrl: ButtonAttrs) => void
+  square?: boolean
 
   /**
-   * Disables the control input
+   * Whether the button a block
    */
-  disabled?: boolean
+  block?: boolean
 }
 
 export function uiButton<T>(attrs: ButtonAttrs, children?: Children): Vnode<ButtonAttrs> {
@@ -28,16 +26,22 @@ export function uiButton<T>(attrs: ButtonAttrs, children?: Children): Vnode<Butt
 
 export const ButtonComponent: FactoryComponent<ButtonAttrs> = () => {
   return {
-    view: ({ attrs }) => {
+    view: ({ attrs, children }) => {
+      const { square, block, class: className, ...rest } = attrs
       return m(
-        'button',
+        'button.twui-btn',
         {
           type: 'button',
-          class: twuiClass('button'),
-          onclick: () => call(attrs.onClick, attrs),
-          disabled: !!attrs.disabled,
+          class: uiClass(
+            {
+              'twui-btn-square': !!square,
+              'twui-btn-block': !!block,
+            },
+            className,
+          ),
+          ...rest,
         },
-        attrs.text,
+        children,
       )
     },
   }

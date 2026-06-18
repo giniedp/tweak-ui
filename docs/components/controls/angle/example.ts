@@ -8,13 +8,13 @@ export default () => {
     ui.angle(object, 'value', {
       label: 'Angle',
       degree: true,
-      onChange: console.log,
+      onchange: console.log,
       description: 'A control with custom label',
     })
     ui.angle(object, 'value', {
       label: '',
       degree: true,
-      onChange: console.log,
+      onchange: console.log,
       description: 'A control with no label',
     })
     ui.angle(object, 'value', {
@@ -23,15 +23,15 @@ export default () => {
       min: -90,
       max: 90,
       step: 15,
-      onChange: console.log,
+      onchange: console.log,
       description: 'A control with min max and step',
     })
     ui.number(object, 'value', {
       label: '',
       degree: true,
-      onChange: console.log,
+      onchange: console.log,
       description: 'connected number control',
     })
-    ui.control('JSON', () => JSON.stringify(object))
+    ui.pre('JSON', () => JSON.stringify(object, null, 2))
   })
 }

@@ -1,0 +1,18 @@
+.twui-btn {
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  color: var(--twui-color-content);
+  height: var(--twui-size);
+}
+
+.twui-btn-square {
+  width: var(--twui-size);
+  height: var(--twui-size);
+  padding-inline: 0;
+}
+
+.twui-btn-block {
+  width: 100%;
+}

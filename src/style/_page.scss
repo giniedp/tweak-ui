@@ -1,0 +1,42 @@
+.twui-page {
+  display: grid;
+  grid-template:
+    'header' auto
+    'content' 1fr
+    'footer' auto
+    / 100%;
+  width: 100%;
+  gap: var(--twui-gap);
+}
+.twui-page > * {
+  grid-area: content;
+}
+.twui-page-header {
+  grid-area: header;
+}
+.twui-page-content {
+  grid-area: content;
+}
+.twui-page-footer {
+  grid-area: footer;
+}
+
+.twui-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: 'start content end';
+  gap: var(--twui-gap);
+  align-items: center;
+}
+.twui-bar > * {
+  grid-area: content;
+}
+.twui-bar-start {
+  grid-area: start;
+}
+.twui-bar-content {
+  grid-area: content;
+}
+.twui-bar-end {
+  grid-area: end;
+}

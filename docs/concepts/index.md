@@ -2,13 +2,12 @@
 
 ## Mithril.js
 
-This library is based on [mithril](https://mithril.js.org/). All key concepts of mithril
+This library is based on [Mithril.js](https://mithril.js.org/). All key concepts of mithril
 also apply to this library. Check mithril documentation when writing custom controls for Tweak UI
 
 ## UI Builder
 
-Tweak UI adds a UI builder on top of mithril to improve the developer experience for this specific use case.
-This is how you can create a UI with Tweak UI:
+Tweak UI provides a builder API on top of Mithril to simplify constructing control panels.
 
 ```ts
 import { mountUi } from 'tweak-ui'
@@ -18,12 +17,13 @@ mountUi('.your-selector', (ui) => {
 })
 ```
 
-Mention there is no `return` statement. All control definitions are captured by the builder and rendered into a mithril component. This happens only ince when you call `mountUi`, hence you can not dynamically add or remove controls.
+The builder collects control definitions during execution and compiles them into a Mithril component. There is no `return` value. This process runs once at `mountUi` call time, so controls are static and cannot be added or removed dynamically.
 
 ## Value binding
 
-There are several ways how to provide input valiuse to controls. All of them use the `value` property.
-For a simple, static use case it would be enough to just set the `value` property to a primitive value.
+Controls receive input through the `value` property. Supported patterns:
+
+**Static value**
 
 ```ts
 ui.number({
@@ -31,7 +31,7 @@ ui.number({
 })
 ```
 
-The `value` may also be a getter and optionally a setter.
+**Getter / Setter**
 
 ```ts
 ui.number({
@@ -44,7 +44,7 @@ ui.number({
 })
 ```
 
-And finally, the value may be an object and a property name to get and set the value.
+**Object + property binding**
 
 ```ts
 const object = {
@@ -61,25 +61,20 @@ ui.number(object, 'myValue', {
 })
 ```
 
+These approaches enable both simple and reactive data flows depending on the use case.
+
+## Control wrapper item
+
+A `control` is a standardized UI wrapper providing label and description layout. Most tweakable controls are built on it, ensuring visual consistency. It can also be used independently to present arbitrary content.
+
 ## Custom controls
 
-Register your custom controls by using the <code>component</code> function.
-The argument must be a unique name and a component class or component factory.
-Consult the documentation of <a href="https://mithril.js.org/components.html" target="_blank">mithriljs</a>
-for how the components work. Take a look at the source code for how Tweak Ui components are
-implemented.
+Custom UI can be implemented directly using Mithril components, no registration step is required.
+
+However, the builder API itself is not extensible; only built-in controls are available through it. For custom behavior, render components outside the builder or alongside it.
+
+Refer to <a href="https://mithril.js.org/components.html" target="_blank">Mithril.js</a>
+component documentation and existing library source code for implementation patterns.
 
 <Example name="example-custom-control.ts"/>
 <ExampleCode name="example-custom-control.ts"/>
-
-## Theme
-
-Tweak ui comes with a default theme and the alternatives `.twui-dark` and `.twui-light`.
-Add one of these classes to the root element to change the look.
-
-Another quick and easy way is to change the CSS variables for the root element.
-However <a href="https://caniuse.com/#feat=css-variables" target="_blank">not all browsers</a> support that.
-Read more about CSS variables
-<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties">here </a>,
-<a target="_blank" href="https://www.w3schools.com/css/css3_variables.asp">here </a> or
-<a target="_blank" href="https://medium.freecodecamp.org/learn-css-variables-in-5-minutes-80cf63b4025d">here </a>

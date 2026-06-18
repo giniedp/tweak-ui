@@ -1,0 +1,29 @@
+.twui-number {
+  > .twui-ctrl-content {
+    display: grid;
+    gap: var(--twui-gap);
+    grid-template-columns: auto auto;
+  }
+
+  input {
+    grid-area: start;
+    text-align: right;
+    min-width: 0;
+    grid-column: 1 / span 2;
+  }
+
+  input[type='range'] {
+    grid-column: 1 / span 1;
+    margin: 0;
+    accent-color: var(--twui-color-base-content);
+    height: var(--twui-size);
+  }
+
+  input[type='range'] + input {
+    grid-column: 2 / span 1;
+  }
+
+  .twui-ctrl-content > *:not(input) {
+    grid-area: end;
+  }
+}

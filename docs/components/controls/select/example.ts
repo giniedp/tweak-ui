@@ -5,13 +5,13 @@ export default () => {
     ui.select(object, 'value', {
       label: 'Select',
       options: ['foo', 'bar', 'baz', { label: 'a label', value: {} }],
-      onChange: console.log,
+      onchange: console.log,
     })
     ui.select(object, 'value', {
       label: 'Select',
       options: { Foo: 'foo', Bar: 'bar', Baz: 'baz', 'A Label': { some: 'value' } },
-      onChange: console.log,
+      onchange: console.log,
     })
-    ui.control('JSON', () => JSON.stringify(object, null, 2))
+    ui.pre('JSON', () => JSON.stringify(object, null, 2))
   })
 }

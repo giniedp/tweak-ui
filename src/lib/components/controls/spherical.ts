@@ -1,8 +1,8 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
 
-import { ControlValue, getControlValue, setControlValue } from '../../core'
-import { call, clamp, cssClass, dragUtil, getTouchInTarget, twuiClass } from '../../core/utils'
-import { ControlAttrs, ControlComponent } from './control'
+import { getControlValue, setControlValue } from '../../core'
+import { call, clamp, dragUtil, getTouchInTarget, uiClass } from '../../core/utils'
+import { uiControl, ValueControlAttrs } from '../elements'
 
 /**
  * @public
@@ -18,11 +18,11 @@ export type SphericalValue = { radius: number; azimuth: number; polar: number }
  * Spherical component model
  * @public
  */
-export interface SphericalAttrs<T = unknown> extends ControlValue<T, CartesianValue>, ControlAttrs {
+export interface SphericalAttrs<T = unknown> extends ValueControlAttrs<T, CartesianValue> {
   /**
    * This is called when the control value has been changed.
    */
-  onInput?: (model: T, value: unknown) => void
+  oninput?: (model: T, value: unknown) => void
 
   /**
    * This is called once the control value is committed by the user.
@@ -30,7 +30,7 @@ export interface SphericalAttrs<T = unknown> extends ControlValue<T, CartesianVa
    * @remarks
    * Unlike the `onInput` callback, this is not necessarily called for each value change.
    */
-  onChange?: (model: T, value: unknown) => void
+  onchange?: (model: T, value: unknown) => void
 }
 
 export function uiSpherical<T>(
@@ -63,10 +63,10 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
     backface = polar > Math.PI / 2
   }
 
-  function onChange(type: 'change' | 'input') {
+  function onchange(type: 'change' | 'input') {
     const value = toCartesian(radius, azimuth, polar)
     setControlValue(attrs, value)
-    call(type === 'input' ? attrs.onInput : attrs.onChange, attrs.value, value)
+    call(type === 'input' ? attrs.oninput : attrs.onchange, attrs.value, value)
   }
 
   function onStartPolar(e: MouseEvent) {
@@ -106,38 +106,38 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
           polar = Math.PI - polar
         }
       }
-      onChange('input')
+      onchange('input')
       m.redraw()
     },
     onEnd: (e) => {
       drag.deactivate()
       dragging = null
-      onChange('change')
+      onchange('change')
       m.redraw()
     },
   })
 
   function onPhiInput(model: unknown, value: number) {
     azimuth = toRad(value)
-    onChange('input')
+    onchange('input')
   }
   function onPhiChange(model: unknown, value: number) {
     azimuth = toRad(value)
-    onChange('change')
+    onchange('change')
   }
 
   function onThetaInput(model: unknown, value: number) {
     polar = toRad(value)
-    onChange('input')
+    onchange('input')
   }
   function onThetaChange(model: unknown, value: number) {
     polar = toRad(value)
-    onChange('change')
+    onchange('change')
   }
   function onBackfaceChange(model: unknown, value: boolean) {
     backface = value
     polar = Math.PI - polar
-    onChange('change')
+    onchange('change')
     setTimeout(() => m.redraw())
   }
 
@@ -149,12 +149,12 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
     onupdate: updateState,
     view: () => {
       cartesian = toCartesian(radius, azimuth, polar, cartesian)
-      return m(
-        ControlComponent,
+      return uiControl(
         {
+          tagName: 'label.twui-spherical',
           label: attrs.label,
           description: attrs.description,
-          class: twuiClass('spherical'),
+          class: attrs.class,
           style: {
             '--azimuth-value': `${toDeg(azimuth)}`,
             '--polar-value': `${toDeg(polar)}`,
@@ -162,62 +162,50 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
         },
         [
           m(
-            'div',
+            'div.twui-spherical-label',
+            {},
+            `x: ${cartesian.x.toFixed(2)} y: ${cartesian.y.toFixed(2)} z: ${cartesian.z.toFixed(2)}`,
+          ),
+          m(
+            'div.twui-spherical-pane',
             {
-              class: twuiClass('spherical-content'),
+              oncreate: (vnode) => (paneElement = vnode.dom as HTMLElement),
+              class: uiClass({
+                'is-dragging': !!dragging,
+              }),
+              style: {
+                aspectRatio: '1',
+                display: 'flex',
+                'align-items': 'center',
+                'justify-content': 'center',
+                position: 'relative',
+              },
             },
-            [
-              m(
-                'div',
-                {
-                  class: twuiClass('spherical-label'),
+            m(
+              'div.twui-spherical-arm',
+              {
+                onmousedown: onStartPolar,
+                ontouchstart: onStartPolar,
+                tabIndex: 0,
+                style: {
+                  width: '50%', // gives us the radius
+                  display: 'flex',
+                  justifyContent: 'end', // push knob to edge
+                  alignItems: 'center',
+                  transform: `translateX(50%) rotate(${azimuth}rad)`,
+                  transformOrigin: 'left center',
                 },
-                `x: ${cartesian.x.toFixed(2)} y: ${cartesian.y.toFixed(2)} z: ${cartesian.z.toFixed(2)}`,
-              ),
-              m(
-                'div',
-                {
-                  oncreate: (vnode) => (paneElement = vnode.dom as HTMLElement),
-                  class: cssClass(twuiClass('spherical-pane'), {
-                    'is-dragging': !!dragging,
-                  }),
-                  style: {
-                    aspectRatio: '1',
-                    display: 'flex',
-                    'align-items': 'center',
-                    'justify-content': 'center',
-                    position: 'relative',
-                  },
+              },
+              m('div.twui-spherical-knob', {
+                onmousedown: onStartAzim,
+                ontouchstart: onStartAzim,
+                tabIndex: 0,
+                style: {
+                  aspectRatio: '1',
+                  transform: 'translateX(100%)',
                 },
-                m(
-                  'div',
-                  {
-                    class: twuiClass('spherical-arm'),
-                    onmousedown: onStartPolar,
-                    ontouchstart: onStartPolar,
-                    tabIndex: 0,
-                    style: {
-                      width: '50%', // gives us the radius
-                      display: 'flex',
-                      justifyContent: 'end', // push knob to edge
-                      alignItems: 'center',
-                      transform: `translateX(50%) rotate(${azimuth}rad)`,
-                      transformOrigin: 'left center',
-                    },
-                  },
-                  m('div', {
-                    class: twuiClass('spherical-knob'),
-                    onmousedown: onStartAzim,
-                    ontouchstart: onStartAzim,
-                    tabIndex: 0,
-                    style: {
-                      aspectRatio: '1',
-                      transform: 'translateX(100%)',
-                    },
-                  }),
-                ),
-              ),
-            ],
+              }),
+            ),
           ),
         ],
       )

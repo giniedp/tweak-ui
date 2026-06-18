@@ -11,6 +11,6 @@ export default () => {
       reset: [0, 0],
       snap: 0.1,
     })
-    ui.control('JSON', () => JSON.stringify(object, null, 2))
+    ui.pre('JSON', () => JSON.stringify(object, null, 2))
   })
 }

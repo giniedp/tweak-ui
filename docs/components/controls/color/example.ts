@@ -10,22 +10,22 @@ export default () => {
     ui.color(object, 'hex', {
       label: 'Color #rgb',
       format: '#rgb',
-      onInput: console.log,
-      onChange: console.log,
+      oninput: console.log,
+      onchange: console.log,
       description: 'A color control with hex format',
     })
     ui.color(object, 'rgb', {
       label: 'Color {}rgb',
       format: '{}rgb',
-      onInput: console.log,
-      onChange: console.log,
+      oninput: console.log,
+      onchange: console.log,
       description: 'Controls an object with r, g, b fields',
     })
     ui.color(object, 'vec', {
       label: 'Color {n}xyz',
       format: '{n}xyz',
-      onInput: console.log,
-      onChange: console.log,
+      oninput: console.log,
+      onchange: console.log,
       description: 'Controls an object with x, y, z fields',
     })
   })

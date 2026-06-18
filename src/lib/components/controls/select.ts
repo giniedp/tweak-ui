@@ -1,10 +1,8 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
 
-import { ControlValue, getControlValue, setControlValue } from '../../core'
-import { call, isNumber, isString, twuiClass } from '../../core/utils'
-import { ControlAttrs, ControlComponent } from './control'
-
-const emptyArray: any[] = []
+import { getControlValue, setControlValue } from '../../core'
+import { isNumber, isString } from '../../core/utils'
+import { uiControl, ValueControlAttrs } from '../elements'
 
 /**
  * @public
@@ -43,7 +41,7 @@ export type SelectModelOptions = SelectOptionArray | SelectOptionsObject
  * Select component model
  * @public
  */
-export interface SelectAttrs<T = unknown, V = any> extends ControlValue<T, V>, ControlAttrs {
+export interface SelectAttrs<T = unknown, V = any> extends ValueControlAttrs<T, V> {
   /**
    * The select options
    */
@@ -52,7 +50,7 @@ export interface SelectAttrs<T = unknown, V = any> extends ControlValue<T, V>, C
   /**
    * This is called once the control value is committed by the user.
    */
-  onChange?: (model: T, value: V) => void
+  onchange?: (model: T, value: V) => void
 
   /**
    * Disables the control input
@@ -109,7 +107,7 @@ function getOptions(
   const options = node.attrs.options
 
   if (!options) {
-    return emptyArray
+    return []
   }
 
   if (Array.isArray(options)) {
@@ -166,29 +164,29 @@ export const SelectComponent: FactoryComponent<SelectAttrs> = () => {
     return null
   }
 
-  function onChange(e: Event) {
+  function onchange(e: Event) {
     const el = e.target as HTMLSelectElement
     const value = getSelectionAt(el.selectedIndex)
     const written = setControlValue(attrs, value)
-    call(attrs.onChange, attrs, written)
+    attrs.onchange?.(attrs, written)
   }
 
   return {
     view: (node) => {
       attrs = node.attrs
       options = getOptions(node)
-      return m(
-        ControlComponent,
+      return uiControl(
         {
+          tagName: 'label.twui-select',
           label: attrs.label,
           description: attrs.description,
+          class: attrs.class,
         },
         m(
           'select',
           {
-            class: twuiClass('select'),
             selectedIndex: getSelectedIndex(),
-            onchange: onChange,
+            onchange: onchange,
             disabled: attrs.disabled,
           },
           options.map((it) => {

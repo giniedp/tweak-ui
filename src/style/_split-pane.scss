@@ -1,0 +1,50 @@
+.twui-split-pane {
+  overflow: hidden;
+}
+.twui-split-pane.dragging {
+  user-select: none;
+}
+
+.twui-split-pane > *:not(.twui-split-gutter) {
+  flex: 1;
+  min-width: 1rem;
+  min-height: 1rem;
+}
+
+.twui-split-gutter:last-child {
+  display: none;
+}
+.twui-split-gutter::before {
+  content: '';
+  position: absolute;
+  background-color: var(--twui-color-base-100);
+  opacity: 0;
+}
+.twui-split-gutter:hover::before {
+  background-color: var(--twui-color-base-100);
+  opacity: 1;
+}
+
+.twui-split-gutter-v {
+  position: relative;
+  min-height: 0.25rem;
+  cursor: row-resize;
+}
+.twui-split-gutter-v::before {
+  top: 1px;
+  left: 0.25rem;
+  right: 0.25rem;
+  bottom: 1px;
+}
+
+.twui-split-gutter-h {
+  position: relative;
+  min-width: 0.25rem;
+  cursor: col-resize;
+}
+.twui-split-gutter-h::before {
+  left: 1px;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  right: 1px;
+}

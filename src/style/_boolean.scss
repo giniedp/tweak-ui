@@ -1,0 +1,12 @@
+.twui-checkbox {
+  min-height: var(--twui-size);
+  line-height: var(--twui-size);
+
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+
+  .twui-ctrl-content {
+    display: inline-flex;
+    gap: var(--twui-gap);
+  }
+}

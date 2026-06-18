@@ -1,8 +1,21 @@
 export type StatTransform = 'linear' | 'log' | 'exp'
 
 export type SamplerConfig = {
+  /**
+   * Display name of the stat
+   */
   name?: string
+
+  /**
+   * Display color of the stat
+   */
   color?: string
+
+  /**
+   * Formatting for the current value
+   */
+  fractionDigits?: number
+
   /**
    * Function that returns the current value of the stat
    */
@@ -27,10 +40,14 @@ export type SamplerConfig = {
   max?: number
 
   transform?: StatTransform
+
+  noGraph?: boolean
 }
 
 export interface Sampler {
   color?: string
+  noGraph?: boolean
+  fractionDigits?: number
 
   smoothing: number
   transform: (v: number) => number
@@ -70,6 +87,8 @@ export interface Sampler {
 export function sampler(config: SamplerConfig, size: number): Sampler {
   const sampler: Sampler = {
     color: config.color,
+    noGraph: config.noGraph,
+    fractionDigits: config.fractionDigits,
 
     smoothing: config.smoothing ?? 0,
     transform: linearTransform,

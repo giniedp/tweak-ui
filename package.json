@@ -1,9 +1,16 @@
 {
   "name": "tweak-ui",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "main": "dist/tweak-ui.umd.js",
   "module": "dist/tweak-ui.module.js",
-  "typings": "dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/tweak-ui.module.js",
+      "require": "./dist/tweak-ui.umd.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
   "files": [
     "dist"
   ],
@@ -12,15 +19,11 @@
   "type": "module",
   "description": "Tweak UI - a lightweight js library for building input controls with data binding",
   "scripts": {
-    "dev": "concurrently -n ⬢,⬢,⬢ -c red,green,blue -p '{name}' -k 'pnpm:dev:tsc' 'pnpm:dev:scss' 'pnpm:dev:docs'",
-    "dev:tsc": "pnpm build:tsc -w",
-    "dev:scss": "sass --watch src/style/index.scss dist/tweak-ui.css",
+    "dev": "concurrently -n ⬢,⬢ -c red,green,blue -p '{name}' -k 'pnpm:dev:lib' 'pnpm:dev:docs'",
+    "dev:lib": "pnpm vite build -w",
     "dev:docs": "vitepress dev docs",
-    "build": "pnpm build:vite && pnpm build:tsc && pnpm build:scss && pnpm build:scss:min && pnpm build:docs",
+    "build": "pnpm build:vite && pnpm build:docs",
     "build:vite": "pnpm vite build",
-    "build:tsc": "pnpm tsc -p ./src/tsconfig.lib.json",
-    "build:scss": "sass src/style/index.scss dist/tweak-ui.css",
-    "build:scss:min": "sass src/style/index.scss dist/tweak-ui.min.css --style=compressed",
     "build:api": "api-extractor run --local --verbose && api-documenter markdown -i temp -o docs/api",
     "build:docs": "vitepress build docs",
     "copy": "pnpm copy:scss",
@@ -31,17 +34,17 @@
     "test:coverage": "IS_COVERAGE=yes karma start --single-run"
   },
   "devDependencies": {
-    "@microsoft/api-documenter": "^7.12.12",
-    "@microsoft/api-extractor": "^7.13.2",
+    "@microsoft/api-documenter": "^7.30.3",
+    "@microsoft/api-extractor": "^7.58.5",
     "@types/mithril": "^2.2.8",
-    "concurrently": "^9.1.2",
+    "concurrently": "^9.2.1",
     "highlight.js": "^11.11.1",
-    "sass": "^1.32.8",
     "tslib": "^2.1.0",
-    "typescript": "^6.0.2",
+    "typescript": "^6.0.3",
     "vite": "8.0.8",
-    "vitepress": "^1.6.3",
-    "vitepress-sidebar": "^1.31.1",
+    "vite-plugin-dts": "^4.5.4",
+    "vitepress": "^1.6.4",
+    "vitepress-sidebar": "^1.33.1",
     "vitest": "^4.1.4"
   },
   "dependencies": {

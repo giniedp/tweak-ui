@@ -1,0 +1,42 @@
+canvas.twui-graph {
+  width: 100%;
+}
+
+table.twui-graph {
+  display: table !important;
+  text-align: right;
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  thead,
+  tbody {
+    width: 100%;
+  }
+
+  td,
+  th {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 4px;
+  }
+
+  th:first-child,
+  td:first-child {
+    width: var(--twui-label-size);
+    text-align: left;
+  }
+
+  .twui-current {
+    width: 70px;
+    font-weight: 600;
+  }
+
+  .twui-stats {
+    width: 110px;
+    color: #888;
+    font-size: 0.85em;
+  }
+}

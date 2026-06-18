@@ -3,10 +3,14 @@ import { mountUi } from 'tweak-ui'
 export default () => {
   const object = { message: 'Helloo World' }
   mountUi('.example-frame', (ui) => {
-    ui.text(object, 'message', {
+    ui.string(object, 'message', {
       label: 'Text',
-      onInput: console.log,
+      oninput: console.log,
     })
-    ui.control('JSON', () => JSON.stringify(object, null, 2))
+    ui.string(object, 'message', {
+      label: 'Text',
+      disabled: true,
+    })
+    ui.pre('JSON', () => JSON.stringify(object, null, 2))
   })
 }

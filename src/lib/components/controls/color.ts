@@ -1,24 +1,15 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
-import { getColorCodec } from '../../color-formats'
-import { ControlValue, getControlValue, getRawValue, setControlValue } from '../../core'
-import {
-  call,
-  cssClass,
-  isArray,
-  isNumber,
-  isObject,
-  isString,
-  padLeft,
-  twuiClass,
-} from '../../core/utils'
-import { ControlAttrs, ControlComponent } from './control'
+import { getColorAdapter } from '../../color'
+import { getControlValue, getRawValue, setControlValue } from '../../core'
+import { isArray, isNumber, isObject, isString, padLeft, uiClass } from '../../core/utils'
+import { uiControl, ValueControlAttrs } from '../elements'
 import { ColorPickerAttrs, uiColorPicker } from './color-picker'
 
 /**
  * Color component model
  * @public
  */
-export interface ColorAttrs<T = unknown> extends ControlValue<T, any>, ControlAttrs {
+export interface ColorAttrs<T = unknown> extends ValueControlAttrs<T, any> {
   /**
    * The format of the string value. Defaults to 'rgb'
    *
@@ -36,7 +27,7 @@ export interface ColorAttrs<T = unknown> extends ControlValue<T, any>, ControlAt
   /**
    * This is called when the control value has been changed.
    */
-  onInput?: (model: T, value: any) => void
+  oninput?: (model: T, value: any) => void
 
   /**
    * This is called once the control value is committed by the user.
@@ -44,7 +35,7 @@ export interface ColorAttrs<T = unknown> extends ControlValue<T, any>, ControlAt
    * @remarks
    * Unlike the `onInput` callback, this is not necessarily called for each value change.
    */
-  onChange?: (model: T, value: any) => void
+  onchange?: (model: T, value: any) => void
 }
 
 export function uiColor<T>(attrs: ColorAttrs<T>, children?: Children): Vnode<ColorAttrs<T>> {
@@ -56,12 +47,12 @@ export const ColorControl: FactoryComponent<ColorAttrs> = () => {
   let opened = false
   let rgba: string
   let value: any
-  const codec = getColorCodec('rgba()')
+  const codec = getColorAdapter('rgba()')
 
   function updateState(node: Vnode<ColorAttrs>) {
     attrs = node.attrs
     value = getControlValue(attrs)
-    rgba = codec.fromControl(getColorCodec(attrs.format).toControl(value))
+    rgba = codec.fromControl(getColorAdapter(attrs.format).toControl(value))
   }
 
   function toggle() {
@@ -70,12 +61,12 @@ export const ColorControl: FactoryComponent<ColorAttrs> = () => {
 
   function onPickerInput(p: ColorPickerAttrs, v: any) {
     setControlValue(attrs, v)
-    call(attrs.onInput, attrs.value, v)
+    attrs.oninput?.(attrs.value, v)
   }
 
   function onPickerChange(p: ColorPickerAttrs, v: any) {
     setControlValue(attrs, v)
-    call(attrs.onChange, attrs.value, v)
+    attrs.onchange?.(attrs.value, v)
   }
 
   function getText() {
@@ -107,16 +98,18 @@ export const ColorControl: FactoryComponent<ColorAttrs> = () => {
     onupdate: updateState,
     view: (node) => {
       updateState(node)
-      return m.fragment({}, [
-        m(
-          ControlComponent,
+      return [
+        uiControl(
           {
             label: attrs.label,
             description: attrs.description,
-            class: {
-              [twuiClass('color')]: true,
-              [twuiClass('color-open')]: opened,
-            },
+            class: uiClass(
+              {
+                'twui-color': true,
+                'twui-color-open': opened,
+              },
+              attrs.class,
+            ),
           },
           m(
             "button[type='button']",
@@ -132,12 +125,12 @@ export const ColorControl: FactoryComponent<ColorAttrs> = () => {
               uiColorPicker({
                 value: getRawValue(attrs),
                 format: attrs.format,
-                onInput: onPickerInput,
-                onChange: onPickerChange,
+                oninput: onPickerInput,
+                onchange: onPickerChange,
               }),
             ])
           : null,
-      ])
+      ]
     },
   }
 }

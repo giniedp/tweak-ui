@@ -113,6 +113,9 @@ export function statsRenderer(canvas: HTMLCanvasElement): StatsRenderer {
     gl.bufferData(gl.ARRAY_BUFFER, verts, gl.DYNAMIC_DRAW)
 
     for (let r = 0; r < rows; r++) {
+      if (samplers[r].noGraph) {
+        continue
+      }
       gl.uniform3fv(uColor, colors[r])
       gl.drawArrays(gl.LINE_STRIP, r * history, history)
     }

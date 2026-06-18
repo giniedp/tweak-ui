@@ -10,21 +10,21 @@ export default () => {
     ui.colorPicker(object, 'hex', {
       label: 'Color',
       format: '#rgb',
-      onInput: console.log,
-      onChange: console.log,
+      oninput: console.log,
+      onchange: console.log,
     })
     ui.colorPicker(object, 'rgb', {
       label: 'Object with r,g,b',
       format: '{}rgb',
-      onInput: console.log,
-      onChange: console.log,
+      oninput: console.log,
+      onchange: console.log,
     })
     ui.colorPicker(object, 'vec', {
       label: 'Object with x,y,z',
       format: '{n}rgb',
-      onInput: console.log,
-      onChange: console.log,
+      oninput: console.log,
+      onchange: console.log,
     })
-    ui.control('JSON', () => JSON.stringify(object, null, 2))
+    ui.pre('JSON', () => JSON.stringify(object, null, 2))
   })
 }

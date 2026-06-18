@@ -1,8 +1,7 @@
-import { ControlValueAdapter, mountUi, redrawUi } from 'tweak-ui'
+import { mountUi, redrawUi, ValueFieldAdapter } from 'tweak-ui'
 
-const remAdapter: ControlValueAdapter<string, number> = {
+const remAdapter: ValueFieldAdapter<string, number> = {
   toControl: (value) => {
-    console.log(value, value.replace('rem', ''))
     return parseFloat(value.replace('rem', ''))
   },
   fromControl: (value) => {
@@ -76,7 +75,7 @@ export default (element: HTMLElement) => {
         max: 2,
         adapter: remAdapter,
         slider: true,
-        onInput: update,
+        oninput: update,
         description:
           'The size of the main UI elements, used for example as height for inputs and buttons.',
       })
@@ -87,7 +86,7 @@ export default (element: HTMLElement) => {
         max: 1,
         adapter: remAdapter,
         slider: true,
-        onInput: update,
+        oninput: update,
         description: 'The inset within the root element, applied as padding',
       })
       ui.number(variables, '--twui-gap', {
@@ -97,7 +96,7 @@ export default (element: HTMLElement) => {
         max: 1,
         adapter: remAdapter,
         slider: true,
-        onInput: update,
+        oninput: update,
         description: 'The flexbox and grid gap between elements',
       })
       ui.number(variables, '--twui-radius', {
@@ -107,27 +106,27 @@ export default (element: HTMLElement) => {
         max: 1,
         adapter: remAdapter,
         slider: true,
-        onInput: update,
+        oninput: update,
         description: 'The border-radius for elements that have rounded corners',
       })
     })
 
     ui.group('Colors', { collapsible: true }, () => {
-      ui.list({ horizontal: true }, () => {
+      ui.flex({ flow: 'row' }, () => {
         ui.button('Default', {
-          onClick: () => {
+          onclick: () => {
             Object.assign(variables, defaultTheme)
             update()
           },
         })
         ui.button('Dark', {
-          onClick: () => {
+          onclick: () => {
             Object.assign(variables, darkTheme)
             update()
           },
         })
         ui.button('Light', {
-          onClick: () => {
+          onclick: () => {
             Object.assign(variables, lightTheme)
             update()
           },
@@ -138,12 +137,14 @@ export default (element: HTMLElement) => {
         ui.color(variables, key as any, {
           label: key.replace('--twui-color-', '').replace(/-/g, ' '),
           format: '#rgb',
-          onChange: update,
+          onchange: update,
         })
       }
     })
     ui.group('CSS', () => {
-      ui.pre(() => JSON.stringify(variables, null, 2).replace(/"/g, '').replace(/,/g, ';').trim())
+      ui.pre(null!, () =>
+        JSON.stringify(variables, null, 2).replace(/"/g, '').replace(/,/g, ';').trim(),
+      )
     })
   })
 }

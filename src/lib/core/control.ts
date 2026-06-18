@@ -1,30 +1,4 @@
-/**
- * Utility to convert a value from a raw format to a control format and back.
- *
- * @public
- */
-export type ControlValueAdapter<RawValue, ControlValue> = {
-  toControl: (value: RawValue) => ControlValue
-  fromControl: (value: ControlValue) => RawValue
-}
-
-export type ControlValue<T, Value> = {
-  /**
-   * The raw value of the control, used when `target` and `property` are not set.
-   */
-  value: T
-  /**
-   * The property name in `value` where the raw value is stored.
-   *
-   * @remarks
-   * Requires the `target` option to be set.
-   */
-  prop?: keyof T
-  /**
-   * An optional adapter to convert between the raw value and the control value.
-   */
-  adapter?: ControlValueAdapter<any, Value>
-}
+import { ValueField } from './types'
 
 /**
  * Gets a value of a view model
@@ -32,7 +6,7 @@ export type ControlValue<T, Value> = {
  * @public
  * @param control - The model of a component
  */
-export function getControlValue<V>(control: ControlValue<any, V>): V {
+export function getControlValue<V>(control: ValueField<any, V>): V {
   return toControl(control, getRawValue(control))
 }
 
@@ -44,30 +18,30 @@ export function getControlValue<V>(control: ControlValue<any, V>): V {
  * @param value - The value for the component
  * @returns the encoded value as it was written to the model
  */
-export function setControlValue<V, R>(control: ControlValue<any, V>, value: V) {
+export function setControlValue<V, R>(control: ValueField<any, V>, value: V) {
   const raw = fromControl(control, value)
   setRawValue(control, raw)
   return raw
 }
 
-export function getRawValue(model: ControlValue<any, any>) {
-  if (model.prop) {
-    return model.value?.[model.prop!]
+export function getRawValue(model: ValueField<any, any>) {
+  if (model.field) {
+    return model.value?.[model.field!]
   }
   return model.value
 }
 
-export function setRawValue(model: ControlValue<any, any>, value: any): void {
-  if (!model.prop) {
+export function setRawValue(model: ValueField<any, any>, value: any): void {
+  if (!model.field) {
     model.value = value
     return
   }
-  if (isWriteable(model.value, model.prop)) {
-    model.value[model.prop] = value
+  if (isWriteable(model.value, model.field)) {
+    model.value[model.field] = value
     return
   }
   console.warn(
-    `Cannot write value to control model. Property "${String(model.prop)}" is not writeable.`,
+    `Cannot write value to control model. Property "${String(model.field)}" is not writeable.`,
   )
 }
 
@@ -76,14 +50,14 @@ function isWriteable<T>(obj: T, key: keyof T): boolean {
   return !desc || !!desc.writable || !!desc.set
 }
 
-function fromControl<Value>(source: ControlValue<unknown, Value>, value: Value): unknown {
+function fromControl<Value>(source: ValueField<unknown, Value>, value: Value): unknown {
   if (source.adapter) {
     return source.adapter.fromControl(value)
   }
   return value
 }
 
-function toControl<Value>(source: ControlValue<unknown, Value>, raw: unknown): Value {
+function toControl<Value>(source: ValueField<unknown, Value>, raw: unknown): Value {
   if (source.adapter) {
     return source.adapter.toControl(raw)
   }

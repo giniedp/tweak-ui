@@ -1,17 +1,15 @@
 import m, { Children, FactoryComponent, Vnode, VnodeDOM } from 'mithril'
-import { twuiClass } from '../../core/utils'
 import { StatsConfig, statsRenderer, StatsRenderer } from '../../stats'
-import { ControlAttrs } from '../controls/control'
 
-export interface GraphAttrs extends ControlAttrs, Partial<StatsConfig> {
+export interface GraphAttrs extends Partial<StatsConfig> {
   rowHeight?: number
 }
 
 export function uiGraph(attrs: GraphAttrs, children?: Children): Vnode<GraphAttrs> {
-  return m(Graph, attrs, children)
+  return m(GraphComponent, attrs, children)
 }
 
-export const Graph: FactoryComponent<GraphAttrs> = () => {
+export const GraphComponent: FactoryComponent<GraphAttrs> = () => {
   let observer: ResizeObserver | null = null
   let frameId: number | null = null
   let canvas: HTMLCanvasElement | null = null
@@ -24,7 +22,7 @@ export const Graph: FactoryComponent<GraphAttrs> = () => {
     canvas = el
     observer?.observe(canvas)
     updateGraph()
-    setInterval(updateLegend, 250)
+    legendTimer = setInterval(updateLegend, 250)
   }
 
   function disconnect() {
@@ -99,22 +97,12 @@ export const Graph: FactoryComponent<GraphAttrs> = () => {
     view: ({ attrs: { rowHeight, collapsed } }) => {
       const height = (rowHeight || 50) * (collapsed ? 1 : config.rows.length) * devicePixelRatio
       return [
-        m('canvas', {
-          class: twuiClass('graph'),
+        m('canvas.twui-graph', {
           style: `width: 100%; height: ${height}px`,
           oncreate: canvasCreated,
           onremove: cavasRemoved,
         }),
-        m('table', { class: twuiClass('graph') }, [
-          m('thead', {}, [
-            m('tr', {}, [
-              m('th', {}, ''),
-              m('th', {}, 'Min'),
-              m('th', {}, 'Max'),
-              m('th', {}, 'Avg'),
-              m('th', {}, 'Cur'),
-            ]),
-          ]),
+        m('table.twui-graph', {}, [
           m(
             'tbody',
             {},
@@ -125,11 +113,11 @@ export const Graph: FactoryComponent<GraphAttrs> = () => {
                   oncreate: ({ dom }) => (legendNodes[i] = dom as HTMLDivElement),
                 },
                 [
-                  m('td', { style: `color: ${r.color}` }, r.name!),
-                  m('td', {}),
-                  m('td', {}),
-                  m('td', {}),
-                  m('td', {}),
+                  m('td', { style: r.noGraph ? {} : `color: ${r.color}`, title: r.name! }, [
+                    m('span', r.name!),
+                  ]),
+                  m('td.twui-stats', { title: 'min / max / avg' }, []),
+                  m('td.twui-current', {}),
                 ],
               )
             }),
@@ -163,15 +151,47 @@ function renderLegend(renderer: StatsRenderer | null, nodes: HTMLElement[]) {
   for (let i = 0; i < nodes.length; i++) {
     const el = nodes[i]
     const sampler = renderer.sampler(i)
-    const td = el?.querySelectorAll('td')
-    if (!td || !sampler) {
+    if (!sampler || !el) {
       continue
     }
-    td[1].textContent = sampler.minSeen.toFixed(2)
-    td[2].textContent = sampler.maxSeen.toFixed(2)
-    td[3].textContent = sampler.avg.toFixed(2)
-    td[4].textContent = sampler.value?.toFixed(2) ?? ''
+
+    const current = el.querySelector('.twui-current')
+    const stats = el.querySelector('.twui-stats')
+    if (current) {
+      current.textContent = formatValue(sampler.value, sampler.fractionDigits)
+    }
+    if (stats) {
+      if (sampler.noGraph) {
+        stats.textContent = ''
+      } else {
+        const fd = sampler.fractionDigits
+        stats.textContent = `${formatValue(sampler.minSeen, fd)}/${formatValue(sampler.maxSeen, fd)}/${formatValue(sampler.avg, fd)}`
+      }
+    }
   }
+}
+
+function formatValue(value: number | null, fractionDigits?: number): string {
+  if (value == null) {
+    return 'n/a'
+  }
+  if (fractionDigits != null) {
+    return value.toFixed(fractionDigits)
+  }
+  const abs = Math.abs(value)
+  if (abs < Number.EPSILON) {
+    return '0'
+  }
+  if (abs < 1) {
+    return value.toFixed(3)
+  }
+  if (abs < 10) {
+    return value.toFixed(2)
+  }
+  if (abs < 100) {
+    return value.toFixed(1)
+  }
+  return value.toFixed(0)
 }
 
 const DEFAULT_COLORS = [

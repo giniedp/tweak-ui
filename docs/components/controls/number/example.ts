@@ -7,6 +7,6 @@ export default () => {
     ui.number(object, 'b', { min: 1, max: 100, step: 0.5, label: 'Range' })
     ui.number(object, 'c', { slider: true, label: 'Slider' })
     ui.number({ value: 5, label: 'Unbound' })
-    ui.control('JSON', () => JSON.stringify(object, null, 2))
+    ui.pre('JSON', () => JSON.stringify(object, null, 2))
   })
 }

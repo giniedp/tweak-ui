@@ -1,14 +1,14 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
 
-import { ControlValue, getControlValue, setControlValue } from '../../core'
-import { call, clamp, dragUtil, getTouchInTarget, twuiClass } from '../../core/utils'
-import { ControlAttrs, ControlComponent } from './control'
+import { getControlValue, setControlValue } from '../../core'
+import { clamp, dragUtil, getTouchInTarget } from '../../core/utils'
+import { uiButton, uiControl, ValueControlAttrs } from '../elements'
 
 /**
  * Number component model
  * @public
  */
-export interface NumberAttrs<T = unknown> extends ControlValue<T, number>, ControlAttrs {
+export interface NumberAttrs<T = unknown> extends ValueControlAttrs<T, number> {
   /**
    * The placeholder text
    */
@@ -37,7 +37,7 @@ export interface NumberAttrs<T = unknown> extends ControlValue<T, number>, Contr
   /**
    * This is called when the control value has been changed.
    */
-  onInput?: (model: T, value: number) => void
+  oninput?: (model: T, value: number) => void
 
   /**
    * This is called once the control value is committed by the user.
@@ -45,12 +45,22 @@ export interface NumberAttrs<T = unknown> extends ControlValue<T, number>, Contr
    * @remarks
    * Unlike the `onInput` callback, this is not necessarily called for each value change.
    */
-  onChange?: (model: T, value: number) => void
+  onchange?: (model: T, value: number) => void
 
   /**
    * Disables the control input
    */
   disabled?: boolean
+
+  /**
+   * The maximum number of fraction digits to display. By default, this is 3.
+   */
+  maxFractionDigits?: number
+
+  /**
+   * The minimum number of fraction digits to display. By default, this is 0.
+   */
+  minFractionDigits?: number
 }
 
 export function uiNumber<T>(attrs: NumberAttrs<T>, children?: Children): Vnode<NumberAttrs<T>> {
@@ -58,7 +68,6 @@ export function uiNumber<T>(attrs: NumberAttrs<T>, children?: Children): Vnode<N
 }
 
 export const NumberComponent: FactoryComponent<NumberAttrs> = () => {
-  let type: 'number' | 'slider'
   let min: number
   let max: number
   let step: number | undefined
@@ -66,37 +75,41 @@ export const NumberComponent: FactoryComponent<NumberAttrs> = () => {
   let placeholder: string
   let isSlider: boolean
   let value: number
-  let percent: number
   let attrs: NumberAttrs
+  let editing: boolean
 
   function updateState(node: m.Vnode<NumberAttrs>) {
     attrs = node.attrs
     isSlider = !!attrs.slider
-    type = isSlider ? 'slider' : 'number'
     min = isSlider ? (attrs.min ?? 0) : attrs.min!
     max = isSlider ? (attrs.max ?? 1) : attrs.max!
     step = isSlider ? (attrs.step ?? 0.01) : attrs.step!
     value = getControlValue<number>(attrs)
     disabled = !!attrs.disabled
-    percent = isSlider ? ((value - min) / (max - min)) * 100 : 0
-
-    console.log('updateState', { value, percent, min, max, isSlider, attrs })
   }
 
   function setModelValue(e: 'input' | 'change', v: number) {
     value = isNaN(v) ? null! : clamp(v, min, max)!
     setControlValue(attrs, value)
-    const cb = e === 'input' ? attrs.onInput : attrs.onChange
-    call(cb, attrs.value, value)
+    const cb = e === 'input' ? attrs.oninput : attrs.onchange
+    cb?.(attrs.value, value)
     m.redraw()
   }
 
-  function onInput(e: Event) {
+  function onfocus() {
+    editing = true
+  }
+
+  function onblur() {
+    editing = false
+  }
+
+  function oninput(e: Event) {
     const el = e.target as HTMLInputElement
     setModelValue('input', parseFloat(el.value))
   }
 
-  function onChange(e: Event) {
+  function onchange(e: Event) {
     const el = e.target as HTMLInputElement
     setModelValue('change', parseFloat(el.value))
   }
@@ -124,7 +137,7 @@ export const NumberComponent: FactoryComponent<NumberAttrs> = () => {
     },
   })
 
-  function onWheel(e: WheelEvent) {
+  function onwheel(e: WheelEvent) {
     e.preventDefault()
     const dir = (e.ctrlKey ? 0.5 : 1) * clamp(e.deltaY, -1, 1)
     const add = (step || 0.2) * dir
@@ -140,15 +153,15 @@ export const NumberComponent: FactoryComponent<NumberAttrs> = () => {
     oninit: updateState,
     onupdate: updateState,
     view: (node) => {
-      return m(
-        ControlComponent,
+      updateState(node)
+      return uiControl(
         {
+          tagName: 'label.twui-number',
           label: attrs.label,
           description: attrs.description,
-          style: attrs.style,
-          class: twuiClass('number'),
+          class: attrs.class,
         },
-        m.fragment({}, [
+        [
           isSlider
             ? m("input[type='range']", {
                 ariahidden: true,
@@ -156,24 +169,27 @@ export const NumberComponent: FactoryComponent<NumberAttrs> = () => {
                 max: max,
                 step: step,
                 value: value,
-                oninput: onInput,
-                onchange: onChange,
-                onwheel: onWheel,
+                oninput: oninput,
+                onchange: onchange,
+                onwheel: onwheel,
                 disabled: disabled,
               })
             : null,
-          m("input[type='number']", {
+          m('input', {
+            type: editing ? 'number' : 'text',
             min: min,
             max: max,
             step: step,
-            value: value,
-            oninput: onInput,
-            onchange: onChange,
-            onwheel: onWheel,
+            value: editing ? value : Intl.NumberFormat().format(value),
+            onfocus: onfocus,
+            onblur: onblur,
+            oninput: oninput,
+            onchange: onchange,
+            onwheel: onwheel,
             placeholder: placeholder!,
             disabled: disabled,
           }),
-        ]),
+        ],
       )
     },
   }

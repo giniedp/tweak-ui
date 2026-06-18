@@ -1,13 +1,13 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
-import { ControlValue, getControlValue, setControlValue } from '../../core'
-import { call, cssClass, dragUtil, getTouchInTarget, twuiClass } from '../../core/utils'
-import { ControlAttrs, uiControl } from './control'
+import { getControlValue, setControlValue } from '../../core'
+import { call, dragUtil, getTouchInTarget, uiClass } from '../../core/utils'
+import { uiControl, ValueControlAttrs } from '../elements'
 
 /**
  * Spherical component model
  * @public
  */
-export interface AngleAttrs<T = unknown> extends ControlValue<T, number>, ControlAttrs {
+export interface AngleAttrs<T = unknown> extends ValueControlAttrs<T, number> {
   /**
    * Whether to use degrees instead of radians
    */
@@ -31,7 +31,7 @@ export interface AngleAttrs<T = unknown> extends ControlValue<T, number>, Contro
   /**
    * This is called when the control value has been changed.
    */
-  onInput?: (target: T, value: number) => void
+  oninput?: (target: T, value: number) => void
 
   /**
    * This is called once the control value is committed by the user.
@@ -39,7 +39,7 @@ export interface AngleAttrs<T = unknown> extends ControlValue<T, number>, Contro
    * @remarks
    * Unlike the `onInput` callback, this is not necessarily called for each value change.
    */
-  onChange?: (target: T, value: number) => void
+  onchange?: (target: T, value: number) => void
 }
 
 export function uiAngle<T>(attrs: AngleAttrs<T>, children?: Children): Vnode<AngleAttrs<T>> {
@@ -107,7 +107,6 @@ export const AngleComponent: FactoryComponent<AngleAttrs> = () => {
     min = min != null ? wrapDegrees(min) * DEG_TO_RAD : null!
     max = max != null ? wrapDegrees(max) * DEG_TO_RAD : null!
     step = step != null ? wrapDegrees(step) * DEG_TO_RAD : null!
-    console.log({ min, max, step })
     angle = getControlValue(attrs) ?? angle
     if (attrs.degree) {
       angle = angle * DEG_TO_RAD
@@ -119,7 +118,7 @@ export const AngleComponent: FactoryComponent<AngleAttrs> = () => {
     updatePositions()
     const value = attrs.degree ? angle * RAD_TO_DEG : angle
     setControlValue(attrs, value)
-    call(type === 'input' ? attrs.onInput : attrs.onChange, attrs.value, value)
+    call(type === 'input' ? attrs.oninput : attrs.onchange, attrs.value, value)
   }
 
   function updatePositions() {
@@ -173,73 +172,61 @@ export const AngleComponent: FactoryComponent<AngleAttrs> = () => {
     onupdate: (node) => {
       updateState(node)
     },
-    view: ({ attrs }) => {
+    view: ({ attrs }: Vnode<AngleAttrs<any>>) => {
       return uiControl(
         {
           label: attrs.label,
           description: attrs.description,
-          class: twuiClass('angle'),
+          class: uiClass('twui-angle', attrs.class),
           style: {
             '--angle-value': `${angle * RAD_TO_DEG}`,
           },
         },
         [
           m(
-            'div',
+            'div.twui-angle-label',
+            {},
+            `${(angle * RAD_TO_DEG).toFixed(1)}° / ${angle.toFixed(2)} rad`,
+          ),
+          m(
+            'div.twui-angle-pane',
             {
-              class: twuiClass('angle-content'),
+              oncreate: (vnode) => (paneElement = vnode.dom as HTMLElement),
+              class: uiClass({
+                'is-dragging': dragging,
+              }),
+              style: {
+                aspectRatio: '1',
+                display: 'flex',
+                'align-items': 'center',
+                'justify-content': 'center',
+                position: 'relative',
+              },
             },
-            [
-              m(
-                'div',
-                {
-                  class: twuiClass('angle-label'),
+            m(
+              'div.twui-angle-arm',
+              {
+                style: {
+                  width: '50%', // gives us the radius
+                  display: 'flex',
+                  justifyContent: 'flex-end', // push knob to edge
+                  alignItems: 'center',
+                  // offset -90deg to make 0° point up
+                  transform: `translateX(50%) rotate(${angle - Math.PI / 2}rad)`,
+                  transformOrigin: 'left center',
                 },
-                `${(angle * RAD_TO_DEG).toFixed(1)}° / ${angle.toFixed(2)} rad`,
-              ),
-              m(
-                'div',
-                {
-                  oncreate: (vnode) => (paneElement = vnode.dom as HTMLElement),
-                  class: cssClass(twuiClass('angle-pane'), {
-                    'is-dragging': dragging,
-                  }),
-                  style: {
-                    aspectRatio: '1',
-                    display: 'flex',
-                    'align-items': 'center',
-                    'justify-content': 'center',
-                    position: 'relative',
-                  },
+              },
+              m('div.twui-angle-knob', {
+                oncreate: (vnode) => (knobElement = vnode.dom as HTMLElement),
+                onmousedown: onDragStart,
+                ontouchstart: onDragStart,
+                tabIndex: 0,
+                style: {
+                  aspectRatio: '1',
+                  transform: 'translateX(50%)',
                 },
-                m(
-                  'div',
-                  {
-                    class: twuiClass('angle-arm'),
-                    style: {
-                      width: '50%', // gives us the radius
-                      display: 'flex',
-                      justifyContent: 'flex-end', // push knob to edge
-                      alignItems: 'center',
-                      // offset -90deg to make 0° point up
-                      transform: `translateX(50%) rotate(${angle - Math.PI / 2}rad)`,
-                      transformOrigin: 'left center',
-                    },
-                  },
-                  m('div', {
-                    class: twuiClass('angle-knob'),
-                    oncreate: (vnode) => (knobElement = vnode.dom as HTMLElement),
-                    onmousedown: onDragStart,
-                    ontouchstart: onDragStart,
-                    tabIndex: 0,
-                    style: {
-                      aspectRatio: '1',
-                      transform: 'translateX(50%)',
-                    },
-                  }),
-                ),
-              ),
-            ],
+              }),
+            ),
           ),
         ],
       )

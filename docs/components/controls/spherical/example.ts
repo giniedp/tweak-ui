@@ -6,7 +6,7 @@ export default () => {
     ui.spherical(object, 'value', {
       label: 'Spherical',
       degree: true,
-      onInput: console.log,
+      oninput: console.log,
     })
     ui.pre('JSON', () => JSON.stringify(object, null, 2))
   })

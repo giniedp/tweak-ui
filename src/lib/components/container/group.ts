@@ -1,5 +1,5 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
-import { ClassValue, cssClass, eventWithTimout, twuiClass } from '../../core/utils'
+import { ClassValue, uiClass, eventWithTimout } from '../../core/utils'
 
 /**
  * Group component model
@@ -75,9 +75,8 @@ export const GroupComponent: FactoryComponent<GroupAttrs> = () => {
       return null
     }
     return m(
-      'div',
+      'div.twui-group-title',
       {
-        class: cssClass(twuiClass('group-title')),
         onclick: collapsible ? handleToggle : undefined,
       },
       title,
@@ -89,12 +88,11 @@ export const GroupComponent: FactoryComponent<GroupAttrs> = () => {
     onupdate: updateState,
     view: ({ attrs, children }) => {
       return m(
-        'div',
+        'div.twui-group',
         {
-          class: cssClass({
-            [twuiClass('group')]: true,
-            [twuiClass('group-collapsible')]: !!collapsible,
-            [twuiClass('group-collapsed')]: !!collapsed,
+          class: uiClass({
+            ['twui-group-collapsible']: !!collapsible,
+            ['twui-group-collapsed']: !!collapsed,
           }),
           style: attrs.style,
         },
@@ -116,9 +114,9 @@ const GroupContent: FactoryComponent<{ animate: boolean }> = () => {
     },
     view: ({ children, attrs }) => {
       return m(
-        'div',
+        'div.twui-group-content',
         {
-          class: cssClass(twuiClass('group-content'), {
+          class: uiClass({
             animate: attrs.animate,
             enter: true,
           }),

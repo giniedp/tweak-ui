@@ -11,8 +11,8 @@ export default () => {
       min: -1,
       max: 1,
       step: 0.125,
-      onInput: console.log,
-      onChange: console.log,
+      oninput: console.log,
+      onchange: console.log,
     })
 
     ui.vector(object, 'vector', {
@@ -21,8 +21,8 @@ export default () => {
       min: -1,
       max: 1,
       step: 0.125,
-      onInput: console.log,
-      onChange: console.log,
+      oninput: console.log,
+      onchange: console.log,
     })
 
     ui.vector(object, 'array', {
@@ -31,10 +31,11 @@ export default () => {
       min: -1,
       max: 1,
       step: 0.125,
-      onInput: console.log,
-      onChange: console.log,
+      oninput: console.log,
+      onchange: console.log,
+      unlabeled: true,
     })
 
-    ui.control('JSON', () => JSON.stringify(object, null, 2))
+    ui.pre('JSON', () => JSON.stringify(object, null, 2))
   })
 }

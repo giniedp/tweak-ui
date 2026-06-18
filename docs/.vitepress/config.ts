@@ -1,15 +1,13 @@
 import { defineConfig } from 'vitepress'
 import { generateSidebar } from 'vitepress-sidebar'
-import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
-  title: "Tweak UI",
-  description: "A lightweight js library for building tweak controls with data binding",
+  title: 'Tweak UI',
+  description: 'A lightweight js library for building tweak controls with data binding',
   themeConfig: {
-
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Components', link: '/components' }
+      { text: 'Components', link: '/components' },
     ],
 
     // https://vitepress-sidebar.cdget.com/guide/getting-started
@@ -33,19 +31,7 @@ export default defineConfig({
       excludePattern: ['api/'],
     }),
 
-
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/giniedp/tweak-ui' }
-    ]
+    socialLinks: [{ icon: 'github', link: 'https://github.com/giniedp/tweak-ui' }],
   },
-  markdown: {
-
-  },
-  vite: {
-    resolve: {
-      alias: {
-        'tweak-ui': fileURLToPath(new URL('./../../dist/lib', import.meta.url)),
-      },
-    },
-  },
+  markdown: {},
 })

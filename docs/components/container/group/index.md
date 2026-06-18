@@ -1,6 +1,6 @@
 # Group
 
-Container for text or html output
+Container for grouping related controls.
 
 <Example/>
 

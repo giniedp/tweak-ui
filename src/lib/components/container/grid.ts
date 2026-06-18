@@ -1,5 +1,4 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
-import { cssClass, twuiClass } from '../../core/utils'
 
 /**
  * Grid component model
@@ -29,12 +28,8 @@ export const GridComponent: FactoryComponent<GridAttrs> = () => {
     view: (node) => {
       const data = node.attrs
       return m(
-        'div',
+        'div.twui-grid',
         {
-          class: cssClass({
-            [twuiClass('grid')]: true,
-            // [twuiClass(TYPE, 'horizontal')]: !!data.columns,
-          }),
           style: {
             gridTemplateColumns:
               typeof data.columns === 'number'

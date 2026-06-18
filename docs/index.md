@@ -3,24 +3,14 @@
 layout: home
 
 hero:
-  name: "Tweak UI"
-  text: ""
+  name: 'Tweak UI'
+  text: ''
   tagline: A lightweight tweak controls library
   actions:
-    - theme: alt
-      text: API
-      link: /api
     - theme: brand
       text: Components
       link: /components
 ---
-<!-- features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit -->
 
 ## Getting started
 
@@ -33,7 +23,7 @@ npm install tweak-ui
 Import
 
 ```ts
-import { mountUi } from "tweak-ui"
+import { mountUi } from 'tweak-ui'
 ```
 
 Find stylehseets
@@ -51,7 +41,17 @@ Create an HTML container where Tweak UI should render.
 Mount your controls
 
 ```ts
-mountUi(".my-element", (b) => {
-  // ... builder function
+mountUi('.my-element', (b) => {
+  // ... builder function for static controls
+})
+```
+
+Or with full mithril control
+
+```ts
+mountUi('.my-element', {
+  view: () => {
+    // ... mithril view function for dynamic controls
+  },
 })
 ```

@@ -1,11 +1,13 @@
 // https://vitepress.dev/guide/custom-theme
-import { h } from 'vue'
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
+import { h } from 'vue'
+
 import './style.css'
-import Example from './components/example.vue'
+import 'tweak-ui/style.css'
+
 import ExampleCode from './components/example-code.vue'
-import '../../../dist/tweak-ui.css'
+import Example from './components/example.vue'
 
 export default {
   extends: DefaultTheme,
@@ -17,5 +19,5 @@ export default {
   enhanceApp({ app, router, siteData }) {
     app.component('Example', Example)
     app.component('ExampleCode', ExampleCode)
-  }
+  },
 } satisfies Theme

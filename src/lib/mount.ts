@@ -1,7 +1,6 @@
-import m, { ChildArray } from 'mithril'
+import m, { ChildArray, Component } from 'mithril'
 import { Builder, BuilderFn } from './builder'
-import { GroupComponent } from './components'
-import { renderSchema } from './core'
+import { renderChildren } from './core'
 
 /**
  * Mithril's hyperscript function.
@@ -15,20 +14,23 @@ export const h = m
 /**
  * Mounts a ui to the given element
  */
-export function mountUi(target: Element | string, data: ChildArray | BuilderFn) {
+export function mountUi(target: Element | string, data: ChildArray): void
+export function mountUi(target: Element | string, data: BuilderFn): void
+export function mountUi<A, S>(target: Element | string, data: Component<A, S>): void
+export function mountUi(target: Element | string, data: ChildArray | BuilderFn | Component): void {
   const el = typeof target === 'string' ? document.querySelector(target)! : target
-  el.classList.add('twui-root')
+  el.classList.add('twui')
   if (!data) {
     m.mount(el, null)
   } else if (Array.isArray(data)) {
-    m.mount(el, { view: () => m(GroupComponent, {}, data) })
-  } else if (data) {
+    m.mount(el, { view: () => data })
+  } else if (typeof data === 'function') {
     const schema = Builder.build(data)
     m.mount(el, {
-      view: () => {
-        return m(GroupComponent, {}, renderSchema(schema))
-      },
+      view: () => renderChildren(schema),
     })
+  } else {
+    m.mount(el, data)
   }
 }
 

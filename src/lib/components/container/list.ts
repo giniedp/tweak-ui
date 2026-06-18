@@ -1,5 +1,5 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
-import { cssClass, twuiClass } from '../../core/utils'
+import { StyleAttr } from '../../core'
 
 /**
  * List component model
@@ -7,33 +7,39 @@ import { cssClass, twuiClass } from '../../core/utils'
  */
 export interface ListAttrs {
   /**
-   * Enables horizontal layout
+   * Maps to flex-flow CSS property.
+   * @links https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-flow
    */
-  horizontal?: boolean
+  flow?: `row` | `column` | string
+  /**
+   * Maps to flex CSS property.
+   * @links https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex
+   */
+  flex?: string | number
   /**
    * Custom CSS Style
    */
-  style?: Partial<CSSStyleDeclaration>
+  style?: StyleAttr
 }
 
-export function uiList<T>(attrs: ListAttrs, children?: Children): Vnode<ListAttrs> {
-  return m(ListComponent, attrs, children)
+export function uiFlex<T>(attrs: ListAttrs, children?: Children): Vnode<ListAttrs> {
+  return m(FlexComponent, attrs, children)
 }
 
-export const ListComponent: FactoryComponent<ListAttrs> = () => {
+export const FlexComponent: FactoryComponent<ListAttrs> = () => {
   return {
-    view: (node) => {
-      const data = node.attrs
+    view: ({ attrs: { flex, flow, style, ...rest }, children }) => {
       return m(
-        'div',
+        'div.twui-flex',
         {
-          class: cssClass({
-            [twuiClass('list')]: true,
-            [twuiClass('list', 'horizontal')]: !!data.horizontal,
-          }),
-          style: data.style,
+          style: {
+            flex: flex ?? 'auto',
+            flexFlow: flow || 'column nowrap',
+            ...(style || {}),
+          },
+          ...rest,
         },
-        node.children,
+        children,
       )
     },
   }

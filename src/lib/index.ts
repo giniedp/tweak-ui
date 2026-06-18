@@ -16,7 +16,7 @@
  */
 
 export * from './builder'
-export * from './color-formats'
+export * from './color'
 export * from './components'
 export * from './core'
 export * from './mount'

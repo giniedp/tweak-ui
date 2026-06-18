@@ -1,7 +1,7 @@
-import { Children, FactoryComponent, default as m, Vnode } from 'mithril'
+import { Child, Children, FactoryComponent, default as m, Vnode } from 'mithril'
 
 import { mapChildren } from '../../core'
-import { cssClass, twuiClass } from '../../core/utils'
+import { uiClass } from '../../core/utils'
 import { GroupAttrs } from './group'
 
 /**
@@ -9,7 +9,7 @@ import { GroupAttrs } from './group'
  * @public
  */
 export interface TabsAttrs {
-  //
+  vertical?: boolean
 }
 
 const tabsHost = Symbol('tabsHost')
@@ -22,7 +22,7 @@ export interface TabsHost {
 }
 
 export interface TabAttrs {
-  title: string
+  title: Child
   active?: boolean
   disabled?: boolean
 }
@@ -30,6 +30,7 @@ export interface TabAttrs {
 export const TabComponent: FactoryComponent<TabAttrs> = () => {
   let host: TabsHost
   let vnode: Vnode<TabAttrs>
+
   return {
     oninit: (node) => {
       host = (node.attrs as any)[tabsHost]
@@ -47,29 +48,32 @@ export const TabComponent: FactoryComponent<TabAttrs> = () => {
       const active = host.isActive(vnode)
       return [
         m(
-          'button',
+          'button.twui-tab',
           {
-            class: cssClass(twuiClass('tab'), { active }),
+            class: uiClass({
+              active,
+            }),
             onclick: () => host.activate(vnode),
           },
           title,
         ),
-        !active ? null : m('div', { class: cssClass(twuiClass('tab-content')) }, children),
+        !active ? null : m('div.twui-tab-content', {}, children),
       ]
     },
   }
 }
 
-export function uiTabs<T>(attrs: TabsAttrs, children?: Children): Vnode<TabsAttrs> {
-  return m(Tabs, attrs, children)
+export function uiTabs(attrs: TabsAttrs, children?: Children): Vnode<TabsAttrs> {
+  return m(TabsComponent, attrs, children)
 }
 
-export const Tabs: FactoryComponent<TabsAttrs> = () => {
+export const TabsComponent: FactoryComponent<TabsAttrs> = () => {
   const children: Vnode<TabAttrs>[] = []
   let active: Vnode<TabAttrs> | null = null
   const host: TabsHost = {
     attach(child) {
       children.push(child)
+      active ||= child
       if (child.attrs.active) {
         active = child
       }
@@ -129,14 +133,12 @@ export const Tabs: FactoryComponent<TabsAttrs> = () => {
 
   return {
     view: (node) => {
-      // const data = node.attrs
-      // const tabs = data.children || []
-      // const active = clamp(data.active || 0, 0, tabs.length - 1)
-      // const tab = tabs[active]
       return m(
-        'div',
+        'div.twui-tabs',
         {
-          class: twuiClass('tabs'),
+          class: uiClass({
+            'twui-tabs-vertical': !!node.attrs.vertical,
+          }),
         },
         m.fragment({}, [tabChildren(node)]),
       )

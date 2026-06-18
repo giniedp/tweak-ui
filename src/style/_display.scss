@@ -1,0 +1,41 @@
+.twui-ctrl {
+  display: grid;
+  grid-template-columns: auto;
+
+  align-items: start;
+  gap: var(--twui-gap);
+}
+
+.twui-ctrl:has(> .twui-ctrl-label) {
+  grid-template-columns: var(--twui-label-size) auto;
+}
+
+.twui-ctrl-label {
+  grid-column: 1;
+}
+
+.twui-ctrl-content {
+  grid-column: 1;
+  display: grid;
+  gap: var(--twui-gap);
+}
+
+.twui-ctrl-label ~ .twui-ctrl-content {
+  grid-column: 2;
+}
+
+.twui-ctrl-label {
+  min-height: var(--twui-size);
+  padding: 0 calc(var(--twui-size) / 4);
+  display: inline-flex;
+  align-items: center;
+}
+
+.twui-ctrl-description {
+  grid-column: 1 / span 2;
+  font-size: 80%;
+  font-style: italic;
+  color: var(--twui-color-base-content);
+  padding: 0 0.5rem 0.25rem;
+  opacity: 0.75;
+}

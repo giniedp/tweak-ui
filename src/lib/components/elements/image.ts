@@ -1,6 +1,6 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
 
-import { cssClass, isNumber, isString, twuiClass } from '../../core/utils'
+import { uiClass, isNumber, isString } from '../../core/utils'
 
 /**
  * Image component model
@@ -8,14 +8,9 @@ import { cssClass, isNumber, isString, twuiClass } from '../../core/utils'
  */
 export interface ImageAttrs {
   /**
-   * A label for the control, only rendered if the control is used in a context that supports it (e.g. group).
-   */
-  label?: string
-
-  /**
    * The image source url
    */
-  src?: string | string[]
+  src?: string
   /**
    * Aspect ratio of the picture container
    */
@@ -31,7 +26,7 @@ export interface ImageAttrs {
   /**
    * This is callend when the control is clicked
    */
-  onClick?: (ctrl: ImageAttrs) => void
+  onclick?: (ctrl: ImageAttrs) => void
 }
 
 export function uiImage(attrs: ImageAttrs, children?: Children): Vnode<ImageAttrs> {
@@ -56,28 +51,24 @@ export const ImageComponent: FactoryComponent<ImageAttrs> = () => {
     }
   }
   return {
-    view: ({ attrs: { src, aspect, fit, width, onClick } }) => {
-      return (Array.isArray(src) ? src : [src]).map((src) => {
-        console.log(src)
-        return m(
-          'picture',
-          {
-            class: cssClass({
-              [twuiClass('image')]: true,
-              [twuiClass('image', 'aspect')]: !!aspect,
-            }),
-            style: {
-              '--twui-aspect': ratio(aspect),
-              '--twui-fit': fit || 'fit',
-              width: size(width),
-            },
-          },
-          m('img', {
-            src: src,
-            onclick: onClick,
+    view: ({ attrs: { src, aspect, fit, width, onclick } }) => {
+      return m(
+        'picture.twui-image',
+        {
+          class: uiClass({
+            ['twui-image-aspect']: !!aspect,
           }),
-        )
-      })
+          style: {
+            '--twui-aspect': ratio(aspect),
+            '--twui-fit': fit || 'fit',
+            width: size(width),
+          },
+        },
+        m('img', {
+          src,
+          onclick,
+        }),
+      )
     },
   }
 }

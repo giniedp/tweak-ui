@@ -75,12 +75,18 @@ export interface ClassDictionary {
 
 export interface ClassArray extends Array<ClassValue> {}
 
+export function uiStyle(
+  style: Partial<CSSStyleDeclaration> | undefined,
+): Partial<CSSStyleDeclaration> {
+  return style || {}
+}
+
 /**
  * Builds a css class from various argument types
  * @param exp
  */
-export function cssClass(...args: ClassValue[]): string
-export function cssClass(): string {
+export function uiClass(...args: ClassValue[]): string
+export function uiClass(): string {
   // common case
   if (arguments.length === 1 && isString(arguments[0])) {
     return arguments[0] as string
@@ -102,7 +108,9 @@ export function cssClass(): string {
 
     // string
     if (typeof value === 'string') {
-      if (value) result.push(value)
+      if (value) {
+        result.push(value)
+      }
       return
     }
 
@@ -140,13 +148,6 @@ export function padLeft(value: string, length: number, char: string) {
     value = `${char}${value}`
   }
   return value
-}
-
-/**
- * @internal
- */
-export function twuiClass(name: string, variation?: string) {
-  return `twui-${name}` + (variation ? `-${variation}` : '')
 }
 
 /**

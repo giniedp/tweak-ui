@@ -3,40 +3,51 @@ import { h, mountUi } from 'tweak-ui'
 export default () => {
   mountUi('.example-frame', (ui) => {
     let counter = 0
-    ui.control(
-      'Static Text',
-      `
-      Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
-      sed diam nonumy eirmod tempor invidunt ut labore et dolore magna
-      counter value is ${counter}
-    `,
-    )
-    ui.control(
+
+    ui.display('Static Text', 'This is a static text content, wrapped in a control with a label.')
+
+    ui.display(
       'Static HTML',
       h.trust(`
+        <div>
+        This is a static HTML content, wrapped in a control with a label.
+        <br>
+        <br>
+        The counter value is <b style="color: green;">'${counter}'</b> and it won't update when the counter changes.
+        <br>
+        <br>
         <b onclick="alert('Dont trust HTML blindly')" style="color: red; cursor: pointer">
-          Don't click me
+          Beware of trusting HTML blindly!
         </b>
-        counter value is ${counter}
+        </div>
       `),
     )
-    ui.control(
+
+    ui.display(
       'Static Mithril',
-      h(
-        'a',
-        {
-          target: '_blank',
-          href: 'https://mithril.js.org/',
-        },
-        'this is a mithril link',
-        `  counter value is ${counter}`,
-      ),
+      h('div', {}, [
+        'This is a static Mithril content, wrapped in a control with a label. ',
+        h(
+          'a',
+          {
+            target: '_blank',
+            href: 'https://mithril.js.org/',
+          },
+          'this is a mithril link',
+        ),
+        ' The counter value is ',
+        counter,
+        " and it won't update when the counter changes.",
+      ]),
     )
-    ui.control('Dynamic content', () => {
+
+    ui.display('Dynamic content', () => {
       return ` (counter: ${counter})`
     })
+
+    ui.divider()
     ui.button('Update', {
-      onClick: () => {
+      onclick: () => {
         console.log(counter++)
         h.redraw()
       },

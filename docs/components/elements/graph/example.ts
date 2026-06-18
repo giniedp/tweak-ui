@@ -5,14 +5,13 @@ export default () => {
     let time = performance.now()
     let time1 = performance.now()
     ui.group('Graph Example', { collapsible: true }, () => {
-      ui.graph('Graph', {
-        label: 'Example Graph',
+      ui.graph({
         historySize: 300,
         collapsed: true,
         rowHeight: 30,
         rows: [
           {
-            name: 'noise spikes',
+            name: 'noise spikes long long name',
             sample: () => (Math.random() < 0.02 ? 1 : 0) * 2 - 1,
           },
           {

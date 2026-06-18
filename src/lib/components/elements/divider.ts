@@ -1,23 +1,13 @@
-import m, { FactoryComponent, Vnode } from 'mithril'
-import { twuiClass } from '../../core/utils'
+import m, { Attributes, FactoryComponent, Vnode } from 'mithril'
 
-/**
- * Divider component model
- *
- * @public
- */
-export interface DividerAttrs {
-  text?: string
-}
-
-export function uiDivider(attrs: DividerAttrs): Vnode<DividerAttrs> {
+export function uiDivider(attrs: Attributes): Vnode<Attributes> {
   return m(Divider, attrs)
 }
 
-export const Divider: FactoryComponent<DividerAttrs> = () => {
+export const Divider: FactoryComponent<Attributes> = () => {
   return {
-    view: ({ attrs: { text }, children }) => {
-      return m('div', { class: twuiClass('divider') }, text ?? null, children)
+    view: (node) => {
+      return m('div.twui-divider', node.attrs, node.children)
     },
   }
 }

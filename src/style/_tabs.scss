@@ -1,0 +1,38 @@
+.twui-tabs {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: stretch;
+  border-color: var(--twui-color-base-300);
+  gap: var(--twui-gap);
+}
+
+button.twui-tab {
+  order: 0;
+  flex: 1;
+  background-color: var(--twui-color-base-100);
+}
+button.twui-tab.active {
+  background-color: var(--twui-color-base-200);
+}
+button.twui-tab.active:not(:focus) {
+  outline-color: var(--twui-color-base-200);
+}
+
+.twui-tab-content {
+  order: 1;
+  width: 100%;
+}
+
+.twui-tabs-vertical {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.twui-tabs-vertical .twui-tab {
+  grid-column: 1;
+}
+
+.twui-tabs-vertical .twui-tab-content {
+  grid-column: 2;
+  grid-row: 1 / -1;
+}

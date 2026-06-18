@@ -1,14 +1,14 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
 
-import { ControlValue, getControlValue } from '../../core'
-import { call, clamp, dragUtil, getTouchPoint, twuiClass } from '../../core/utils'
-import { ControlAttrs, ControlComponent } from './control'
+import { getControlValue } from '../../core'
+import { call, clamp, dragUtil, getTouchPoint, uiClass } from '../../core/utils'
+import { uiControl, ValueControlAttrs } from '../elements'
 
 /**
  * Point component model
  * @public
  */
-export interface PointAttrs<T = unknown> extends ControlValue<T, any>, ControlAttrs {
+export interface PointAttrs<T = unknown> extends ValueControlAttrs<T, any> {
   /**
    * The object field names. Defaults to `['x', 'y']`
    */
@@ -37,14 +37,14 @@ export interface PointAttrs<T = unknown> extends ControlValue<T, any>, ControlAt
   /**
    * This is called when the control value has been changed.
    */
-  onInput?: (model: PointAttrs<T>, value: number) => void
+  oninput?: (model: PointAttrs<T>, value: number) => void
   /**
    * This is called once the control value is committed by the user.
    *
    * @remarks
    * Unlike the `onInput` callback, this is not necessarily called for each value change.
    */
-  onChange?: (model: PointAttrs<T>, value: number) => void
+  onchange?: (model: PointAttrs<T>, value: number) => void
 }
 
 const DEFAULT_RANGE = [0, 1]
@@ -68,7 +68,7 @@ export const PointComponent: FactoryComponent<PointAttrs> = () => {
   let snap: number
   let attrs: PointAttrs
 
-  function fetchValue(node: m.Vnode<PointAttrs>) {
+  function updateState(node: m.Vnode<PointAttrs>) {
     attrs = node.attrs
     const keys = attrs.keys || DEFAULT_KEYS
     kx = keys[0]
@@ -102,7 +102,7 @@ export const PointComponent: FactoryComponent<PointAttrs> = () => {
     }
   }
 
-  function onChange(type: 'change' | 'input') {
+  function onchange(type: 'change' | 'input') {
     updateValue()
     const value: any = getControlValue(attrs) ?? {
       [kx]: vx,
@@ -110,7 +110,7 @@ export const PointComponent: FactoryComponent<PointAttrs> = () => {
     }
     value[kx] = vx
     value[ky] = vy
-    call(type === 'input' ? attrs.onInput : attrs.onChange, attrs, value)
+    call(type === 'input' ? attrs.oninput : attrs.onchange, attrs, value)
   }
 
   function onMouseDown(e: MouseEvent) {
@@ -131,7 +131,7 @@ export const PointComponent: FactoryComponent<PointAttrs> = () => {
       x = clamp((cx - tx - rect.left) / cw, 0, 1)
       y = clamp((cy - ty - rect.top) / ch, 0, 1)
 
-      onChange('input')
+      onchange('input')
       m.redraw()
     },
     onEnd: () => {
@@ -139,24 +139,24 @@ export const PointComponent: FactoryComponent<PointAttrs> = () => {
       if (rx != null && ry != null) {
         x = rx
         y = ry
-        onChange('input')
+        onchange('input')
       }
-      onChange('change')
+      onchange('change')
       m.redraw()
     },
   })
 
   return {
     onremove: drag.deactivate,
-    oninit: fetchValue,
-    onupdate: fetchValue,
-    view: () => {
-      return m(
-        ControlComponent,
+    oninit: updateState,
+    onupdate: updateState,
+    view: (node) => {
+      updateState(node)
+      return uiControl(
         {
           label: attrs.label,
           description: attrs.description,
-          class: twuiClass('point'),
+          class: uiClass('twui-point', attrs.class),
         },
         m(
           '.point-area',
