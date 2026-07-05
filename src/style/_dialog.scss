@@ -1,0 +1,46 @@
+dialog.twk-dialog {
+  pointer-events: none;
+  visibility: hidden;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  color: inherit;
+  overscroll-behavior: contain;
+  z-index: 999;
+  scrollbar-gutter: auto;
+  background-color: #0000;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  position: fixed;
+  inset: 0;
+  overflow: clip;
+
+  border: none;
+}
+
+.twk-dialog-content {
+  background-color: var(--twk-color-base-100);
+  border-radius: var(--twk-radius);
+  opacity: 0;
+  overscroll-behavior: contain;
+  grid-row-start: 1;
+  grid-column-start: 1;
+  width: 100%;
+  max-width: 32rem;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+dialog.twk-dialog[open] {
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
+  background-color: oklch(0% 0 0 / 0.4);
+  .twk-dialog-content {
+    opacity: 1;
+    translate: 0;
+    scale: 1;
+  }
+}

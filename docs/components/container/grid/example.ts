@@ -9,6 +9,7 @@ export default () => {
       ui.button('Button')
       ui.button('Button')
       ui.button('Button')
+      ui.button('Button', { style: { gridColumn: '1 / -1' } })
     })
   })
 }

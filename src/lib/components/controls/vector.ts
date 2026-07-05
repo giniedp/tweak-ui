@@ -1,19 +1,15 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
-import { getControlValue, setControlValue } from '../../core'
-import { uiClass } from '../../core/utils'
-import { uiControl, ValueControlAttrs } from '../elements'
-import { uiNumber } from './number'
+import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
+import { CommonWidgetAttrs, uiWidget } from '../elements'
+import { uiScalarInput } from './scalar'
 
-/**
- * @public
- */
-export type VectorValue = number[] | { [key: string]: number } | { [key: number]: number }
+export type VectorWidgetAttrs<T = unknown> = CommonWidgetAttrs & VectorInputAttrs<T>
 
 /**
  * Vector component model
  * @public
  */
-export interface VectorAttrs<T = unknown> extends ValueControlAttrs<T, VectorValue> {
+export type VectorInputAttrs<T = unknown> = TweakableAttrs<T, any> & {
   /**
    * The vector object field names. Defaults to `['x', 'y', 'z']`
    */
@@ -52,16 +48,40 @@ export interface VectorAttrs<T = unknown> extends ValueControlAttrs<T, VectorVal
   /**
    * Disables the control input
    */
-  disabled?: boolean
+  readonly?: boolean
 }
 
-export function uiVector<T>(attrs: VectorAttrs<T>, children?: Children): Vnode<VectorAttrs<T>> {
-  return m(VectorComponent as any, attrs as any, children)
+export function uiVectorWidget<T>(
+  attrs: VectorWidgetAttrs<T>,
+  children?: Children,
+): Vnode<VectorWidgetAttrs<T>> {
+  return m(VectorWidgetComponent as any, attrs as any, children)
 }
 
+export function uiVectorInput<T>(
+  attrs: VectorInputAttrs<T>,
+  children?: Children,
+): Vnode<VectorInputAttrs<T>> {
+  return m(VectorInputComponent as any, attrs as any, children)
+}
+
+export const VectorWidgetComponent: FactoryComponent<VectorWidgetAttrs> = () => {
+  return {
+    view: ({ attrs: { label, class: className, ...rest } }) => {
+      return uiWidget(
+        {
+          tagName: 'label.twk-vector-widget',
+          label: label ?? rest.field,
+          class: className,
+        },
+        [m(VectorInputComponent, rest)],
+      )
+    },
+  }
+}
 const defaultKeys = ['x', 'y', 'z']
-export const VectorComponent: FactoryComponent<VectorAttrs> = () => {
-  function onchange(type: 'input' | 'change', field: string, v: number, attrs: VectorAttrs) {
+export const VectorInputComponent: FactoryComponent<VectorInputAttrs> = () => {
+  function onchange(type: 'input' | 'change', field: string, v: number, attrs: VectorInputAttrs) {
     const value: any = getControlValue(attrs) || {}
     value[field] = isNaN(v) ? null : v
     setControlValue(attrs, value)
@@ -74,30 +94,27 @@ export const VectorComponent: FactoryComponent<VectorAttrs> = () => {
       const keys = attrs.keys || defaultKeys
       const cols = attrs.cols || keys.length
       const value = getControlValue(attrs) as any
-      return uiControl(
+      return m(
+        'div.twk-vector-input',
         {
-          label: attrs.label,
-          description: attrs.description,
-          class: uiClass('twui-vector', attrs.class),
-          contentStyle: {
+          style: {
             display: 'grid',
             gridTemplateColumns: `repeat(${cols}, 1fr)`,
           },
         },
         keys.map((field) => {
-          return m('span', { class: 'twui-vector-field' }, [
-            attrs.unlabeled ? null : m('span', field),
-            uiNumber({
-              min: attrs.min,
-              max: attrs.max,
-              step: attrs.step,
-              value: value?.[field],
-              disabled: attrs.disabled,
-              oninput: (_, v) => onchange('input', field, v as number, attrs),
-              onchange: (_, v) => onchange('change', field, v as number, attrs),
-              placeholder: field,
-            }),
-          ])
+          return uiScalarInput({
+            min: attrs.min,
+            max: attrs.max,
+            step: attrs.step,
+            value,
+            field,
+            readonly: attrs.readonly,
+            slotBefore: attrs.unlabeled ? null : m('span.twk-color-muted', field),
+            oninput: (_, v) => onchange('input', field, v as number, attrs),
+            onchange: (_, v) => onchange('change', field, v as number, attrs),
+            placeholder: field,
+          })
         }),
       )
     },

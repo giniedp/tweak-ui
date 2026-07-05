@@ -1,15 +1,17 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
 import { getColorAdapter } from '../../color'
-import { getControlValue, getRawValue, setControlValue } from '../../core'
-import { isArray, isNumber, isObject, isString, padLeft, uiClass } from '../../core/utils'
-import { uiControl, ValueControlAttrs } from '../elements'
+import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
+import { isArray, isNumber, isObject, isString, padLeft } from '../../core/utils'
+import { CommonWidgetAttrs, uiWidget } from '../elements'
 import { ColorPickerAttrs, uiColorPicker } from './color-picker'
+
+export type ColorWidgetAttrs<T = unknown> = CommonWidgetAttrs & ColorAttrs<T>
 
 /**
  * Color component model
  * @public
  */
-export interface ColorAttrs<T = unknown> extends ValueControlAttrs<T, any> {
+export type ColorAttrs<T = unknown> = TweakableAttrs<T, any> & {
   /**
    * The format of the string value. Defaults to 'rgb'
    *
@@ -38,11 +40,33 @@ export interface ColorAttrs<T = unknown> extends ValueControlAttrs<T, any> {
   onchange?: (model: T, value: any) => void
 }
 
-export function uiColor<T>(attrs: ColorAttrs<T>, children?: Children): Vnode<ColorAttrs<T>> {
-  return m(ColorControl as any, attrs as any, children)
+export function uiColorWidget<T>(
+  attrs: ColorWidgetAttrs<T>,
+  children?: Children,
+): Vnode<ColorWidgetAttrs<T>> {
+  return m(ColorWidgetComponent as any, attrs as any, children)
 }
 
-export const ColorControl: FactoryComponent<ColorAttrs> = () => {
+export function uiColor<T>(attrs: ColorAttrs<T>, children?: Children): Vnode<ColorAttrs<T>> {
+  return m(ColorComponent as any, attrs as any, children)
+}
+
+export const ColorWidgetComponent: FactoryComponent<ColorWidgetAttrs> = () => {
+  return {
+    view: ({ attrs: { label, class: className, ...rest } }) => {
+      return uiWidget(
+        {
+          tagName: 'div.twk-color-widget',
+          label: label ?? rest.field,
+          class: className,
+        },
+        [m(ColorComponent, rest)],
+      )
+    },
+  }
+}
+
+export const ColorComponent: FactoryComponent<ColorAttrs> = () => {
   let attrs: ColorAttrs<any>
   let opened = false
   let rgba: string
@@ -95,41 +119,34 @@ export const ColorControl: FactoryComponent<ColorAttrs> = () => {
 
   return {
     oninit: updateState,
-    onupdate: updateState,
-    view: (node) => {
-      updateState(node)
+    onbeforeupdate: updateState,
+    view: ({ attrs: { value, field, binding, format } }) => {
       return [
-        uiControl(
+        m(
+          'div.twk-color-input',
           {
-            label: attrs.label,
-            description: attrs.description,
-            class: uiClass(
-              {
-                'twui-color': true,
-                'twui-color-open': opened,
-              },
-              attrs.class,
-            ),
+            style: { '--twk-color-value': rgba },
           },
           m(
-            "button[type='button']",
+            "button.twk-btn[type='button']",
             {
-              style: { 'background-color': rgba },
               onclick: toggle,
             },
             getText() || '?',
           ),
+          opened
+            ? m.fragment({}, [
+                uiColorPicker({
+                  binding: binding as never,
+                  value: value as any,
+                  field: field,
+                  format: format,
+                  oninput: onPickerInput,
+                  onchange: onPickerChange,
+                }),
+              ])
+            : null,
         ),
-        opened
-          ? m.fragment({}, [
-              uiColorPicker({
-                value: getRawValue(attrs),
-                format: attrs.format,
-                oninput: onPickerInput,
-                onchange: onPickerChange,
-              }),
-            ])
-          : null,
       ]
     },
   }

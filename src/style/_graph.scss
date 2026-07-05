@@ -1,8 +1,8 @@
-canvas.twui-graph {
+canvas.twk-graph {
   width: 100%;
 }
 
-table.twui-graph {
+table.twk-graph {
   display: table !important;
   text-align: right;
   width: 100%;
@@ -25,16 +25,16 @@ table.twui-graph {
 
   th:first-child,
   td:first-child {
-    width: var(--twui-label-size);
+    width: var(--twk-label-size);
     text-align: left;
   }
 
-  .twui-current {
+  .twk-current {
     width: 70px;
     font-weight: 600;
   }
 
-  .twui-stats {
+  .twk-stats {
     width: 110px;
     color: #888;
     font-size: 0.85em;

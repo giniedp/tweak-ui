@@ -7,9 +7,11 @@ export default () => {
       label: 'Text',
       oninput: console.log,
     })
+
     ui.string(object, 'message', {
       label: 'Text',
-      disabled: true,
+      readonly: true,
+      class: 'twk-text-end',
     })
     ui.pre('JSON', () => JSON.stringify(object, null, 2))
   })

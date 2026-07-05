@@ -3,28 +3,30 @@ import { mountUi, TreeDataAdapter } from 'tweak-ui'
 // Example node type
 type MyNode = { id: string; label: string; icon?: string; children?: MyNode[] }
 
+const expandedMap = new Map<string, boolean>()
 const adapter: TreeDataAdapter<MyNode> = {
-  getId: (node) => node.id,
-  getLabel: (node) => node.label,
-  getIcon: (node) => node.icon,
-  getChildren: (node) => node.children,
-  isExpandable: (node) => !!node.children && node.children.length > 0,
+  version: 1,
+  nodeId: (node) => node.id,
+  nodeLabel: (node) => node.label,
+  nodeIcon: (node, open) => (!node.children ? '📄' : open ? '📂' : '📁'),
+  nodeChildren: (node) => node.children,
+  isExpanded: (node) => expandedMap.get(node.id) ?? false,
+  setExpanded: (node, expanded) => {
+    adapter.version++
+    expandedMap.set(node.id, expanded)
+  },
 }
-
 const data: MyNode[] = [
   {
     id: '1',
     label: 'Root',
-    icon: '📁',
     children: Array.from({ length: 100 }, (_, i) => {
       return {
         id: `${i + 1000}`,
         label: 'Child ' + (i + 1),
-        icon: '📁',
         children: Array.from({ length: 10 }, (_, j) => ({
           id: `${i + 1000}-${j + 1}`,
           label: `Grandchild ${j + 1}`,
-          icon: '📄',
         })),
       }
     }),
@@ -35,8 +37,8 @@ export default () => {
   mountUi('.example-frame', (ui) => {
     let selectedId: string = null!
     ui.tree({
-      adapter,
       data,
+      adapter,
       style: {
         height: '400px',
       },
@@ -44,7 +46,7 @@ export default () => {
         return selectedId
       },
       onSelect: (node) => {
-        selectedId = adapter.getId(node)
+        selectedId = adapter.nodeId(node)
         console.log('Selected node:', node, 'Selected ID:', selectedId)
       },
     })

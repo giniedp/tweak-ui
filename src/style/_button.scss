@@ -1,18 +1,52 @@
-.twui-btn {
+.tweak-ui .twk-btn {
+  --twk-btn-bg: var(--twk-color-base-100);
+  --twk-btn-color: var(--twk-color-content);
+  --twk-btn-size: var(--twk-size);
+
   cursor: pointer;
   text-align: center;
   vertical-align: middle;
   user-select: none;
-  color: var(--twui-color-content);
-  height: var(--twui-size);
-}
+  color: var(--twk-btn-color);
+  min-height: var(--twk-btn-size);
+  border-radius: var(--twk-radius);
 
-.twui-btn-square {
-  width: var(--twui-size);
-  height: var(--twui-size);
-  padding-inline: 0;
-}
+  outline-offset: 1px;
 
-.twui-btn-block {
-  width: 100%;
+  background-color: var(--twk-btn-bg);
+  padding-inline: var(--twk-button-pad-x);
+
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+
+  outline-color: var(--twk-color-neutral);
+  &:hover {
+    background-color: color-mix(in oklab, var(--btn-color, var(--twk-btn-bg)), #000 7%);
+    // background-color: var(--twk-color-base-200);
+  }
+  &:focus {
+    outline-color: var(--twk-color-accent);
+  }
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &.twk-btn-accent {
+    --twk-btn-bg: var(--twk-color-accent);
+    --twk-btn-color: var(--twk-color-neutral);
+  }
+  &.twk-btn-lg {
+    --twk-btn-size: calc(var(--twk-size) * 1.25);
+  }
+  &.twk-btn-sq {
+    width: var(--twk-btn-size);
+    height: var(--twk-btn-size);
+    padding-inline: 0;
+    flex: none;
+  }
+
+  &.twk-btn-bl {
+    width: 100%;
+  }
 }

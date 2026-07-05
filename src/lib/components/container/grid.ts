@@ -4,7 +4,7 @@ import m, { Children, FactoryComponent, Vnode } from 'mithril'
  * Grid component model
  * @public
  */
-export interface GridAttrs {
+export type GridAttrs = {
   /**
    * Grit template columns specification, e.g. "1fr 2fr 1fr" or "3"
    */
@@ -28,7 +28,7 @@ export const GridComponent: FactoryComponent<GridAttrs> = () => {
     view: (node) => {
       const data = node.attrs
       return m(
-        'div.twui-grid',
+        'div.twk-grid',
         {
           style: {
             gridTemplateColumns:

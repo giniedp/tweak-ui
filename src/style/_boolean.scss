@@ -1,12 +1,28 @@
-.twui-checkbox {
-  min-height: var(--twui-size);
-  line-height: var(--twui-size);
+// .twk-checkbox {
+//   min-height: var(--twk-size);
+//   line-height: var(--twk-size);
 
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+//   cursor: pointer;
+//   transition: background-color 0.2s ease-in-out;
 
-  .twui-ctrl-content {
-    display: inline-flex;
-    gap: var(--twui-gap);
+//   .twk-widget-content {
+//     display: inline-flex;
+//     gap: var(--twk-gap);
+//   }
+// }
+
+.twk-bool-input {
+  display: flex;
+  flex-direction: row;
+
+  align-items: center;
+  gap: var(--twk-gap);
+
+  input {
+    min-width: 0;
+    text-align: right;
   }
+}
+.twk-bool-input.twk-align-end {
+  justify-content: flex-end;
 }

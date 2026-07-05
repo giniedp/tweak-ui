@@ -1,0 +1,50 @@
+.twk-bitmask-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--twk-gap);
+
+  .twk-bitmask-row {
+    display: flex;
+    flex-direction: row;
+    gap: var(--twk-gap);
+    cursor: pointer;
+  }
+
+  .twk-bitmask-row > * {
+    flex: none;
+  }
+  .twk-bitmask-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-left: 0.25rem;
+  }
+
+  .twk-bitmask-bit {
+    opacity: 0.5;
+    padding-right: 0.25rem;
+  }
+
+  .twk-bitmask-value {
+    opacity: 0.5;
+  }
+
+  .twk-bitmask-indicator {
+    width: var(--twk-size);
+    height: var(--twk-size);
+    background-color: var(--twk-color-base-100);
+  }
+}
+
+.twk-bitmask-active .twk-bitmask-indicator::before {
+  content: '';
+  display: block;
+  width: 50%;
+  height: 50%;
+  margin: 25%;
+  background-color: var(--twk-color-accent);
+}
+
+.twk-bitmask-active .twk-bitmask-value {
+  opacity: 1;
+}

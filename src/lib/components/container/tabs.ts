@@ -8,7 +8,7 @@ import { GroupAttrs } from './group'
  * Tabs component model
  * @public
  */
-export interface TabsAttrs {
+export type TabsAttrs = {
   vertical?: boolean
 }
 
@@ -48,7 +48,7 @@ export const TabComponent: FactoryComponent<TabAttrs> = () => {
       const active = host.isActive(vnode)
       return [
         m(
-          'button.twui-tab',
+          'button.twk-btn.twk-tab',
           {
             class: uiClass({
               active,
@@ -57,7 +57,7 @@ export const TabComponent: FactoryComponent<TabAttrs> = () => {
           },
           title,
         ),
-        !active ? null : m('div.twui-tab-content', {}, children),
+        !active ? null : m('div.twk-tab-content', {}, children),
       ]
     },
   }
@@ -134,10 +134,10 @@ export const TabsComponent: FactoryComponent<TabsAttrs> = () => {
   return {
     view: (node) => {
       return m(
-        'div.twui-tabs',
+        'div.twk-tabs',
         {
           class: uiClass({
-            'twui-tabs-vertical': !!node.attrs.vertical,
+            'twk-tabs-vertical': !!node.attrs.vertical,
           }),
         },
         m.fragment({}, [tabChildren(node)]),

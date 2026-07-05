@@ -1,16 +1,26 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Child, Children, FactoryComponent, Vnode } from 'mithril'
 import { getControlValue, setControlValue } from '../../core'
-import { uiControl, ValueControlAttrs } from '../elements'
+import { uiWidget, ValueWidgetAttrs } from '../elements'
 
 /**
  * Basic input component model
  * @public
  */
-export interface InputAttrs<T = unknown> extends ValueControlAttrs<T, string> {
+export type InputWidgetAttrs<T = unknown> = ValueWidgetAttrs<T, string> & {
   /**
    * The placeholder text
    */
   placeholder?: string
+
+  /**
+   * Content before the input field
+   */
+  slotBefore?: Child
+
+  /**
+   * Content after the input field
+   */
+  slotAfter?: Child
 
   /**
    * This is called when the control value has been changed.
@@ -28,7 +38,7 @@ export interface InputAttrs<T = unknown> extends ValueControlAttrs<T, string> {
   /**
    * Disables the control input
    */
-  disabled?: boolean
+  readonly?: boolean
 
   /**
    *
@@ -36,12 +46,37 @@ export interface InputAttrs<T = unknown> extends ValueControlAttrs<T, string> {
   type?: string
 }
 
-export function uiInput<T>(attrs: InputAttrs<T>, children?: Children): Vnode<InputAttrs<T>> {
-  return m(InputComponent as any, attrs as any, children)
+export function uiInputWidget<T>(
+  attrs: InputWidgetAttrs<T>,
+  children?: Children,
+): Vnode<InputWidgetAttrs<T>> {
+  return m(InputWidgetComponent as any, attrs as any, children)
 }
 
-export const InputComponent: FactoryComponent<InputAttrs> = () => {
-  let attrs: InputAttrs
+export function uiInput<T>(
+  attrs: InputWidgetAttrs<T>,
+  children?: Children,
+): Vnode<InputWidgetAttrs<T>> {
+  return m(InputWidgetComponent as any, attrs as any, children)
+}
+
+export const InputWidgetComponent: FactoryComponent<InputWidgetAttrs> = () => {
+  return {
+    view: ({ attrs: { label, class: className, ...rest } }) => {
+      return uiWidget(
+        {
+          tagName: 'label.twk-input-widget',
+          label: label ?? rest.field,
+          class: className,
+        },
+        m(InputComponent, rest),
+      )
+    },
+  }
+}
+
+export const InputComponent: FactoryComponent<InputWidgetAttrs> = () => {
+  let attrs: InputWidgetAttrs
   function onchange(e: Event) {
     const el = e.target as HTMLInputElement
     const value = el.value
@@ -53,22 +88,18 @@ export const InputComponent: FactoryComponent<InputAttrs> = () => {
   return {
     view: (node) => {
       attrs = node.attrs
-      return uiControl(
-        {
-          tagName: 'label.twui-input',
-          label: attrs.label,
-          description: attrs.description,
-          class: attrs.class,
-        },
+      return m('div.twk-input', {}, [
+        node.attrs.slotBefore ? m('span', {}, node.attrs.slotBefore) : null,
         m('input', {
           type: attrs.type || 'text',
           value: getControlValue(attrs),
           oninput: onchange,
           onchange: onchange,
           placeholder: attrs.placeholder,
-          disabled: attrs.disabled,
+          disabled: attrs.readonly,
         }),
-      )
+        node.attrs.slotAfter ? m('span', {}, node.attrs.slotAfter) : null,
+      ])
     },
   }
 }

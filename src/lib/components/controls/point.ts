@@ -2,13 +2,13 @@ import m, { Children, FactoryComponent, Vnode } from 'mithril'
 
 import { getControlValue } from '../../core'
 import { call, clamp, dragUtil, getTouchPoint, uiClass } from '../../core/utils'
-import { uiControl, ValueControlAttrs } from '../elements'
+import { uiWidget, ValueWidgetAttrs } from '../elements'
 
 /**
  * Point component model
  * @public
  */
-export interface PointAttrs<T = unknown> extends ValueControlAttrs<T, any> {
+export type PointAttrs<T = unknown> = ValueWidgetAttrs<T, any> & {
   /**
    * The object field names. Defaults to `['x', 'y']`
    */
@@ -152,11 +152,10 @@ export const PointComponent: FactoryComponent<PointAttrs> = () => {
     onupdate: updateState,
     view: (node) => {
       updateState(node)
-      return uiControl(
+      return uiWidget(
         {
           label: attrs.label,
-          description: attrs.description,
-          class: uiClass('twui-point', attrs.class),
+          class: uiClass('twk-point', attrs.class),
         },
         m(
           '.point-area',

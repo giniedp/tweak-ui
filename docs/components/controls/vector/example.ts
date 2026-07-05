@@ -36,6 +36,18 @@ export default () => {
       unlabeled: true,
     })
 
+    ui.vector(object, 'array', {
+      label: 'Array',
+      keys: ['0', '1', '2'],
+      min: -1,
+      max: 1,
+      step: 0.125,
+      oninput: console.log,
+      onchange: console.log,
+      unlabeled: true,
+      readonly: true,
+    })
+
     ui.pre('JSON', () => JSON.stringify(object, null, 2))
   })
 }

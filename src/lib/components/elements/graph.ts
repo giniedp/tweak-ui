@@ -97,12 +97,12 @@ export const GraphComponent: FactoryComponent<GraphAttrs> = () => {
     view: ({ attrs: { rowHeight, collapsed } }) => {
       const height = (rowHeight || 50) * (collapsed ? 1 : config.rows.length) * devicePixelRatio
       return [
-        m('canvas.twui-graph', {
+        m('canvas.twk-graph', {
           style: `width: 100%; height: ${height}px`,
           oncreate: canvasCreated,
           onremove: cavasRemoved,
         }),
-        m('table.twui-graph', {}, [
+        m('table.twk-graph', {}, [
           m(
             'tbody',
             {},
@@ -116,8 +116,8 @@ export const GraphComponent: FactoryComponent<GraphAttrs> = () => {
                   m('td', { style: r.noGraph ? {} : `color: ${r.color}`, title: r.name! }, [
                     m('span', r.name!),
                   ]),
-                  m('td.twui-stats', { title: 'min / max / avg' }, []),
-                  m('td.twui-current', {}),
+                  m('td.twk-stats', { title: 'min / max / avg' }, []),
+                  m('td.twk-current', {}),
                 ],
               )
             }),
@@ -155,8 +155,8 @@ function renderLegend(renderer: StatsRenderer | null, nodes: HTMLElement[]) {
       continue
     }
 
-    const current = el.querySelector('.twui-current')
-    const stats = el.querySelector('.twui-stats')
+    const current = el.querySelector('.twk-current')
+    const stats = el.querySelector('.twk-stats')
     if (current) {
       current.textContent = formatValue(sampler.value, sampler.fractionDigits)
     }

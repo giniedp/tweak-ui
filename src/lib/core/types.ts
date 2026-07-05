@@ -34,27 +34,50 @@ export type ComponentChildren = ComponentSchema | Children | (() => Children)
  */
 export type ComponentSchema = Array<ComponentDescriptor<any>>
 
-export type ValueField<T, Value = unknown> = {
-  /**
-   * The raw value of the control, or the object containing it if `field` is set.
-   */
-  value: T
-  /**
-   * The property name in `value` where the raw value is stored.
-   */
-  field?: keyof T
-  /**
-   * An optional adapter to convert between the raw value and the control value.
-   */
-  adapter?: ValueFieldAdapter<any, Value>
+export function binding<T>(target: T, field: keyof T): ValueBinding<T, T[keyof T]> {
+  return {
+    get: () => target[field],
+    set: (value) => (target[field] = value),
+  }
 }
 
 /**
- * Utility to convert a value from a raw format to a control format and back.
+ * A get/set pair that encapsulates access to a value without exposing the source object.
  *
  * @public
  */
-export type ValueFieldAdapter<RawValue, ControlValue> = {
+export type ValueBinding<M, T> = {
+  get: (model: M, field?: keyof M) => T
+  set?: (value: T, model: M, field?: keyof M) => void
+}
+
+export type TweakableAttrs<T, Value = unknown> = {
+  /**
+   * The target object being tweaked.
+   */
+  value: T
+  /**
+   * The property on `value` to read from and write to
+   */
+  field?: keyof T
+  /**
+   * The custom binding controller
+   */
+  binding?: ValueBinding<T, Value>
+  /**
+   * An optional adapter to convert between the raw value and the control value.
+   */
+  adapter?: ControlAdapter<any, Value>
+}
+
+/**
+ * Converts between the raw stored value and the value the control operates on.
+ * Use when the control's internal representation differs from the source data format
+ * e.g. radians stored, degrees displayed; or a packed integer unpacked into a vector.
+ *
+ * @public
+ */
+export type ControlAdapter<RawValue, ControlValue> = {
   toControl: (value: RawValue) => ControlValue
   fromControl: (value: ControlValue) => RawValue
 }

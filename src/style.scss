@@ -1,21 +1,34 @@
-@use 'style/angle';
 @use 'style/base';
-@use 'style/boolean';
+
 @use 'style/button';
+
+@use 'style/dialog';
+@use 'style/container';
+@use 'style/divider';
+@use 'style/group';
+@use 'style/tree';
+@use 'style/tabs';
+@use 'style/split-pane';
+@use 'style/section';
+
+@use 'style/widget';
+
+@use 'style/input';
+@use 'style/angle';
+@use 'style/bitmask';
+@use 'style/boolean';
+
 @use 'style/color-picker';
 @use 'style/color';
-@use 'style/container';
-@use 'style/display';
-@use 'style/divider';
+@use 'style/checkbox';
 @use 'style/graph';
-@use 'style/group';
 @use 'style/image';
 @use 'style/matrix';
-@use 'style/number';
-@use 'style/page';
 @use 'style/point';
+@use 'style/scalar';
 @use 'style/spherical';
-@use 'style/split-pane';
-@use 'style/tabs';
-@use 'style/tree';
+@use 'style/string';
 @use 'style/vector';
+@use 'style/poll';
+
+@use 'style/utils';

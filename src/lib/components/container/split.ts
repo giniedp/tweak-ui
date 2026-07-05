@@ -158,12 +158,12 @@ export const SplitComponent: FactoryComponent<SplitAttr> = () => {
       minSizePx = minSize = Math.max(minSize || 16, 0)
       queueMicrotask(measurePanes)
       return m(
-        'div.twui-split-pane',
+        'div.twk-split-pane',
         {
           ...rest,
           class: uiClass({
-            'twui-split-pane-h': isHorizontal,
-            'twui-split-pane-v': !isHorizontal,
+            'twk-split-pane-h': isHorizontal,
+            'twk-split-pane-v': !isHorizontal,
           }),
           style: {
             ...(style || {}),
@@ -180,10 +180,10 @@ export const SplitComponent: FactoryComponent<SplitAttr> = () => {
             child,
             noGutter
               ? null
-              : m('div.twui-split-gutter', {
+              : m('div.twk-split-gutter', {
                   class: uiClass({
-                    'twui-split-gutter-h': isHorizontal,
-                    'twui-split-gutter-v': !isHorizontal,
+                    'twk-split-gutter-h': isHorizontal,
+                    'twk-split-gutter-v': !isHorizontal,
                   }),
                   onmousedown: (e: MouseEvent) =>
                     handleMouseDown(e, i, child as any, list[i + 1] as any),

@@ -1,8 +1,8 @@
-.twui-color-picker {
+.twk-color-picker {
   flex: auto 1 1;
   display: flex;
   flex-direction: row;
-  gap: var(--twui-gap);
+  gap: var(--twk-gap);
 
   .color-picker-panel {
     flex: 1;
@@ -13,7 +13,7 @@
     flex: none;
     display: flex;
     flex-direction: column;
-    gap: var(--twui-gap);
+    gap: var(--twk-gap);
 
     .input-r {
       border-left: 2px solid #f00 !important;
@@ -43,8 +43,9 @@
   .color-picker-a {
     &:focus {
       outline: none;
-      border-color: var(--twui-color-accent);
+      border-color: var(--twk-color-accent);
     }
+    border-radius: var(--twk-radius);
   }
 
   .color-picker-sv {
@@ -55,7 +56,7 @@
     cursor: crosshair;
     z-index: 1;
     border-bottom: 1px solid;
-    border-color: var(--twui-color-base-300);
+    border-color: var(--twk-color-base-300);
   }
   .color-picker-sv-bg {
     position: absolute;
@@ -63,6 +64,7 @@
     left: 0;
     right: 0;
     bottom: 0;
+    border-radius: var(--twk-radius);
   }
   .color-picker-sv-cursor {
     box-sizing: border-box;
@@ -83,7 +85,7 @@
     box-sizing: border-box;
     cursor: ew-resize;
     border-bottom: 1px solid;
-    border-color: var(--twui-color-base-300);
+    border-color: var(--twk-color-base-300);
   }
 
   .color-picker-h-cursor,
@@ -117,6 +119,6 @@
   .color-picker-sv,
   .color-picker-h,
   .color-picker-a {
-    border-color: var(--twui-color-base-300);
+    border-color: var(--twk-color-base-300);
   }
 }

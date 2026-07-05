@@ -1,11 +1,11 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Attributes, Children, FactoryComponent, Vnode } from 'mithril'
 import { StyleAttr } from '../../core'
 
 /**
  * List component model
  * @public
  */
-export interface ListAttrs {
+export type ListAttrs = Attributes & {
   /**
    * Maps to flex-flow CSS property.
    * @links https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/flex-flow
@@ -30,7 +30,7 @@ export const FlexComponent: FactoryComponent<ListAttrs> = () => {
   return {
     view: ({ attrs: { flex, flow, style, ...rest }, children }) => {
       return m(
-        'div.twui-flex',
+        'div.twk-flex',
         {
           style: {
             flex: flex ?? 'auto',

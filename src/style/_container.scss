@@ -1,11 +1,17 @@
-.twui-flex {
+.twk-flex {
   display: flex;
   flex-flow: column nowrap;
   align-items: stretch;
-  gap: var(--twui-gap);
+  gap: var(--twk-gap);
 }
 
-.twui-grid {
+.twk-flex-row {
+  display: flex;
+  flex-flow: row nowrap;
+  gap: var(--twk-gap);
+}
+
+.twk-grid {
   display: grid;
-  gap: var(--twui-gap);
+  gap: var(--twk-gap);
 }

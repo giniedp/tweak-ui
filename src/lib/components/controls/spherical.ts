@@ -2,7 +2,7 @@ import m, { Children, FactoryComponent, Vnode } from 'mithril'
 
 import { getControlValue, setControlValue } from '../../core'
 import { call, clamp, dragUtil, getTouchInTarget, uiClass } from '../../core/utils'
-import { uiControl, ValueControlAttrs } from '../elements'
+import { uiWidget, ValueWidgetAttrs } from '../elements'
 
 /**
  * @public
@@ -18,7 +18,7 @@ export type SphericalValue = { radius: number; azimuth: number; polar: number }
  * Spherical component model
  * @public
  */
-export interface SphericalAttrs<T = unknown> extends ValueControlAttrs<T, CartesianValue> {
+export type SphericalAttrs<T = unknown> = ValueWidgetAttrs<T, CartesianValue> & {
   /**
    * This is called when the control value has been changed.
    */
@@ -149,11 +149,10 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
     onupdate: updateState,
     view: () => {
       cartesian = toCartesian(radius, azimuth, polar, cartesian)
-      return uiControl(
+      return uiWidget(
         {
-          tagName: 'label.twui-spherical',
-          label: attrs.label,
-          description: attrs.description,
+          tagName: 'label.twk-spherical',
+          label: attrs.label ?? attrs.field,
           class: attrs.class,
           style: {
             '--azimuth-value': `${toDeg(azimuth)}`,
@@ -162,12 +161,12 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
         },
         [
           m(
-            'div.twui-spherical-label',
+            'div.twk-spherical-label',
             {},
             `x: ${cartesian.x.toFixed(2)} y: ${cartesian.y.toFixed(2)} z: ${cartesian.z.toFixed(2)}`,
           ),
           m(
-            'div.twui-spherical-pane',
+            'div.twk-spherical-pane',
             {
               oncreate: (vnode) => (paneElement = vnode.dom as HTMLElement),
               class: uiClass({
@@ -182,7 +181,7 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
               },
             },
             m(
-              'div.twui-spherical-arm',
+              'div.twk-spherical-arm',
               {
                 onmousedown: onStartPolar,
                 ontouchstart: onStartPolar,
@@ -196,7 +195,7 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
                   transformOrigin: 'left center',
                 },
               },
-              m('div.twui-spherical-knob', {
+              m('div.twk-spherical-knob', {
                 onmousedown: onStartAzim,
                 ontouchstart: onStartAzim,
                 tabIndex: 0,

@@ -1,0 +1,354 @@
+.tweak-ui {
+  // padding — uniform
+  .twk-p-0 {
+    padding: 0;
+  }
+  .twk-p-1 {
+    padding: var(--twk-gap);
+  }
+  .twk-p-2 {
+    padding: calc(var(--twk-gap) * 2);
+  }
+  .twk-p-4 {
+    padding: calc(var(--twk-gap) * 4);
+  }
+
+  // padding — x axis
+  .twk-px-0 {
+    padding-inline: 0;
+  }
+  .twk-px-1 {
+    padding-inline: var(--twk-gap);
+  }
+  .twk-px-2 {
+    padding-inline: calc(var(--twk-gap) * 2);
+  }
+  .twk-px-4 {
+    padding-inline: calc(var(--twk-gap) * 4);
+  }
+
+  // padding — y axis
+  .twk-py-0 {
+    padding-block: 0;
+  }
+  .twk-py-1 {
+    padding-block: var(--twk-gap);
+  }
+  .twk-py-2 {
+    padding-block: calc(var(--twk-gap) * 2);
+  }
+  .twk-py-4 {
+    padding-block: calc(var(--twk-gap) * 4);
+  }
+
+  // semantic padding aliases — matches component variables
+  .twk-p-inset {
+    padding: var(--twk-inset);
+  }
+  .twk-px-label {
+    padding-inline: var(--twk-label-pad-x);
+  }
+  .twk-px-input {
+    padding-inline: var(--twk-input-pad-x);
+  }
+  .twk-px-button {
+    padding-inline: var(--twk-button-pad-x);
+  }
+
+  // gap
+  .twk-gap-0 {
+    gap: 0;
+  }
+  .twk-gap-1 {
+    gap: var(--twk-gap);
+  }
+  .twk-gap-2 {
+    gap: calc(var(--twk-gap) * 2);
+  }
+  .twk-gap-4 {
+    gap: calc(var(--twk-gap) * 4);
+  }
+
+  .twk-w-full {
+    width: 100%;
+  }
+  .twk-w-label {
+    width: var(--twk-label-size);
+  }
+  .twk-h-input {
+    height: var(--twk-input-height);
+  }
+  .twk-h-btn {
+    height: var(--twk-button-height);
+  }
+  .twk-h-full {
+    height: 100%;
+  }
+
+  .twk-rounded-none {
+    border-radius: 0;
+  }
+  .twk-rounded {
+    border-radius: var(--twk-radius);
+  }
+  .twk-rounded-full {
+    border-radius: 9999px;
+  }
+
+  .twk-text-end {
+    text-align: end;
+  }
+  .twk-text-right {
+    text-align: right;
+  }
+  .twk-text-start {
+    text-align: start;
+  }
+  .twk-text-left {
+    text-align: left;
+  }
+  .twk-text-center {
+    text-align: center;
+  }
+
+  .twk-text-xs {
+    font-size: 0.625rem;
+  }
+  .twk-text-sm {
+    font-size: 0.75rem;
+  }
+  .twk-text-md {
+    font-size: 0.875rem;
+  }
+
+  .twk-bg-100 {
+    background-color: var(--twk-color-base-100);
+  }
+  .twk-bg-200 {
+    background-color: var(--twk-color-base-200);
+  }
+  .twk-bg-300 {
+    background-color: var(--twk-color-base-300);
+  }
+  .twk-bg-content {
+    background-color: var(--twk-color-base-content);
+  }
+  .twk-bg-neutral {
+    background-color: var(--twk-color-neutral);
+  }
+  .twk-bg-neutral-content {
+    background-color: var(--twk-color-neutral-content);
+  }
+  .twk-bg-accent {
+    background-color: var(--twk-color-accent);
+  }
+
+  .twk-color-100 {
+    color: var(--twk-color-base-100);
+  }
+  .twk-color-200 {
+    color: var(--twk-color-base-200);
+  }
+  .twk-color-300 {
+    color: var(--twk-color-base-300);
+  }
+  .twk-color-content {
+    color: var(--twk-color-base-content);
+  }
+  .twk-color-neutral {
+    color: var(--twk-color-neutral);
+  }
+  .twk-color-neutral-content {
+    color: var(--twk-color-neutral-content);
+  }
+  .twk-color-accent {
+    color: var(--twk-color-accent);
+  }
+  .twk-color-muted {
+    color: color-mix(in srgb, var(--twk-color-base-content) 40%, transparent);
+  }
+  .twk-color-dim {
+    color: color-mix(in srgb, var(--twk-color-base-content) 20%, transparent);
+  }
+
+  .twk-glass {
+    background-color: color-mix(
+      in srgb,
+      var(--twk-glass-color, #000000) var(--twk-glass-percent, 50%),
+      transparent
+    );
+    backdrop-filter: blur(40px);
+  }
+
+  .twk-glass-100 {
+    --twk-glass-color: var(--twk-color-base-100);
+  }
+  .twk-glass-200 {
+    --twk-glass-color: var(--twk-color-base-200);
+  }
+  .twk-glass-300 {
+    --twk-glass-color: var(--twk-color-base-300);
+  }
+
+  @keyframes twk-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+//
+// all patterns are built from css variables so they adapt to theme overrides.
+// use --twk-pattern-* to override per-instance via inline style or a wrapper.
+//
+// defaults
+:root {
+  --twk-pattern-color-a: color-mix(in srgb, var(--twk-color-base-300) 100%, transparent);
+  --twk-pattern-color-b: color-mix(in srgb, var(--twk-color-base-100) 80%, transparent);
+  --twk-pattern-color-line: color-mix(in srgb, var(--twk-color-base-content) 8%, transparent);
+  --twk-pattern-size: 0.5rem; // cell / grid unit
+  --twk-pattern-line-width: 1px;
+}
+
+//
+// classic 2x2 checkerboard.
+// primary use: alpha channel preview, empty texture slots.
+//
+// <div class="twk-bg-checker">
+// <div class="twk-bg-checker" style="--twk-pattern-size: 1rem;">
+
+.twk-bg-checker {
+  background-color: var(--twk-pattern-color-a);
+  background-image: repeating-conic-gradient(
+    var(--twk-pattern-color-b) 0% 25%,
+    transparent 25% 50%
+  );
+  background-size: calc(var(--twk-pattern-size) * 2) calc(var(--twk-pattern-size) * 2);
+  background-position: 0 0;
+}
+
+// fine variant — half the cell size, useful for small thumbnails
+.twk-bg-checker-fine {
+  --twk-pattern-size: 0.25rem;
+  @extend .twk-bg-checker;
+}
+
+// coarse variant — double the cell size, useful for full previews
+.twk-bg-checker-coarse {
+  --twk-pattern-size: 1rem;
+  @extend .twk-bg-checker;
+}
+
+//
+// uniform grid lines on a solid base.
+// primary use: spatial controls, uv editors, matrix backgrounds.
+//
+// <div class="twk-bg-grid">
+// <div class="twk-bg-grid" style="--twk-pattern-size: 1rem; --twk-pattern-line-width: 2px;">
+
+.twk-bg-grid {
+  background-color: var(--twk-pattern-color-a);
+  background-image:
+    linear-gradient(
+      to right,
+      var(--twk-pattern-color-line) var(--twk-pattern-line-width),
+      transparent var(--twk-pattern-line-width)
+    ),
+    linear-gradient(
+      to bottom,
+      var(--twk-pattern-color-line) var(--twk-pattern-line-width),
+      transparent var(--twk-pattern-line-width)
+    );
+  background-size: var(--twk-pattern-size) var(--twk-pattern-size);
+  background-position: 0 0;
+}
+
+//
+// grid with brighter center lines on x and y axes.
+// primary use: vector/coordinate controls, uv preview with origin marker.
+// requires the element to have a known size or be position:relative.
+//
+// <div class="twk-bg-grid-axis">
+
+.twk-bg-grid-axis {
+  --twk-pattern-color-axis: color-mix(in srgb, var(--twk-color-base-content) 20%, transparent);
+
+  background-color: var(--twk-pattern-color-a);
+  background-image:
+      // axis lines — drawn on top
+    linear-gradient(
+      to right,
+      var(--twk-pattern-color-axis) var(--twk-pattern-line-width),
+      transparent var(--twk-pattern-line-width)
+    ),
+    linear-gradient(
+      to bottom,
+      var(--twk-pattern-color-axis) var(--twk-pattern-line-width),
+      transparent var(--twk-pattern-line-width)
+    ),
+    // regular grid underneath
+    linear-gradient(
+        to right,
+        var(--twk-pattern-color-line) var(--twk-pattern-line-width),
+        transparent var(--twk-pattern-line-width)
+      ),
+    linear-gradient(
+      to bottom,
+      var(--twk-pattern-color-line) var(--twk-pattern-line-width),
+      transparent var(--twk-pattern-line-width)
+    );
+  background-size:
+    100% 100%,
+    // axis x — full width, center via position
+    100% 100%,
+    // axis y
+    var(--twk-pattern-size) var(--twk-pattern-size),
+    var(--twk-pattern-size) var(--twk-pattern-size);
+  background-position:
+    0 50%,
+    // axis x — centered vertically
+    50% 0,
+    // axis y — centered horizontally
+    0 0,
+    0 0;
+}
+
+//
+// dot grid — softer alternative to hard grid lines.
+// primary use: node graph backgrounds, spatial canvas backdrops.
+//
+// <div class="twk-bg-dots">
+
+.twk-bg-dots {
+  --twk-pattern-dot-size: 1.5px;
+
+  background-color: var(--twk-pattern-color-a);
+  background-image: radial-gradient(
+    circle,
+    var(--twk-pattern-color-line) var(--twk-pattern-dot-size),
+    transparent var(--twk-pattern-dot-size)
+  );
+  background-size: var(--twk-pattern-size) var(--twk-pattern-size);
+  background-position: 0 0;
+}
+
+//
+// diagonal stripes — hazard / disabled / loading state indicator.
+// primary use: unavailable slots, locked controls, placeholder areas.
+//
+// <div class="twk-bg-stripes">
+// <div class="twk-bg-stripes twk-bg-stripes--vertical">
+
+.twk-bg-stripes {
+  background-color: var(--twk-pattern-color-a);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--twk-pattern-color-b) 0px,
+    var(--twk-pattern-color-b) var(--twk-pattern-size),
+    transparent var(--twk-pattern-size),
+    transparent calc(var(--twk-pattern-size) * 2)
+  );
+}

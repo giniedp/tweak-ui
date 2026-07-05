@@ -2,8 +2,8 @@ import m, { Child, FactoryComponent, Vnode } from 'mithril'
 import { uiClass } from '../../core/utils'
 
 export interface TreeAttrs<T> {
+  data: Iterable<T>
   adapter: TreeDataAdapter<T>
-  data: T[]
   selectedId?: string
   rowHeight?: number
   style?: Partial<CSSStyleDeclaration>
@@ -11,11 +11,18 @@ export interface TreeAttrs<T> {
 }
 
 export interface TreeDataAdapter<T> {
-  getId(node: T): string
-  getLabel(node: T): Child
-  getIcon(node: T): Child
-  getChildren(node: T): Iterable<T> | undefined
-  isExpandable(node: T): boolean
+  version: number
+  nodeId(node: T): string
+  nodeLabel(node: T): Child
+  nodeIcon(node: T, expanded: boolean): Child
+  nodeChildren(node: T): Iterable<T> | undefined
+  isExpanded(node: T): boolean
+  setExpanded(node: T, expanded: boolean): void
+  connect?(controller: TreeController<T>): void
+}
+
+export interface TreeController<T> {
+  scrollTo(node: T): void
 }
 
 export function uiTree<T>(attrs: TreeAttrs<T>): Vnode<TreeAttrs<T>> {
@@ -31,33 +38,34 @@ interface FlatNode<T> {
 function flattenTree<T>(
   data: Iterable<T>,
   adapter: TreeDataAdapter<T>,
-  expandedMap: Map<string, boolean>,
   depth = 0,
   result: FlatNode<T>[] = [],
 ): FlatNode<T>[] {
   for (const node of data) {
-    const id = adapter.getId(node)
-    const expanded = expandedMap.get(id) ?? false
+    const expanded = adapter.isExpanded(node) ?? false
+    const children = adapter.nodeChildren(node)
     result.push({ node, depth, expanded })
-    if (adapter.isExpandable(node) && expanded) {
-      const children = adapter.getChildren(node)
-      if (children) {
-        flattenTree(children, adapter, expandedMap, depth + 1, result)
-      }
+    if (!!children && expanded) {
+      flattenTree(children, adapter, depth + 1, result)
     }
   }
   return result
 }
 
+const ROW_HEIGHT = 22
 export const TreeComponent: FactoryComponent<TreeAttrs<any>> = () => {
-  let expandedMap = new Map<string, boolean>()
   let scrollTop = 0
   let observer: ResizeObserver | null = null
   let height = 0
+  let nodes: FlatNode<any>[] = []
+  let treeVersion: number | undefined
+  let adapter: TreeDataAdapter<any> | null = null
+  let selectedId: string | undefined
+  let rowHeight: number | undefined
+  let onSelect: ((node: any) => void) | undefined
+  let data: Iterable<any> = []
+  let scrollEl: HTMLElement | null = null
   return {
-    oninit() {
-      expandedMap = new Map()
-    },
     onremove() {
       observer?.disconnect()
     },
@@ -71,66 +79,94 @@ export const TreeComponent: FactoryComponent<TreeAttrs<any>> = () => {
       })
       observer.observe(dom)
     },
-    view(vnode) {
-      const { adapter, data, selectedId, onSelect, style, rowHeight = 32 } = vnode.attrs
-      const flatNodes = flattenTree(data, adapter, expandedMap)
-      const totalRows = flatNodes.length
+    onupdate({ attrs: { adapter } }) {
+      adapter.connect?.({
+        scrollTo(node) {
+          const index = nodes.findIndex((it) => it.node === node)
+          if (index >= 0) {
+            scrollEl?.scrollTo({
+              top: index * (rowHeight ?? ROW_HEIGHT),
+              behavior: 'instant',
+            })
+            m.redraw()
+          }
+        },
+      })
+    },
+    view({ attrs }) {
+      data = attrs.data!
+      adapter = attrs.adapter!
+      selectedId = attrs.selectedId!
+      rowHeight = attrs.rowHeight ?? ROW_HEIGHT
+      onSelect = attrs.onSelect
+
+      if (treeVersion == null || treeVersion !== adapter.version) {
+        nodes = flattenTree(data, adapter)
+      }
+
+      const totalRows = nodes.length
       const visibleRows = Math.ceil(height / rowHeight)
       const startIdx = Math.floor(scrollTop / rowHeight)
       const endIdx = Math.min(startIdx + visibleRows, totalRows)
       const offsetY = startIdx * rowHeight
-      const childNodes = flatNodes.slice(startIdx, endIdx)
+      const childNodes = nodes.slice(startIdx, endIdx)
       return m(
-        'div.twui-tree',
+        'div.twk-tree',
         {
-          style,
+          style: attrs.style ?? {},
+          oncreate: ({ dom }) => {
+            scrollEl = dom as HTMLElement
+          },
           onscroll: (e: UIEvent) => {
             scrollTop = (e.target as HTMLElement).scrollTop
           },
         },
         m(
-          'div.twui-tree-spacer',
+          'div.twk-tree-spacer',
           {
             style: {
               height: `${totalRows * rowHeight}px`,
             },
           },
           m(
-            'div.twui-tree-viewport',
+            'div.twk-tree-viewport',
             {
               style: {
-                '--twui-tree-row-height': `${rowHeight}px`,
+                '--twk-tree-row-height': `${rowHeight}px`,
                 transform: `translateY(${offsetY}px)`,
               },
             },
             childNodes.map(({ node, depth, expanded }) => {
-              const id = adapter.getId(node)
+              const id = adapter!.nodeId(node)
               const isSelected = id === selectedId
-              const icon = adapter.getIcon(node)
-              const isExpandable = adapter.isExpandable(node)
+              const icon = adapter!.nodeIcon(node, adapter!.isExpanded(node))
+              const isExpandable = !!adapter!.nodeChildren(node)
               return m(
-                'div.twui-tree-row',
+                'div.twk-tree-row',
                 {
                   key: id,
-                  class: uiClass({ selected: isSelected }),
+                  class: uiClass({
+                    selected: isSelected,
+                    expandable: isExpandable,
+                  }),
                   style: {
                     height: `${rowHeight}px`,
-                    '--twui-tree-row-depth': depth,
+                    '--twk-tree-row-depth': depth,
                   },
                   onclick: () => onSelect?.(node),
                 },
                 [
-                  m('span.twui-tree-toggle', {
+                  m('span.twk-tree-toggle', {
                     class: uiClass({ expanded, expandable: isExpandable }),
                     onclick: (e: MouseEvent) => {
                       if (isExpandable) {
                         e.stopPropagation()
-                        expandedMap.set(id, !expanded)
+                        adapter!.setExpanded(node, !expanded)
                       }
                     },
                   }),
-                  icon ? m('span.twui-tree-icon', {}, icon) : null,
-                  m('span.twui-tree-label', {}, adapter.getLabel(node)),
+                  icon ? m('span.twk-tree-icon', {}, icon) : null,
+                  m('span.twk-tree-label', {}, adapter!.nodeLabel(node)),
                 ],
               )
             }),

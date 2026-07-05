@@ -1,17 +1,21 @@
 import { Children } from 'mithril'
 import {
-  AngleComponent,
+  AngleInputComponent,
+  AngleWidgetComponent,
   BarComponent,
   BarContentComponent,
   BarEndComponent,
   BarStartComponent,
-  BooleanComponent,
+  BitmaskInputComponent,
+  BitmaskWidgetComponent,
+  BoolInputComponent,
+  BoolWidgetComponent,
   ButtonAttrs,
   ButtonComponent,
-  ColorControl,
+  ColorComponent,
   ColorPicker,
-  ControlAttrs,
-  ControlComponent,
+  ColorPickerWidgetComponent,
+  ColorWidgetComponent,
   Divider,
   FlexComponent,
   GraphAttrs,
@@ -21,24 +25,31 @@ import {
   GroupComponent,
   ImageAttrs,
   ImageComponent,
-  InputComponent,
-  MatrixComponent,
-  NumberComponent,
-  PageComponent,
-  PageFooterComponent,
-  PageHeaderComponent,
+  MatrixInputComponent,
+  MatrixWidgetComponent,
   PointComponent,
+  PollComponent,
+  PollWidgetComponent,
+  ScalarInputComponent,
+  ScalarWidgetComponent,
+  SectionComponent,
+  SectionFooterComponent,
+  SectionHeaderComponent,
   SelectComponent,
   SphericalComponent,
   SplitComponent,
   SplitContentComponent,
+  StringInputComponent,
+  StringWidgetComponent,
   TabsComponent,
-  TextComponent,
   TreeAttrs,
   TreeComponent,
-  VectorComponent,
+  VectorInputComponent,
+  VectorWidgetComponent,
+  WidgetAttrs,
+  WidgetComponent,
 } from './components'
-import { Component, ComponentChildren, ComponentSchema, OmitIn, ValueField } from './core'
+import { Component, ComponentChildren, ComponentSchema, OmitIn, TweakableAttrs } from './core'
 import { isFunction, isObject, isString } from './core/utils'
 
 /**
@@ -84,31 +95,40 @@ export class Builder {
   public tabs = componentGenerator(this, TabsComponent)
   public split = componentGenerator(this, SplitComponent)
   public splitContent = componentGenerator(this, SplitContentComponent)
-  public page = componentGenerator(this, PageComponent)
-  public pageHeader = componentGenerator(this, PageHeaderComponent)
-  public pageFooter = componentGenerator(this, PageFooterComponent)
+  public section = componentGenerator(this, SectionComponent)
+  public sectionHeader = componentGenerator(this, SectionHeaderComponent)
+  public sectionFooter = componentGenerator(this, SectionFooterComponent)
   public bar = componentGenerator(this, BarComponent)
   public barStart = componentGenerator(this, BarStartComponent)
   public barEnd = componentGenerator(this, BarEndComponent)
   public barContent = componentGenerator(this, BarContentComponent)
 
-  public input = fieldGenerator(this, InputComponent)
-  public boolean = fieldGenerator(this, BooleanComponent)
-  public checkbox = fieldGenerator(this, BooleanComponent)
-  public string = fieldGenerator(this, TextComponent)
-  public text = fieldGenerator(this, TextComponent)
-  public number = fieldGenerator(this, NumberComponent)
-  public select = fieldGenerator(this, SelectComponent)
+  public bool = widgetGenerator(this, BoolWidgetComponent)
+  public string = widgetGenerator(this, StringWidgetComponent)
+  public scalar = widgetGenerator(this, ScalarWidgetComponent)
+  public vector = widgetGenerator(this, VectorWidgetComponent)
+  public matrix = widgetGenerator(this, MatrixWidgetComponent)
+  public select = widgetGenerator(this, SelectComponent)
+  public angle = widgetGenerator(this, AngleWidgetComponent)
+  public bitmask = widgetGenerator(this, BitmaskWidgetComponent)
+  public poll = widgetGenerator(this, PollWidgetComponent)
+  public color = widgetGenerator(this, ColorWidgetComponent)
+  public colorPicker = widgetGenerator(this, ColorPickerWidgetComponent)
 
-  public vector = fieldGenerator(this, VectorComponent)
-  public matrix = fieldGenerator(this, MatrixComponent)
+  public boolInput = widgetGenerator(this, BoolInputComponent)
+  public stringInput = widgetGenerator(this, StringInputComponent)
+  public scalarInput = widgetGenerator(this, ScalarInputComponent)
+  public vectorInput = widgetGenerator(this, VectorInputComponent)
+  public matrixInput = widgetGenerator(this, MatrixInputComponent)
+  public selectInput = widgetGenerator(this, SelectComponent)
+  public angleInput = widgetGenerator(this, AngleInputComponent)
+  public bitmaskInput = widgetGenerator(this, BitmaskInputComponent)
+  public pollInput = widgetGenerator(this, PollComponent)
+  public colorInput = widgetGenerator(this, ColorComponent)
+  public colorPickerInput = widgetGenerator(this, ColorPicker)
 
-  public color = fieldGenerator(this, ColorControl)
-  public colorPicker = fieldGenerator(this, ColorPicker)
-
-  public angle = fieldGenerator(this, AngleComponent)
-  public point = fieldGenerator(this, PointComponent)
-  public spherical = fieldGenerator(this, SphericalComponent)
+  public point = widgetGenerator(this, PointComponent)
+  public spherical = widgetGenerator(this, SphericalComponent)
 
   public button(text: string, opts: ButtonAttrs = {}) {
     this.add(ButtonComponent, opts, text)
@@ -130,13 +150,13 @@ export class Builder {
     this.add(GraphComponent, opts)
   }
 
-  public display(label: string, children?: ComponentChildren) {
-    this.add(ControlComponent, { label }, children)
+  public widget(label: string, children?: ComponentChildren) {
+    this.add(WidgetComponent, { label }, children)
   }
 
   public pre(label: string, children?: ComponentChildren) {
     this.add(
-      ControlComponent,
+      WidgetComponent,
       {
         label,
         style: {
@@ -159,8 +179,8 @@ export class Builder {
    * Adds a render function as a component
    * This breaks out of the static builder schema and allows for dynamic content.
    */
-  public control(attrs: ControlAttrs, children?: ComponentChildren) {
-    this.add(ControlComponent, attrs, children)
+  public control(attrs: WidgetAttrs, children?: ComponentChildren) {
+    this.add(WidgetComponent, attrs, children)
   }
 
   /**
@@ -198,13 +218,13 @@ function groupGenerator<Attrs extends Object>(
   }
 }
 
-export type FieldGenerator<A extends ValueField<any, any>> = {
+export type FieldGenerator<A extends TweakableAttrs<any, any>> = {
   (opts: A): void
   <V, K extends keyof V>(target: V, property: K): void
   <V, K extends keyof V>(target: V, property: K, opts: OmitIn<A, 'value' | 'field'>): void
 }
 
-function fieldGenerator<A extends ValueField<any, any>>(
+function widgetGenerator<A extends TweakableAttrs<any, any>>(
   builder: Builder,
   component: Component<A>,
 ): FieldGenerator<A> {
@@ -259,7 +279,7 @@ function groupOptions<T extends Object>(b: Builder, args: IArguments) {
   return { options, children }
 }
 
-function fieldOptions<T extends ValueField<any, any> & ControlAttrs>(args: IArguments): T {
+function fieldOptions<T extends TweakableAttrs<any, any> & WidgetAttrs>(args: IArguments): T {
   let attr: T
 
   if (args.length === 1) {

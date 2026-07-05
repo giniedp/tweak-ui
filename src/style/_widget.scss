@@ -1,0 +1,24 @@
+.twk-widget {
+  display: grid;
+  grid-template-areas: 'label content';
+  grid-template-columns: 0.75fr 1fr;
+  gap: var(--twk-gap);
+  width: 100%;
+}
+
+.twk-widget > * {
+  grid-area: content;
+  overflow: hidden;
+}
+
+.twk-widget-label {
+  grid-area: label;
+  min-height: var(--twk-size);
+  flex: 0.75;
+  padding: 0 calc(var(--twk-size) / 4);
+  display: inline-flex;
+  align-items: center;
+  align-self: start;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--twk-color-base-content) 40%, transparent);
+}

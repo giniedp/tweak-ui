@@ -13,7 +13,8 @@
     "inlineSources": true,
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
-    "target": "ES6",
+    "target": "esnext",
+
     "allowSyntheticDefaultImports": true,
     "typeRoots": ["../node_modules/@types"]
   }

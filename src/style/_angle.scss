@@ -1,33 +1,53 @@
-.twui-angle-label {
-  height: var(--twui-size);
+.twk-angle-label {
+  height: var(--twk-size);
   white-space: nowrap;
-  text-align: center;
+  text-align: right;
 }
 
-.twui-angle-pane {
+.twk-angle-input {
+  display: grid;
+  grid-template-areas:
+    'display input'
+    'display output';
+
+  grid-template-columns: min-content auto;
+  grid-template-rows: auto min-content;
+  gap: var(--twk-gap);
+  column-gap: calc(var(--twk-gap) * 2);
+
+  .twk-scalar-input {
+    grid-area: input;
+  }
+  .twk-angle-label {
+    grid-area: output;
+  }
+}
+
+.twk-angle-pane {
+  grid-area: display;
   width: 100%;
-  max-width: 150px;
-  outline: 3px solid var(--twui-color-base-content);
-  // outline-offset: -3px;
+  width: var(--twk-size);
+  height: var(--twk-size);
+  outline: 1px solid var(--twk-color-base-content);
+  outline-offset: -1px;
   border-radius: 50%;
 
   background-image: conic-gradient(
     from 0deg,
-    var(--twui-color-base-content) calc(var(--angle-value) / 360 * 100%),
+    var(--twk-color-base-content) calc(var(--angle-value) / 360 * 100%),
     transparent 0
   );
-  margin: 0.5rem auto;
 }
 
-.twui-angle-knob {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 50%;
-  background-color: var(--twui-color-base-content);
-  user-select: none;
-  box-shadow: 0 0 3px var(--twui-color-neutral);
-}
-.twui-angle-knob:focus {
-  outline: 2px solid var(--twui-color-accent);
-  outline-offset: 2px;
-}
+// .twk-angle-knob {
+//   width: 1rem;
+//   height: 1rem;
+//   border-radius: 50%;
+//   background-color: var(--twk-color-base-content);
+//   user-select: none;
+//   box-shadow: 0 0 3px var(--twk-color-neutral);
+// }
+// .twk-angle-knob:focus {
+//   outline: 2px solid var(--twk-color-accent);
+//   outline-offset: 2px;
+// }

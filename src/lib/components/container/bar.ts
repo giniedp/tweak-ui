@@ -40,7 +40,7 @@ export function uiBarContent<T>(attrs: Attributes, children?: Children): Vnode<A
 export const BarComponent: FactoryComponent<Attributes> = () => {
   return {
     view: ({ attrs: { start, end, ...rest }, children }) => {
-      return m('div.twui-bar', rest, [
+      return m('div.twk-bar', rest, [
         start ? m(BarStartComponent, start) : null,
         children,
         end ? m(BarEndComponent, end) : null,
@@ -52,7 +52,7 @@ export const BarComponent: FactoryComponent<Attributes> = () => {
 export const BarStartComponent: FactoryComponent<Attributes> = () => {
   return {
     view: ({ attrs, children }) => {
-      return m('div.twui-bar-start', attrs, children)
+      return m('div.twk-bar-start', attrs, children)
     },
   }
 }
@@ -60,7 +60,7 @@ export const BarStartComponent: FactoryComponent<Attributes> = () => {
 export const BarEndComponent: FactoryComponent<Attributes> = () => {
   return {
     view: ({ attrs, children }) => {
-      return m('div.twui-bar-end', attrs, children)
+      return m('div.twk-bar-end', attrs, children)
     },
   }
 }
@@ -68,7 +68,7 @@ export const BarEndComponent: FactoryComponent<Attributes> = () => {
 export const BarContentComponent: FactoryComponent<Attributes> = () => {
   return {
     view: ({ attrs, children }) => {
-      return m('div.twui-bar-content', attrs, children)
+      return m('div.twk-bar-content', attrs, children)
     },
   }
 }

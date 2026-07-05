@@ -1,14 +1,18 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
-import { EventAttrs } from '../../core'
+import { EventAttrs, StyleAttr } from '../../core'
 import { uiClass } from '../../core/utils'
 
 /**
  * Button component model
  * @public
  */
-export interface ButtonAttrs extends EventAttrs {
+export type ButtonAttrs = EventAttrs & {
   [key: string]: any
 
+  /**
+   *
+   */
+  style?: StyleAttr
   /**
    * Whether the button square
    */
@@ -18,6 +22,21 @@ export interface ButtonAttrs extends EventAttrs {
    * Whether the button a block
    */
   block?: boolean
+
+  /**
+   * Whether the button is large
+   */
+  large?: boolean
+
+  /**
+   *
+   */
+  accent?: boolean
+
+  /**
+   * Css flex property
+   */
+  flex?: string
 }
 
 export function uiButton<T>(attrs: ButtonAttrs, children?: Children): Vnode<ButtonAttrs> {
@@ -27,18 +46,24 @@ export function uiButton<T>(attrs: ButtonAttrs, children?: Children): Vnode<Butt
 export const ButtonComponent: FactoryComponent<ButtonAttrs> = () => {
   return {
     view: ({ attrs, children }) => {
-      const { square, block, class: className, ...rest } = attrs
+      const { square, block, class: className, style, ...rest } = attrs
       return m(
-        'button.twui-btn',
+        'button.twk-btn',
         {
           type: 'button',
           class: uiClass(
             {
-              'twui-btn-square': !!square,
-              'twui-btn-block': !!block,
+              'twk-btn-sq': !!square,
+              'twk-btn-bl': !!block,
+              'twk-btn-lg': !!attrs.large,
+              'twk-btn-accent': !!attrs.accent,
             },
             className,
           ),
+          style: {
+            flex: attrs.flex,
+            ...(style || {}),
+          },
           ...rest,
         },
         children,

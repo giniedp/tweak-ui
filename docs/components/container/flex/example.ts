@@ -3,16 +3,16 @@ import { mountUi } from 'tweak-ui'
 export default () => {
   mountUi('.example-frame', (ui) => {
     ui.flex({ flow: 'row' }, () => {
-      ui.string({ value: 'Ho' })
-      ui.string({ value: 'ri' })
-      ui.string({ value: 'zon' })
-      ui.string({ value: 'tal' })
+      ui.stringInput({ value: 'Ho' })
+      ui.stringInput({ value: 'ri' })
+      ui.stringInput({ value: 'zon' })
+      ui.stringInput({ value: 'tal' })
     })
 
     ui.flex(() => {
-      ui.string({ value: 'Ver' })
-      ui.string({ value: 'ti' })
-      ui.string({ value: 'cal' })
+      ui.stringInput({ value: 'Ver' })
+      ui.stringInput({ value: 'ti' })
+      ui.stringInput({ value: 'cal' })
     })
 
     ui.flex({ flow: 'row' }, () => {
@@ -30,11 +30,11 @@ export default () => {
     })
 
     ui.flex({ flow: 'row' }, () => {
-      ui.button('Left', { style: { flex: 'none' } })
+      ui.button('Left')
       ui.flex({ flow: 'row' }, () => {
-        ui.input({ label: 'Content', value: 'Line 1', type: 'password' })
+        ui.string({ label: 'Label', value: 'Input' })
       })
-      ui.button('Right', { style: { flex: 'none' } })
+      ui.button('Right')
     })
   })
 }

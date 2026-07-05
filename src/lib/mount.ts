@@ -19,7 +19,7 @@ export function mountUi(target: Element | string, data: BuilderFn): void
 export function mountUi<A, S>(target: Element | string, data: Component<A, S>): void
 export function mountUi(target: Element | string, data: ChildArray | BuilderFn | Component): void {
   const el = typeof target === 'string' ? document.querySelector(target)! : target
-  el.classList.add('twui')
+  el.classList.add('tweak-ui')
   if (!data) {
     m.mount(el, null)
   } else if (Array.isArray(data)) {

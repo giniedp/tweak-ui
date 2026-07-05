@@ -1,19 +1,19 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
-import { getControlValue, setControlValue } from '../../core'
-import { uiClass } from '../../core/utils'
-import { uiControl, ValueControlAttrs } from '../elements'
-import { uiNumber } from './number'
+import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
+import { CommonWidgetAttrs, uiWidget } from '../elements'
+import { uiScalarInput } from './scalar'
 
 /**
  * @public
  */
 export type MatrixElements = number[]
+export type MatrixWidgetAttrs<T = unknown> = CommonWidgetAttrs & MatrixInputAttrs<T>
 
 /**
  * Matrix component model
  * @public
  */
-export interface MatrixAttrs<T = unknown> extends ValueControlAttrs<T, MatrixElements> {
+export type MatrixInputAttrs<T = unknown> = TweakableAttrs<T, MatrixElements> & {
   /**
    * The number of rows in the matrix
    */
@@ -52,15 +52,39 @@ export interface MatrixAttrs<T = unknown> extends ValueControlAttrs<T, MatrixEle
   /**
    * Disables the control input
    */
-  disabled?: boolean
+  readonly?: boolean
 }
 
-export function uiMatrix<T>(attrs: MatrixAttrs<T>, children?: Children): Vnode<MatrixAttrs<T>> {
-  return m(MatrixComponent as any, attrs as any, children)
+export function uiMatrixWidget<T>(
+  attrs: MatrixWidgetAttrs<T>,
+  children?: Children,
+): Vnode<MatrixWidgetAttrs<T>> {
+  return m(MatrixWidgetComponent as any, attrs as any, children)
 }
 
-export const MatrixComponent: FactoryComponent<MatrixAttrs> = () => {
-  let attrs: MatrixAttrs
+export const MatrixWidgetComponent: FactoryComponent<MatrixWidgetAttrs> = () => {
+  return {
+    view: ({ attrs: { label, class: className, ...rest } }) => {
+      return uiWidget(
+        {
+          tagName: 'label.twk-matrix-widget',
+          label: label ?? rest.field,
+          class: className,
+        },
+        [m(MatrixInputComponent, rest)],
+      )
+    },
+  }
+}
+export function uiMatrixInput<T>(
+  attrs: MatrixInputAttrs<T>,
+  children?: Children,
+): Vnode<MatrixInputAttrs<T>> {
+  return m(MatrixInputComponent as any, attrs as any, children)
+}
+
+export const MatrixInputComponent: FactoryComponent<MatrixInputAttrs> = () => {
+  let attrs: MatrixInputAttrs
 
   function onchange(type: 'input' | 'change', field: number, v: number) {
     const value = getControlValue(attrs) || ({} as any)
@@ -88,23 +112,22 @@ export const MatrixComponent: FactoryComponent<MatrixAttrs> = () => {
       const cols = attrs.cols ?? 1
       const rows = attrs.rows ?? 1
       const value = getControlValue(attrs)
-      return uiControl(
+      return m(
+        'div.twk-matrix-input',
         {
-          label: attrs.label,
-          description: attrs.description,
-          class: uiClass('twui-matrix', attrs.class),
-          contentStyle: {
+          style: {
             display: 'grid',
             gridTemplateColumns: `repeat(${cols}, auto)`,
           },
         },
         indices(rows, cols).map((field) => {
-          return uiNumber({
+          return uiScalarInput({
             min: attrs.min,
             max: attrs.max,
             step: attrs.step,
-            value: value?.[field],
-            disabled: attrs.disabled,
+            value,
+            field,
+            readonly: attrs.readonly,
             oninput: (_, v) => onchange('input', field, v as number),
             onchange: (_, v) => onchange('change', field, v as number),
           })

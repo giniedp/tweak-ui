@@ -2,7 +2,7 @@ import m, { Children, FactoryComponent, Vnode } from 'mithril'
 
 import { getControlValue, setControlValue } from '../../core'
 import { isNumber, isString } from '../../core/utils'
-import { uiControl, ValueControlAttrs } from '../elements'
+import { uiWidget, ValueWidgetAttrs } from '../elements'
 
 /**
  * @public
@@ -41,7 +41,7 @@ export type SelectModelOptions = SelectOptionArray | SelectOptionsObject
  * Select component model
  * @public
  */
-export interface SelectAttrs<T = unknown, V = any> extends ValueControlAttrs<T, V> {
+export type SelectAttrs<T = unknown, V = any> = ValueWidgetAttrs<T, V> & {
   /**
    * The select options
    */
@@ -55,7 +55,7 @@ export interface SelectAttrs<T = unknown, V = any> extends ValueControlAttrs<T, 
   /**
    * Disables the control input
    */
-  disabled?: boolean
+  readonly?: boolean
 }
 
 function optionsFromFlatArray(arr: SelectOptionArray): SelectOption[] {
@@ -175,19 +175,18 @@ export const SelectComponent: FactoryComponent<SelectAttrs> = () => {
     view: (node) => {
       attrs = node.attrs
       options = getOptions(node)
-      return uiControl(
+      return uiWidget(
         {
-          tagName: 'label.twui-select',
-          label: attrs.label,
-          description: attrs.description,
+          tagName: 'label.twk-select',
+          label: attrs.label ?? attrs.field,
           class: attrs.class,
         },
         m(
-          'select',
+          'select.twk-select-input',
           {
             selectedIndex: getSelectedIndex(),
             onchange: onchange,
-            disabled: attrs.disabled,
+            disabled: attrs.readonly,
           },
           options.map((it) => {
             if ('options' in it) {

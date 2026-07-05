@@ -1,68 +1,70 @@
 :root {
-  --twui-size: 1.25rem;
-  --twui-gap: 0.125rem;
-  --twui-inset: 0.125rem;
-  --twui-radius: 0.25rem;
+  --twk-size: 1.375rem;
+  --twk-gap: 0.125rem;
+  --twk-inset: 0.125rem;
+  --twk-radius: 0.25rem;
 
-  --twui-label-size: 7rem;
-  --twui-label-pad-x: 0.25rem;
-  --twui-label-pad-y: 0rem;
-  --twui-input-height: var(--twui-size);
-  --twui-input-pad-x: 0.375rem;
-  --twui-input-pad-y: 0rem;
-  --twui-button-height: var(--twui-size);
-  --twui-button-pad-x: 0.5rem;
-  --twui-button-pad-y: 0.25rem;
+  --twk-label-size: 7rem;
+  --twk-label-pad-x: 0.25rem;
+  --twk-label-pad-y: 0rem;
+  --twk-input-height: var(--twk-size);
+  --twk-input-pad-x: 0.375rem;
+  --twk-input-pad-y: 0rem;
+  --twk-button-height: var(--twk-size);
+  --twk-button-pad-x: 0.5rem;
+  --twk-button-pad-y: 0.25rem;
 
-  --twui-color-base-100: #2a303c;
-  --twui-color-base-200: #242933;
-  --twui-color-base-300: #20252e;
-  --twui-color-base-content: #b2ccd6;
-  --twui-color-neutral: #1c212b;
-  --twui-color-neutral-content: #b2ccd6;
-  --twui-color-accent: #f9aa33;
+  --twk-color-base-100: #2a303c;
+  --twk-color-base-200: #242933;
+  --twk-color-base-300: #20252e;
+  --twk-color-base-content: #b2ccd6;
+  --twk-color-neutral: #1c212b;
+  --twk-color-neutral-content: #b2ccd6;
+  --twk-color-accent: #f9aa33;
+  --twk-color-bool-true: #f9aa33;
+  --twk-color-bool-false: #2a303c;
 }
 
-.twui-dark {
-  --twui-color-base-100: #1d232a;
-  --twui-color-base-200: #191e24;
-  --twui-color-base-300: #15191e;
-  --twui-color-base-content: #ecf9ff;
-  --twui-color-neutral: #09090b;
-  --twui-color-neutral-content: #e4e4e7;
-  --twui-color-accent: #f9aa33;
+.twk-dark {
+  --twk-color-base-100: #1d232a;
+  --twk-color-base-200: #191e24;
+  --twk-color-base-300: #15191e;
+  --twk-color-base-content: #ecf9ff;
+  --twk-color-neutral: #09090b;
+  t: #e4e4e7;
+  --twk-color-accent: #f9aa33;
 }
 
-.twui-light {
-  --twui-color-base-100: #ffffff;
-  --twui-color-base-200: #f5f5f5;
-  --twui-color-base-300: #ebebeb;
-  --twui-color-base-content: #000000;
-  --twui-color-neutral: #000000;
-  --twui-color-neutral-content: #ffffff;
-  --twui-color-accent: #2196f3;
+.twk-light {
+  --twk-color-base-100: #ffffff;
+  --twk-color-base-200: #f5f5f5;
+  --twk-color-base-300: #ebebeb;
+  --twk-color-base-content: #000000;
+  --twk-color-neutral: #000000;
+  --twk-color-neutral-content: #ffffff;
+  --twk-color-accent: #2196f3;
 }
 
-.twui {
+.tweak-ui {
   interpolate-size: allow-keywords;
-  background-color: var(--twui-color-base-200);
-  color: var(--twui-color-base-content);
+  background-color: var(--twk-color-base-200);
+  color: var(--twk-color-base-content);
   line-height: 1.5;
   display: flex;
   flex-direction: column;
-  gap: var(--twui-gap);
+  gap: var(--twk-gap);
 
   font-family: monospace;
-  font-size: var(--twui-font-size, 12px);
+  font-size: var(--twk-font-size, 12px);
   padding: 0;
   margin: 0;
-  width: var(--twui-width, 20rem);
+  width: var(--twk-width, 20rem);
   flex: auto 0 0; // dont resize in flex context
   overflow: auto;
   overflow-x: hidden;
   box-sizing: border-box;
-  border-radius: calc(var(--twui-radius) + var(--twui-inset));
-  padding: var(--twui-inset, 0);
+  border-radius: calc(var(--twk-radius) + var(--twk-inset));
+  padding: var(--twk-inset, 0);
   //
   // Scrollbars
   //
@@ -72,27 +74,101 @@
   }
 
   &::-webkit-scrollbar-track {
-    background-color: var(--twui-color-base-200);
+    background-color: var(--twk-color-base-200);
   }
 
   &::-webkit-scrollbar-thumb {
     border-width: 1px;
     border-style: solid;
     transition: background-color 0.2s ease-in-out;
-    background-color: var(--twui-color-base-200);
-    border-color: var(--twui-color-base-300);
+    background-color: var(--twk-color-base-200);
+    border-color: var(--twk-color-base-300);
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background-color: var(--twui-color-primary);
+    background-color: var(--twk-color-primary);
   }
 
   //
   // Input Elements
   //
+  button,
   input,
-  select {
-    font-family: monospace;
+  select,
+  optgroup,
+  textarea {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    opacity: 1;
+    background-color: transparent;
+    border-radius: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+
+    &:not([type='checkbox'], select) {
+      appearance: none !important;
+    }
+    &:focus-visible {
+      outline: none;
+    }
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  .twk-input {
+    cursor: text;
+    border: none;
+    appearance: none !important;
+    box-sizing: border-box;
+    white-space: nowrap;
+    vertical-align: middle;
+    touch-action: manipulation;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--twk-gap);
+
+    flex: 1;
+    height: calc(var(--twk-size));
+    min-width: 0;
+    line-height: calc(var(--twk-size));
+    padding: var(--twk-input-pad-y) var(--twk-input-pad-x);
+
+    color: var(--twk-color-base-content);
+    border-radius: var(--twk-radius);
+
+    transition:
+      color 0.2s ease-in-out,
+      background-color 0.2s ease-in-out,
+      outline-color 0.2s ease-in-out;
+
+    input {
+      flex: 1;
+    }
+    &:not(.twk-input-readonly) {
+      outline: 1px solid transparent;
+      outline-offset: -1px;
+      &:hover {
+        background-color: var(--twk-color-base-100);
+      }
+
+      &:focus-within {
+        outline-color: var(--twk-color-accent);
+      }
+    }
   }
 
   label {
@@ -103,193 +179,38 @@
   button,
   a {
     cursor: pointer;
-  }
-
-  button,
-  select,
-  textarea,
-  input:not([type='checkbox']):not([type='range']) {
-    min-width: 0;
-    flex: 1;
-    outline: 1px solid var(--twui-color-base-content);
-    outline-offset: -1px;
-
-    border-radius: var(--twui-radius);
-    border: none;
-    box-sizing: border-box;
-
-    height: calc(var(--twui-size));
-    line-height: calc(var(--twui-size));
-    padding: var(--twui-input-pad-y) var(--twui-input-pad-x);
-    margin: 0;
-
-    transition:
-      color 0.2s ease-in-out,
-      background-color 0.2s ease-in-out,
-      outline-color 0.2s ease-in-out;
-
-    color: var(--twui-color-base-content);
-    background-color: var(--twui-color-base-100);
-    outline-color: var(--twui-color-base-100);
-    &:hover {
-      background-color: var(--twui-color-base-300);
-    }
-
-    &:focus {
-      outline-color: var(--twui-color-accent);
-    }
-  }
-
-  *:disabled,
-  .disabled {
-    opacity: 0.5;
+    align-items: center;
   }
 
   select,
   input:not([type='checkbox']) {
     &:focus {
-      color: var(--twui-color-accent);
+      color: var(--twk-color-accent);
     }
+  }
+
+  select,
+  ::picker(select) {
+    appearance: base-select;
+    border-radius: var(--twk-radius);
+    background: var(--twk-color-base-100);
+    border-color: var(--twk-color-base-300);
+    border: none;
   }
 
   select {
-    &,
-    &::picker(select) {
-      appearance: base-select;
-      border-radius: var(--twui-radius);
-      background: var(--twui-color-base-100);
-      border-color: var(--twui-color-base-300);
-    }
     option {
       display: flex;
       justify-content: flex-start;
-      gap: 20px;
-
-      background: var(--twui-color-base-100);
-      color: var(--twui-color-base-content);
+      gap: var(--twk-gap);
+      padding-inline: var(--twk-button-pad-x);
+      background: var(--twk-color-base-100);
+      color: var(--twk-color-base-content);
     }
     option:hover,
     option:focus {
-      background: var(--twui-color-base-200);
+      background: var(--twk-color-base-200);
     }
-  }
-
-  button {
-    background-color: var(--twui-color-base-300);
-    line-height: calc(var(--twui-size) - 2 * var(--twui-button-pad-y));
-    padding: var(--twui-button-pad-y) var(--twui-button-pad-x);
-
-    font-weight: bold;
-    text-align: center;
-    white-space: nowrap;
-
-    outline-color: var(--twui-color-neutral);
-    outline-style: dotted;
-    &:hover {
-      background-color: var(--twui-color-base-200);
-    }
-    &:focus {
-      outline-color: var(--twui-color-accent);
-    }
-    &:active {
-      transform: translateY(1px);
-    }
-  }
-
-  input.twui-toggle[type='checkbox'] {
-    width: calc(var(--twui-size) * 2);
-    height: calc(var(--twui-size));
-    padding: 2px;
-    border-radius: var(--twui-size);
-    border: 2px solid var(--twui-color-base-100);
-    background-color: var(--twui-color-base-100);
-
-    cursor: pointer;
-    appearance: none;
-    vertical-align: middle;
-    webkit-user-select: none;
-    -webkit-user-select: none;
-    user-select: none;
-    flex-shrink: 0;
-    grid-template-columns: 1fr 1fr;
-    place-content: center;
-    display: inline-grid;
-    margin: 0;
-    &:checked {
-      border-color: var(--twui-color-base-content);
-    }
-    &:focus {
-      border-color: var(--twui-color-accent);
-    }
-    &:before {
-      aspect-ratio: 1;
-      border-radius: 100%;
-      content: '';
-      background-color: var(--twui-color-base-content);
-      grid-row-start: 1;
-      grid-column-start: 1;
-      transition:
-        background-color 0.1s,
-        translate 0.2s;
-      translate: 0;
-      opacity: 0.25;
-    }
-    &:checked:before {
-      translate: 100%;
-      opacity: 1;
-    }
-  }
-}
-
-.twui-bg-100 {
-  background-color: var(--twui-color-base-100);
-}
-.twui-bg-200 {
-  background-color: var(--twui-color-base-200);
-}
-.twui-bg-300 {
-  background-color: var(--twui-color-base-300);
-}
-.twui-bg-content {
-  background-color: var(--twui-color-base-content);
-}
-.twui-bg-neutral {
-  background-color: var(--twui-color-neutral);
-}
-.twui-bg-neutral-content {
-  background-color: var(--twui-color-neutral-content);
-}
-.twui-bg-accent {
-  background-color: var(--twui-color-accent);
-}
-
-.twui-color-100 {
-  color: var(--twui-color-base-100);
-}
-.twui-color-200 {
-  color: var(--twui-color-base-200);
-}
-.twui-color-300 {
-  color: var(--twui-color-base-300);
-}
-.twui-color-content {
-  color: var(--twui-color-base-content);
-}
-.twui-color-neutral {
-  color: var(--twui-color-neutral);
-}
-.twui-color-neutral-content {
-  color: var(--twui-color-neutral-content);
-}
-.twui-color-accent {
-  color: var(--twui-color-accent);
-}
-
-@keyframes twui-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+    padding-inline: var(--twk-button-pad-x);
   }
 }

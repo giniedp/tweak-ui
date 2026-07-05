@@ -1,0 +1,42 @@
+.twk-scalar-input {
+  display: grid;
+  grid-auto-flow: column;
+  position: relative;
+  align-items: center;
+  gap: var(--twk-gap);
+
+  input {
+    min-width: 0;
+    text-align: right;
+  }
+  .unit {
+    opacity: 0.5;
+  }
+}
+
+.twk-scalar-dragable input {
+  cursor: ew-resize;
+}
+
+.twk-scalar-range::after {
+  pointer-events: none;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0.125;
+  background: linear-gradient(
+    to right,
+    var(--twk-color-accent) 0%,
+    var(--twk-color-accent) calc(var(--twk-scalar-value, 0) * 100%),
+    transparent calc(var(--twk-scalar-value, 0) * 100%),
+    transparent 100%
+  );
+  border-radius: var(--twk-radius);
+}
+
+.twk-scalar-range:hover::after {
+  opacity: 0.25;
+}

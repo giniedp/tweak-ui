@@ -1,32 +1,40 @@
 import m, { Children, FactoryComponent, Vnode } from 'mithril'
 
-import { uiClass, isNumber, isString } from '../../core/utils'
+import { EventAttrs, StyleAttr } from '../../core'
+import { isNumber } from '../../core/utils'
 
 /**
  * Image component model
  * @public
  */
-export interface ImageAttrs {
+export type ImageAttrs = EventAttrs & {
   /**
    * The image source url
    */
-  src?: string
+  src?: string | any
+
+  /**
+   *
+   */
+  render?: (src: any) => Promise<ImageBitmap>
+
   /**
    * Aspect ratio of the picture container
    */
-  aspect?: string
+  aspect?: number | string
+
   /**
    * A fixed width
    */
   width?: number | string
+
   /**
    *
    */
   fit?: 'contain' | 'cover' | 'fill'
-  /**
-   * This is callend when the control is clicked
-   */
-  onclick?: (ctrl: ImageAttrs) => void
+
+  class?: string
+  style?: StyleAttr
 }
 
 export function uiImage(attrs: ImageAttrs, children?: Children): Vnode<ImageAttrs> {
@@ -34,41 +42,112 @@ export function uiImage(attrs: ImageAttrs, children?: Children): Vnode<ImageAttr
 }
 
 export const ImageComponent: FactoryComponent<ImageAttrs> = () => {
-  function ratio(spec: string | null | undefined) {
-    if (!spec) {
-      return null
-    }
-    const [x, y] = (spec || '1x1').split('x').map(Number)
-    const padding = (y / x || 1) * 100
-    return `${padding}%`
+  let src: string
+  let srcLoadArg: any
+  let srcRender: (src: any) => Promise<ImageBitmap>
+
+  let cssWidth: string
+  let cssAspect: string
+  let cssFit: string
+
+  let elImage: HTMLImageElement
+  let loadGeneration = 0
+  let lastSrcLoadArg: any
+  let lastSrc: string
+
+  function hasChanged() {
+    return srcLoadArg !== lastSrcLoadArg || src !== lastSrc
   }
-  function size(width: ImageAttrs['width']) {
+
+  function parseSize(width: ImageAttrs['width']) {
     if (isNumber(width)) {
       return `${width}px`
     }
-    if (isString(width)) {
-      return width
-    }
+    return width
   }
+
+  function parseAspect(aspect: ImageAttrs['aspect']) {
+    return String(aspect || '')
+  }
+
+  function captureState(attrs: ImageAttrs) {
+    src = typeof attrs.src === 'string' ? attrs.src : ''
+    srcLoadArg = attrs.src
+    srcRender = attrs.render!
+    cssAspect = parseAspect(attrs.aspect)
+    cssWidth = parseSize(attrs.width)!
+    cssFit = attrs.fit || 'fit'
+  }
+
+  async function loadImage() {
+    if (!elImage || !hasChanged()) {
+      return
+    }
+    lastSrcLoadArg = srcLoadArg
+    lastSrc = src
+    if (!srcRender) {
+      elImage.src = src
+      return
+    }
+    loadGeneration++
+    const generation = loadGeneration
+
+    elImage.classList.add('twk-loading')
+    const bitmap = await srcRender(srcLoadArg)
+    if (generation !== loadGeneration) {
+      bitmap.close() // stale, discard
+      return
+    }
+
+    await renderThumbnail(elImage, bitmap)
+    elImage.classList.remove('twk-loading')
+  }
+
+  async function renderThumbnail(img: HTMLImageElement, bitmap: ImageBitmap) {
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
+    canvas.getContext('2d')!.drawImage(bitmap, 0, 0)
+    const blob = await canvas.convertToBlob({ type: 'image/png' })
+    bitmap.close()
+
+    const next = URL.createObjectURL(blob)
+    URL.revokeObjectURL(img.src)
+    img.src = next
+  }
+
+  function grabRestAttrs(attrs: ImageAttrs) {
+    const { src, render, aspect, width, fit, ...rest } = attrs
+    return rest
+  }
+
   return {
-    view: ({ attrs: { src, aspect, fit, width, onclick } }) => {
-      return m(
-        'picture.twui-image',
-        {
-          class: uiClass({
-            ['twui-image-aspect']: !!aspect,
-          }),
-          style: {
-            '--twui-aspect': ratio(aspect),
-            '--twui-fit': fit || 'fit',
-            width: size(width),
-          },
+    oninit({ attrs }) {
+      captureState(attrs)
+    },
+    onbeforeupdate({ attrs }, old) {
+      captureState(attrs)
+    },
+    onupdate() {
+      loadImage()
+    },
+    view: ({ attrs }) => {
+      return m('img.twk-image', {
+        src,
+        style: {
+          width: cssWidth,
+          aspectRatio: cssAspect,
+          objectFit: cssFit,
+          ...(attrs.style || {}),
         },
-        m('img', {
-          src,
-          onclick,
-        }),
-      )
+
+        onremove: () => {
+          elImage = null!
+        },
+        oncreate: ({ dom }) => {
+          elImage = dom as HTMLImageElement
+          loadImage()
+        },
+        ...grabRestAttrs(attrs),
+      })
     },
   }
 }

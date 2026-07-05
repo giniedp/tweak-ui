@@ -1,38 +1,44 @@
-.twui-tabs {
+.twk-tabs {
   display: flex;
   flex-flow: row wrap;
   align-items: stretch;
-  border-color: var(--twui-color-base-300);
-  gap: var(--twui-gap);
+  border-color: var(--twk-color-base-300);
+  gap: var(--twk-gap);
+
+  button.twk-tab {
+    order: 0;
+    flex: 1;
+    background-color: var(--twk-color-base-100);
+    color: color-mix(in srgb, var(--twk-color-base-content) 40%, transparent);
+  }
+  button.twk-tab:hover {
+    color: var(--twk-color-base-content);
+  }
+  button.twk-tab.twk-btn:not(.active) {
+    background-color: transparent;
+    font-weight: normal;
+  }
+  button.twk-tab.twk-btn.active {
+    font-weight: bold;
+    color: var(--twk-color-accent);
+  }
 }
 
-button.twui-tab {
-  order: 0;
-  flex: 1;
-  background-color: var(--twui-color-base-100);
-}
-button.twui-tab.active {
-  background-color: var(--twui-color-base-200);
-}
-button.twui-tab.active:not(:focus) {
-  outline-color: var(--twui-color-base-200);
-}
-
-.twui-tab-content {
+.twk-tab-content {
   order: 1;
   width: 100%;
 }
 
-.twui-tabs-vertical {
+.twk-tabs-vertical {
   display: grid;
   grid-template-columns: auto 1fr;
 }
 
-.twui-tabs-vertical .twui-tab {
+.twk-tabs-vertical .twk-tab {
   grid-column: 1;
 }
 
-.twui-tabs-vertical .twui-tab-content {
+.twk-tabs-vertical .twk-tab-content {
   grid-column: 2;
   grid-row: 1 / -1;
 }

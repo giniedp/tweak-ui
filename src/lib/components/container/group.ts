@@ -1,15 +1,19 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
-import { ClassValue, uiClass, eventWithTimout } from '../../core/utils'
+import m, { Child, Children, FactoryComponent, Vnode } from 'mithril'
+import { ClassValue, eventWithTimout, uiClass } from '../../core/utils'
 
 /**
  * Group component model
  * @public
  */
-export interface GroupAttrs {
+export type GroupAttrs = {
+  /**
+   * Group icon
+   */
+  icon?: Child
   /**
    * Group title
    */
-  title?: string
+  title?: Child
   /**
    * Group CSS Style
    */
@@ -53,7 +57,8 @@ export function uiGroup<T>(attrs: GroupAttrs, children?: Children): Vnode<GroupA
 }
 
 export const GroupComponent: FactoryComponent<GroupAttrs> = () => {
-  let title: string
+  let title: Child
+  let icon: Child
   let collapsible: boolean
   let collapsed: boolean
   let animate = false
@@ -71,14 +76,15 @@ export const GroupComponent: FactoryComponent<GroupAttrs> = () => {
   }
 
   function groupTitle() {
-    if (!title && !collapsible) {
+    if (!icon && !title && !collapsible) {
       return null
     }
     return m(
-      'div.twui-group-title',
+      'div.twk-group-title',
       {
         onclick: collapsible ? handleToggle : undefined,
       },
+      icon,
       title,
     )
   }
@@ -87,12 +93,16 @@ export const GroupComponent: FactoryComponent<GroupAttrs> = () => {
     oninit: updateState,
     onupdate: updateState,
     view: ({ attrs, children }) => {
+      title = attrs.title || ''
+      icon = attrs.icon || ''
+      collapsible = !!attrs.collapsible
+      collapsed ??= !!attrs.collapsed
       return m(
-        'div.twui-group',
+        'div.twk-group',
         {
           class: uiClass({
-            ['twui-group-collapsible']: !!collapsible,
-            ['twui-group-collapsed']: !!collapsed,
+            ['twk-group-collapsible']: !!collapsible,
+            ['twk-group-collapsed']: !!collapsed,
           }),
           style: attrs.style,
         },
@@ -114,7 +124,7 @@ const GroupContent: FactoryComponent<{ animate: boolean }> = () => {
     },
     view: ({ children, attrs }) => {
       return m(
-        'div.twui-group-content',
+        'div.twk-group-content',
         {
           class: uiClass({
             animate: attrs.animate,

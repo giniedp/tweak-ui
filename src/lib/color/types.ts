@@ -1,4 +1,4 @@
-import { ValueFieldAdapter } from '../core'
+import { ControlAdapter } from '../core'
 
 /**
  * Describes a HSV color value
@@ -112,4 +112,4 @@ export interface OKLCH {
   a: number
 }
 
-export type ColorAdapter<T> = ValueFieldAdapter<T, RGBA>
+export type ColorAdapter<T> = ControlAdapter<T, RGBA>
