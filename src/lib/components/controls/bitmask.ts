@@ -51,10 +51,10 @@ export function uiBitmaskWidget<T>(
 
 export const BitmaskWidgetComponent: FactoryComponent<BitmaskWidgetAttrs> = () => {
   return {
-    view: ({ attrs: { label, class: className, ...rest } }) => {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
-          tagName: 'div.twk-Bitmask-widget',
+          tagName: `${tagName || 'div'}.twk-Bitmask-widget`,
           label: label ?? rest.field,
           class: className,
         },

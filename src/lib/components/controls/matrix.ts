@@ -64,10 +64,10 @@ export function uiMatrixWidget<T>(
 
 export const MatrixWidgetComponent: FactoryComponent<MatrixWidgetAttrs> = () => {
   return {
-    view: ({ attrs: { label, class: className, ...rest } }) => {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
-          tagName: 'label.twk-matrix-widget',
+          tagName: `${tagName || ''}.twk-matrix-widget`,
           label: label ?? rest.field,
           class: className,
         },

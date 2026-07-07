@@ -177,7 +177,7 @@ export const SelectComponent: FactoryComponent<SelectAttrs> = () => {
       options = getOptions(node)
       return uiWidget(
         {
-          tagName: 'label.twk-select',
+          tagName: `${attrs.tagName || 'div'}.twk-select`,
           label: attrs.label ?? attrs.field,
           class: attrs.class,
         },

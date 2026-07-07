@@ -66,10 +66,10 @@ export function uiAngleInput<T>(
 
 export const AngleWidgetComponent: FactoryComponent<AngleWidgetAttrs<unknown>> = () => {
   return {
-    view: ({ attrs: { label, class: className, ...rest } }) => {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
-          tagName: 'label.twk-angle-widget',
+          tagName: `${tagName || 'div'}.twk-angle-widget`,
           label: label ?? rest.field,
           class: className,
         },

@@ -67,10 +67,10 @@ export function uiVectorInput<T>(
 
 export const VectorWidgetComponent: FactoryComponent<VectorWidgetAttrs> = () => {
   return {
-    view: ({ attrs: { label, class: className, ...rest } }) => {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
-          tagName: 'label.twk-vector-widget',
+          tagName: `${tagName || 'div'}.twk-vector-widget`,
           label: label ?? rest.field,
           class: className,
         },

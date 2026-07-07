@@ -18,6 +18,11 @@ export type WidgetAttrs = EventAttrs &
 
 export interface CommonWidgetAttrs {
   /**
+   * The HTML tag to use for the control container, defaults to 'div'
+   */
+  tagName?: string
+
+  /**
    * A label for the control
    */
   label?: Children | false

@@ -62,10 +62,10 @@ export function uiInput<T>(
 
 export const InputWidgetComponent: FactoryComponent<InputWidgetAttrs> = () => {
   return {
-    view: ({ attrs: { label, class: className, ...rest } }) => {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
-          tagName: 'label.twk-input-widget',
+          tagName: `${tagName || 'div'}.twk-input-widget`,
           label: label ?? rest.field,
           class: className,
         },

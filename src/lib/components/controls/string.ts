@@ -65,10 +65,10 @@ export function uiString<T>(
 
 export const StringWidgetComponent: FactoryComponent<StringWidgetAttrs> = () => {
   return {
-    view: ({ attrs: { label, class: className, ...rest } }) => {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
-          tagName: 'label.twk-string-widget',
+          tagName: `${tagName || 'div'}.twk-string-widget`,
           label: label ?? rest.field,
           class: className,
         },

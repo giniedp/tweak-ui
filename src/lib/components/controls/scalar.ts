@@ -93,10 +93,10 @@ export function uiScalarInput<T>(
 
 export const ScalarWidgetComponent: FactoryComponent<ScalarWidgetAttrs> = () => {
   return {
-    view: ({ attrs: { label, class: className, ...rest } }) => {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
-          tagName: 'label.twk-scalar-widget',
+          tagName: `${tagName || 'div'}.twk-scalar-widget`,
           label: label ?? rest.field,
           class: className,
         },

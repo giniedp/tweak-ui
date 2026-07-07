@@ -58,10 +58,10 @@ export function uiColorPicker<T>(
 
 export const ColorPickerWidgetComponent: FactoryComponent<ColorPickerWidgetAttrs> = () => {
   return {
-    view: ({ attrs: { label, class: className, ...rest } }) => {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
-          tagName: 'div.twk-picker-color-widget',
+          tagName: `${tagName || 'div'}.twk-picker-color-widget`,
           label: label ?? rest.field,
           class: className,
         },

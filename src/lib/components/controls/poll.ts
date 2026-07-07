@@ -21,14 +21,14 @@ export function uiPoll<T>(attrs: PollAttrs<T>, children?: Children): Vnode<PollA
 
 export const PollWidgetComponent: FactoryComponent<PollWidgetAttrs> = () => {
   return {
-    view: ({ attrs }) => {
+    view: ({ attrs: { tagName, label, field, class: className, ...rest } }) => {
       return uiWidget(
         {
-          tagName: 'label.twk-input.twk-input-readonly',
-          label: attrs.label ?? attrs.field,
-          class: attrs.class,
+          tagName: `${tagName || 'div'}.twk-input.twk-input-readonly`,
+          label: label ?? field,
+          class: className,
         },
-        m(PollComponent, attrs),
+        m(PollComponent, rest),
       )
     },
   }

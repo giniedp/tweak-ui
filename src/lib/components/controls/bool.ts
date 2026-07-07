@@ -73,10 +73,10 @@ export function uiBoolInput<T>(
 
 export const BoolWidgetComponent: FactoryComponent<BooleanWidgetAttrs> = () => {
   return {
-    view: ({ attrs: { label, class: className, ...rest } }) => {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
-          tagName: 'label.twk-bool-widget',
+          tagName: `${tagName}.twk-bool-widget`,
           label: label ?? rest.field,
           class: className,
         },

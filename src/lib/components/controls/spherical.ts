@@ -151,7 +151,7 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
       cartesian = toCartesian(radius, azimuth, polar, cartesian)
       return uiWidget(
         {
-          tagName: 'label.twk-spherical',
+          tagName: `${attrs.tagName || 'div'}.twk-spherical`,
           label: attrs.label ?? attrs.field,
           class: attrs.class,
           style: {
