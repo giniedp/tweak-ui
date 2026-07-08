@@ -1,4 +1,4 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Children, Vnode } from 'mithril'
 import { getColorAdapter, HSV, hsv2rgb, HSVA, rgb2hsv, RGBA } from '../../color'
 import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
 import { call, clamp, getTouchPoint } from '../../core/utils'
@@ -46,37 +46,37 @@ export function uiColorPickerWidget<T>(
   attrs: ColorPickerWidgetAttrs<T>,
   children?: Children,
 ): Vnode<ColorPickerWidgetAttrs<T>> {
-  return m(ColorPickerWidgetComponent as any, attrs as any, children)
+  return m(ColorPickerWidgetComponent<T>, attrs, children)
 }
 
 export function uiColorPicker<T>(
   attrs: ColorPickerAttrs<T>,
   children?: Children,
 ): Vnode<ColorPickerAttrs<T>> {
-  return m(ColorPicker as any, attrs as any, children)
+  return m(ColorPicker<T>, attrs, children)
 }
 
-export const ColorPickerWidgetComponent: FactoryComponent<ColorPickerWidgetAttrs> = () => {
+export const ColorPickerWidgetComponent = <T>(): m.Component<ColorPickerWidgetAttrs<T>> => {
   return {
     view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
           tagName: `${tagName || 'div'}.twk-picker-color-widget`,
-          label: label ?? rest.field,
+          label: label ?? (rest.field as any),
           class: className,
         },
-        [m(ColorPicker, rest)],
+        [m(ColorPicker<T>, rest)],
       )
     },
   }
 }
 
-export const ColorPicker: FactoryComponent<ColorPickerAttrs> = () => {
+export const ColorPicker = <T>(): m.Component<ColorPickerAttrs<T>> => {
   let hue = 0 // range [0,1]
   let sat = 0 // range [0,1]
   let val = 0 // range [0,1]
   let a = 0 // range [0,1]
-  let attrs: ColorPickerAttrs
+  let attrs: ColorPickerAttrs<T>
 
   function getHSVA(s = sat, v = val): HSVA {
     return {

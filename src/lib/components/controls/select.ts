@@ -1,4 +1,4 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Children, Vnode } from 'mithril'
 
 import { getControlValue, setControlValue } from '../../core'
 import { isNumber, isString } from '../../core/utils'
@@ -101,8 +101,8 @@ function optionsFromObject(obj: SelectOptionsObject): Array<SelectOption> {
     .map((key) => ({ value: obj[key], label: key }))
 }
 
-function getOptions(
-  node: m.Vnode<SelectAttrs>,
+function getOptions<T>(
+  node: m.Vnode<SelectAttrs<T>>,
 ): Array<SelectOption | SelectOptionGroup<SelectOption[]>> {
   const options = node.attrs.options
 
@@ -117,11 +117,11 @@ function getOptions(
 }
 
 export function uiSelect<T>(attrs: SelectAttrs<T>, children?: Children): Vnode<SelectAttrs<T>> {
-  return m(SelectComponent as any, attrs as any, children)
+  return m(SelectComponent<T>, attrs, children)
 }
 
-export const SelectComponent: FactoryComponent<SelectAttrs> = () => {
-  let attrs: SelectAttrs
+export const SelectComponent = <T>(): m.Component<SelectAttrs<T>> => {
+  let attrs: SelectAttrs<T>
   let options: Array<SelectOption | SelectOptionGroup<SelectOption[]>>
 
   function getSelectedIndex() {
@@ -168,7 +168,7 @@ export const SelectComponent: FactoryComponent<SelectAttrs> = () => {
     const el = e.target as HTMLSelectElement
     const value = getSelectionAt(el.selectedIndex)
     const written = setControlValue(attrs, value)
-    attrs.onchange?.(attrs, written)
+    attrs.onchange?.(attrs.value, written)
   }
 
   return {
@@ -178,7 +178,7 @@ export const SelectComponent: FactoryComponent<SelectAttrs> = () => {
       return uiWidget(
         {
           tagName: `${attrs.tagName || 'div'}.twk-select`,
-          label: attrs.label ?? attrs.field,
+          label: attrs.label ?? (attrs.field as any),
           class: attrs.class,
         },
         m(

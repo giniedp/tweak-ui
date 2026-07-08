@@ -1,4 +1,4 @@
-import m, { Child, Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Child, Children, Vnode } from 'mithril'
 
 import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
 import { clamp, dragUtil, getTouchInTarget, uiClass } from '../../core/utils'
@@ -81,39 +81,39 @@ export function uiScalarWidget<T>(
   attrs: ScalarWidgetAttrs<T>,
   children?: Children,
 ): Vnode<ScalarWidgetAttrs<T>> {
-  return m(ScalarWidgetComponent as any, attrs as any, children)
+  return m(ScalarWidgetComponent<T>, attrs, children)
 }
 
 export function uiScalarInput<T>(
   attrs: ScalarInputAttrs<T>,
   children?: Children,
 ): Vnode<ScalarInputAttrs<T>> {
-  return m(ScalarInputComponent as any, attrs as any, children)
+  return m(ScalarInputComponent<T>, attrs, children)
 }
 
-export const ScalarWidgetComponent: FactoryComponent<ScalarWidgetAttrs> = () => {
+export const ScalarWidgetComponent = <T>(): m.Component<ScalarWidgetAttrs<T>> => {
   return {
     view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
           tagName: `${tagName || 'div'}.twk-scalar-widget`,
-          label: label ?? rest.field,
+          label: label ?? (rest.field as any),
           class: className,
         },
-        [m(ScalarInputComponent, rest)],
+        [m(ScalarInputComponent<T>, rest)],
       )
     },
   }
 }
 
-export const ScalarInputComponent: FactoryComponent<ScalarInputAttrs> = () => {
+export const ScalarInputComponent = <T>(): m.Component<ScalarInputAttrs<T>> => {
   let min: number
   let max: number
   let step: number | undefined
   let readonly: boolean
   let placeholder: string
   let value: number
-  let attrs: ScalarInputAttrs
+  let attrs: ScalarInputAttrs<T>
   let editing: boolean
   let hasMinMax = false
   let hasStep = false
@@ -121,7 +121,7 @@ export const ScalarInputComponent: FactoryComponent<ScalarInputAttrs> = () => {
   let range = false
   let formatter: Intl.NumberFormat | undefined
 
-  function updateState(node: m.Vnode<ScalarInputAttrs>) {
+  function updateState(node: m.Vnode<ScalarInputAttrs<T>>) {
     if (!formatter || node.attrs.decimals !== attrs.decimals) {
       formatter = new Intl.NumberFormat('en-US', {
         minimumFractionDigits: node.attrs.decimals ?? 1,

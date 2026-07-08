@@ -29,16 +29,20 @@
     "copy": "pnpm copy:scss",
     "copy:scss": "cp -R ./src/style ./dist/scss",
     "release": "pnpm run build && npm publish --access=public",
-    "test": "karma start --single-run",
-    "test:watch": "karma start --no-single-run --auto-watch",
-    "test:coverage": "IS_COVERAGE=yes karma start --single-run"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@microsoft/api-documenter": "^7.30.3",
     "@microsoft/api-extractor": "^7.58.5",
     "@types/mithril": "^2.2.8",
+    "@vitest/browser": "4.1.4",
+    "@vitest/browser-playwright": "4.1.4",
+    "@vitest/coverage-v8": "^4.1.4",
     "concurrently": "^9.2.1",
     "highlight.js": "^11.11.1",
+    "playwright": "1.61.1",
     "tslib": "^2.1.0",
     "typescript": "^6.0.3",
     "vite": "8.0.8",

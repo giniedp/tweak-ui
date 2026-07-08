@@ -1,4 +1,4 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Children, Vnode } from 'mithril'
 import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
 import { uiClass } from '../../core/utils'
 import { CommonWidgetAttrs, uiButton, uiWidget } from '../elements'
@@ -46,19 +46,19 @@ export function uiBitmaskWidget<T>(
   attrs: BitmaskWidgetAttrs<T>,
   children?: Children,
 ): Vnode<BitmaskWidgetAttrs<T>> {
-  return m(BitmaskWidgetComponent as any, attrs as any, children)
+  return m(BitmaskWidgetComponent<T>, attrs, children)
 }
 
-export const BitmaskWidgetComponent: FactoryComponent<BitmaskWidgetAttrs> = () => {
+export const BitmaskWidgetComponent = <T>(): m.Component<BitmaskWidgetAttrs<T>> => {
   return {
     view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
           tagName: `${tagName || 'div'}.twk-Bitmask-widget`,
-          label: label ?? rest.field,
+          label: label ?? (rest.field as any),
           class: className,
         },
-        [m(BitmaskInputComponent, rest)],
+        [m(BitmaskInputComponent<T>, rest)],
       )
     },
   }
@@ -68,11 +68,11 @@ export function uiBitmaskInput<T>(
   attrs: BitmaskInputAttrs<T>,
   children?: Children,
 ): Vnode<BitmaskInputAttrs<T>> {
-  return m(BitmaskInputComponent as any, attrs as any, children)
+  return m(BitmaskInputComponent<T>, attrs, children)
 }
 
-export const BitmaskInputComponent: FactoryComponent<BitmaskInputAttrs> = () => {
-  let attrs: BitmaskInputAttrs
+export const BitmaskInputComponent = <T>(): m.Component<BitmaskInputAttrs<T>> => {
+  let attrs: BitmaskInputAttrs<T>
 
   function getBitCount() {
     return attrs.bitCount || 32

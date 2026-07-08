@@ -1,4 +1,4 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Children, Vnode } from 'mithril'
 import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
 import { CommonWidgetAttrs, uiWidget } from '../elements'
 import { uiScalarInput } from './scalar'
@@ -55,33 +55,38 @@ export function uiVectorWidget<T>(
   attrs: VectorWidgetAttrs<T>,
   children?: Children,
 ): Vnode<VectorWidgetAttrs<T>> {
-  return m(VectorWidgetComponent as any, attrs as any, children)
+  return m(VectorWidgetComponent<T>, attrs, children)
 }
 
 export function uiVectorInput<T>(
   attrs: VectorInputAttrs<T>,
   children?: Children,
 ): Vnode<VectorInputAttrs<T>> {
-  return m(VectorInputComponent as any, attrs as any, children)
+  return m(VectorInputComponent<T>, attrs, children)
 }
 
-export const VectorWidgetComponent: FactoryComponent<VectorWidgetAttrs> = () => {
+export const VectorWidgetComponent = <T>(): m.Component<VectorWidgetAttrs<T>> => {
   return {
     view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
           tagName: `${tagName || 'div'}.twk-vector-widget`,
-          label: label ?? rest.field,
+          label: label ?? (rest.field as any),
           class: className,
         },
-        [m(VectorInputComponent, rest)],
+        [m(VectorInputComponent<T>, rest)],
       )
     },
   }
 }
 const defaultKeys = ['x', 'y', 'z']
-export const VectorInputComponent: FactoryComponent<VectorInputAttrs> = () => {
-  function onchange(type: 'input' | 'change', field: string, v: number, attrs: VectorInputAttrs) {
+export const VectorInputComponent = <T>(): m.Component<VectorInputAttrs<T>> => {
+  function onchange(
+    type: 'input' | 'change',
+    field: string,
+    v: number,
+    attrs: VectorInputAttrs<T>,
+  ) {
     const value: any = getControlValue(attrs) || {}
     value[field] = isNaN(v) ? null : v
     setControlValue(attrs, value)

@@ -1,9 +1,9 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Children, Vnode } from 'mithril'
 import { getColorAdapter } from '../../color'
 import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
 import { isArray, isNumber, isObject, isString, padLeft } from '../../core/utils'
 import { CommonWidgetAttrs, uiWidget } from '../elements'
-import { ColorPickerAttrs, uiColorPicker } from './color-picker'
+import { uiColorPicker } from './color-picker'
 
 export type ColorWidgetAttrs<T = unknown> = CommonWidgetAttrs & ColorAttrs<T>
 
@@ -44,36 +44,36 @@ export function uiColorWidget<T>(
   attrs: ColorWidgetAttrs<T>,
   children?: Children,
 ): Vnode<ColorWidgetAttrs<T>> {
-  return m(ColorWidgetComponent as any, attrs as any, children)
+  return m(ColorWidgetComponent<T>, attrs, children)
 }
 
 export function uiColor<T>(attrs: ColorAttrs<T>, children?: Children): Vnode<ColorAttrs<T>> {
-  return m(ColorComponent as any, attrs as any, children)
+  return m(ColorComponent<T>, attrs, children)
 }
 
-export const ColorWidgetComponent: FactoryComponent<ColorWidgetAttrs> = () => {
+export const ColorWidgetComponent = <T>(): m.Component<ColorWidgetAttrs<T>> => {
   return {
     view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
           tagName: `${tagName || ''}.twk-color-widget`,
-          label: label ?? rest.field,
+          label: label ?? (rest.field as any),
           class: className,
         },
-        [m(ColorComponent, rest)],
+        [m(ColorComponent<T>, rest)],
       )
     },
   }
 }
 
-export const ColorComponent: FactoryComponent<ColorAttrs> = () => {
-  let attrs: ColorAttrs<any>
+export const ColorComponent = <T>(): m.Component<ColorAttrs<T>> => {
+  let attrs: ColorAttrs<T>
   let opened = false
   let rgba: string
   let value: any
   const codec = getColorAdapter('rgba()')
 
-  function updateState(node: Vnode<ColorAttrs>) {
+  function updateState(node: Vnode<ColorAttrs<T>>) {
     attrs = node.attrs
     value = getControlValue(attrs)
     rgba = codec.fromControl(getColorAdapter(attrs.format).toControl(value))
@@ -83,12 +83,12 @@ export const ColorComponent: FactoryComponent<ColorAttrs> = () => {
     opened = !opened
   }
 
-  function onPickerInput(p: ColorPickerAttrs, v: any) {
+  function onPickerInput(p: T, v: any) {
     setControlValue(attrs, v)
     attrs.oninput?.(attrs.value, v)
   }
 
-  function onPickerChange(p: ColorPickerAttrs, v: any) {
+  function onPickerChange(p: T, v: any) {
     setControlValue(attrs, v)
     attrs.onchange?.(attrs.value, v)
   }

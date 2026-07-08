@@ -1,4 +1,4 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Children, Vnode } from 'mithril'
 import { ControlAdapter, getControlValue, setControlValue, TweakableAttrs } from '../../core'
 import { call, dragUtil, getTouchInTarget, uiClass } from '../../core/utils'
 import { CommonWidgetAttrs, uiWidget } from '../elements'
@@ -54,26 +54,26 @@ export function uiAngleWidget<T>(
   attrs: AngleWidgetAttrs<T>,
   children?: Children,
 ): Vnode<AngleWidgetAttrs<T>> {
-  return m(AngleWidgetComponent as any, attrs as any, children)
+  return m(AngleWidgetComponent<T>, attrs, children)
 }
 
 export function uiAngleInput<T>(
   attrs: AngleInputAttrs<T>,
   children?: Children,
 ): Vnode<AngleInputAttrs<T>> {
-  return m(AngleInputComponent as any, attrs as any, children)
+  return m(AngleInputComponent<T>, attrs, children)
 }
 
-export const AngleWidgetComponent: FactoryComponent<AngleWidgetAttrs<unknown>> = () => {
+export const AngleWidgetComponent = <T>(): m.Component<AngleWidgetAttrs<T>> => {
   return {
     view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
           tagName: `${tagName || 'div'}.twk-angle-widget`,
-          label: label ?? rest.field,
+          label: label ?? (rest.field as any),
           class: className,
         },
-        [m(AngleInputComponent, rest)],
+        [m(AngleInputComponent<T>, rest)],
       )
     },
   }
@@ -92,7 +92,7 @@ export const degToRadAdapter: ControlAdapter<number, number> = {
   fromControl: (value: number) => value * RAD_TO_DEG,
 }
 
-export const AngleInputComponent: FactoryComponent<AngleInputAttrs> = () => {
+export const AngleInputComponent = <T>(): m.Component<AngleInputAttrs<T>> => {
   let angle = 0 // in radians
   let dragging = false
   let pos = [0, 0]
@@ -100,7 +100,7 @@ export const AngleInputComponent: FactoryComponent<AngleInputAttrs> = () => {
   let min: number
   let max: number
   let step: number | undefined
-  let attrs: AngleInputAttrs
+  let attrs: AngleInputAttrs<T>
 
   function clampAndSnapAngle(angle: number) {
     if (min != null && max != null) {
@@ -139,7 +139,7 @@ export const AngleInputComponent: FactoryComponent<AngleInputAttrs> = () => {
     return angle
   }
 
-  function updateState(node: Vnode<AngleInputAttrs>) {
+  function updateState(node: Vnode<AngleInputAttrs<T>>) {
     attrs = node.attrs
 
     min = attrs.min!
@@ -220,7 +220,7 @@ export const AngleInputComponent: FactoryComponent<AngleInputAttrs> = () => {
     onupdate: (node) => {
       updateState(node)
     },
-    view: ({ attrs: { ...rest } }: Vnode<AngleInputAttrs>) => {
+    view: ({ attrs: { ...rest } }: Vnode<AngleInputAttrs<T>>) => {
       return m(
         'div.twk-angle-input',
         {

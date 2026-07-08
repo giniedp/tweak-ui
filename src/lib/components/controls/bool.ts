@@ -1,4 +1,4 @@
-import m, { Child, Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Child, Children, Vnode } from 'mithril'
 import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
 import { uiClass } from '../../core/utils'
 import { CommonWidgetAttrs, uiWidget } from '../elements'
@@ -61,33 +61,33 @@ export function uiBoolWidget<T>(
   attrs: BooleanWidgetAttrs<T>,
   children?: Children,
 ): Vnode<BooleanWidgetAttrs<T>> {
-  return m(BoolWidgetComponent as any, attrs as any, children)
+  return m(BoolWidgetComponent<T>, attrs, children)
 }
 
 export function uiBoolInput<T>(
   attrs: BooleanInputAttrs<T>,
   children?: Children,
 ): Vnode<BooleanInputAttrs<T>> {
-  return m(BoolInputComponent as any, attrs as any, children)
+  return m(BoolInputComponent<T>, attrs, children)
 }
 
-export const BoolWidgetComponent: FactoryComponent<BooleanWidgetAttrs> = () => {
+export const BoolWidgetComponent = <T>(): m.Component<BooleanWidgetAttrs<T>> => {
   return {
     view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
           tagName: `${tagName}.twk-bool-widget`,
-          label: label ?? rest.field,
+          label: label ?? (rest.field as any),
           class: className,
         },
-        [m(BoolInputComponent, rest)],
+        [m(BoolInputComponent<T>, rest)],
       )
     },
   }
 }
 
-export const BoolInputComponent: FactoryComponent<BooleanInputAttrs> = () => {
-  let attrs: BooleanInputAttrs
+export const BoolInputComponent = <T>(): m.Component<BooleanInputAttrs<T>> => {
+  let attrs: BooleanInputAttrs<T>
 
   function onchange(e: Event) {
     const value = (e.target as HTMLInputElement).checked

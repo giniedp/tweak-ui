@@ -1,4 +1,4 @@
-import m, { Child, Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Child, Children, Vnode } from 'mithril'
 import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
 import { uiClass } from '../../core/utils'
 import { CommonWidgetAttrs, uiWidget } from '../elements'
@@ -53,32 +53,32 @@ export function uiStringWidget<T>(
   attrs: StringWidgetAttrs<T>,
   children?: Children,
 ): Vnode<StringWidgetAttrs<T>> {
-  return m(StringWidgetComponent as any, attrs as any, children)
+  return m(StringWidgetComponent<T>, attrs, children)
 }
 
 export function uiString<T>(
   attrs: StringInputAttrs<T>,
   children?: Children,
 ): Vnode<StringInputAttrs<T>> {
-  return m(StringInputComponent as any, attrs as any, children)
+  return m(StringInputComponent<T>, attrs, children)
 }
 
-export const StringWidgetComponent: FactoryComponent<StringWidgetAttrs> = () => {
+export const StringWidgetComponent = <T>(): m.Component<StringWidgetAttrs<T>> => {
   return {
     view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
       return uiWidget(
         {
           tagName: `${tagName || 'div'}.twk-string-widget`,
-          label: label ?? rest.field,
+          label: label ?? (rest.field as any),
           class: className,
         },
-        [m(StringInputComponent, rest)],
+        [m(StringInputComponent<T>, rest)],
       )
     },
   }
 }
-export const StringInputComponent: FactoryComponent<StringInputAttrs> = () => {
-  let attrs: StringInputAttrs
+export const StringInputComponent = <T>(): m.Component<StringInputAttrs<T>> => {
+  let attrs: StringInputAttrs<T>
   function onchange(e: Event) {
     const el = e.target as HTMLInputElement
     const value = el.value

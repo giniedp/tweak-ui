@@ -1,14 +1,16 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Children, Vnode } from 'mithril'
 
-import { getControlValue } from '../../core'
+import { getControlValue, TweakableAttrs } from '../../core'
 import { call, clamp, dragUtil, getTouchPoint, uiClass } from '../../core/utils'
-import { uiWidget, ValueWidgetAttrs } from '../elements'
+import { CommonWidgetAttrs, uiWidget } from '../elements'
+
+export type PointWidgetAttrs<T = unknown> = CommonWidgetAttrs & PointInputAttrs<T>
 
 /**
  * Point component model
  * @public
  */
-export type PointAttrs<T = unknown> = ValueWidgetAttrs<T, any> & {
+export type PointInputAttrs<T = unknown> = TweakableAttrs<T, any> & {
   /**
    * The object field names. Defaults to `['x', 'y']`
    */
@@ -37,24 +39,56 @@ export type PointAttrs<T = unknown> = ValueWidgetAttrs<T, any> & {
   /**
    * This is called when the control value has been changed.
    */
-  oninput?: (model: PointAttrs<T>, value: number) => void
+  oninput?: (model: PointInputAttrs<T>, value: number) => void
   /**
    * This is called once the control value is committed by the user.
    *
    * @remarks
    * Unlike the `onInput` callback, this is not necessarily called for each value change.
    */
-  onchange?: (model: PointAttrs<T>, value: number) => void
+  onchange?: (model: PointInputAttrs<T>, value: number) => void
 }
 
 const DEFAULT_RANGE = [0, 1]
 const DEFAULT_KEYS = ['x', 'y']
 
-export function uiPoint<T>(attrs: PointAttrs<T>, children?: Children): Vnode<PointAttrs<T>> {
-  return m(PointComponent as any, attrs as any, children)
+export function uiPointWidget<T>(
+  attrs: PointWidgetAttrs<T>,
+  children?: Children,
+): Vnode<PointWidgetAttrs<T>> {
+  return m(PointWidgetComponent<T>, attrs, children)
 }
 
-export const PointComponent: FactoryComponent<PointAttrs> = () => {
+export function uiPoint<T>(
+  attrs: PointWidgetAttrs<T>,
+  children?: Children,
+): Vnode<PointWidgetAttrs<T>> {
+  return m(PointWidgetComponent<T>, attrs, children)
+}
+
+export function uiPointInput<T>(
+  attrs: PointInputAttrs<T>,
+  children?: Children,
+): Vnode<PointInputAttrs<T>> {
+  return m(PointInputComponent<T>, attrs, children)
+}
+
+export const PointWidgetComponent = <T>(): m.Component<PointWidgetAttrs<T>> => {
+  return {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
+      return uiWidget(
+        {
+          tagName: `${tagName || 'div'}.twk-point-widget`,
+          label: label ?? (rest.field as any),
+          class: uiClass('twk-point', className),
+        },
+        [m(PointInputComponent<T>, rest)],
+      )
+    },
+  }
+}
+
+export const PointInputComponent = <T>(): m.Component<PointInputAttrs<T>> => {
   let kx: any
   let ky: any
   let xRange = DEFAULT_RANGE
@@ -66,9 +100,9 @@ export const PointComponent: FactoryComponent<PointAttrs> = () => {
   let rx: number
   let ry: number
   let snap: number
-  let attrs: PointAttrs
+  let attrs: PointInputAttrs<T>
 
-  function updateState(node: m.Vnode<PointAttrs>) {
+  function updateState(node: m.Vnode<PointInputAttrs<T>>) {
     attrs = node.attrs
     const keys = attrs.keys || DEFAULT_KEYS
     kx = keys[0]
@@ -152,54 +186,48 @@ export const PointComponent: FactoryComponent<PointAttrs> = () => {
     onupdate: updateState,
     view: (node) => {
       updateState(node)
-      return uiWidget(
+      return m(
+        '.point-area',
         {
-          label: attrs.label,
-          class: uiClass('twk-point', attrs.class),
+          tabindex: 0,
+          onmousedown: onMouseDown,
+          ontouchstart: onMouseDown,
         },
-        m(
-          '.point-area',
-          {
-            tabindex: 0,
-            onmousedown: onMouseDown,
-            ontouchstart: onMouseDown,
+        m('.point-x-axis', {
+          style: {
+            'pointer-events': 'none',
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: `${y * 100}%`,
+            height: `1px`,
           },
-          m('.point-x-axis', {
-            style: {
-              'pointer-events': 'none',
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: `${y * 100}%`,
-              height: `1px`,
-            },
-          }),
-          m('.point-y-axis', {
-            style: {
-              'pointer-events': 'none',
-              position: 'absolute',
-              left: `${x * 100}%`,
-              top: 0,
-              bottom: 0,
-              width: `1px`,
-            },
-          }),
-          m('.point-cursor', {
-            style: {
-              'pointer-events': 'none',
-              left: `${x * 100}%`,
-              top: `${y * 100}%`,
-              position: 'absolute',
-              width: '11px',
-              height: '11px',
-              'margin-top': '-5px',
-              'margin-left': '-5px',
-              border: '1px solid white',
-              'border-radius': '5px',
-              'box-shadow': '0px 0px 2px 1px rgba(0, 0, 0, 0.75)',
-            },
-          }),
-        ),
+        }),
+        m('.point-y-axis', {
+          style: {
+            'pointer-events': 'none',
+            position: 'absolute',
+            left: `${x * 100}%`,
+            top: 0,
+            bottom: 0,
+            width: `1px`,
+          },
+        }),
+        m('.point-cursor', {
+          style: {
+            'pointer-events': 'none',
+            left: `${x * 100}%`,
+            top: `${y * 100}%`,
+            position: 'absolute',
+            width: '11px',
+            height: '11px',
+            'margin-top': '-5px',
+            'margin-left': '-5px',
+            border: '1px solid white',
+            'border-radius': '5px',
+            'box-shadow': '0px 0px 2px 1px rgba(0, 0, 0, 0.75)',
+          },
+        }),
       )
     },
   }

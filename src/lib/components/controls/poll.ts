@@ -1,4 +1,4 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Children, Vnode } from 'mithril'
 import { getControlValue, TweakableAttrs } from '../../core'
 import { CommonWidgetAttrs, uiWidget } from '../elements'
 
@@ -12,32 +12,32 @@ export function uiPollWidget<T>(
   attrs: PollWidgetAttrs<T>,
   children?: Children,
 ): Vnode<PollWidgetAttrs<T>> {
-  return m(PollWidgetComponent as any, attrs as any, children)
+  return m(PollWidgetComponent<T>, attrs, children)
 }
 
 export function uiPoll<T>(attrs: PollAttrs<T>, children?: Children): Vnode<PollAttrs<T>> {
-  return m(PollComponent as any, attrs as any, children)
+  return m(PollComponent<T>, attrs, children)
 }
 
-export const PollWidgetComponent: FactoryComponent<PollWidgetAttrs> = () => {
+export const PollWidgetComponent = <T>(): m.Component<PollWidgetAttrs<T>> => {
   return {
     view: ({ attrs: { tagName, label, field, class: className, ...rest } }) => {
       return uiWidget(
         {
           tagName: `${tagName || 'div'}.twk-input.twk-input-readonly`,
-          label: label ?? field,
+          label: label ?? (field as any),
           class: className,
         },
-        m(PollComponent, rest),
+        m(PollComponent<T>, rest),
       )
     },
   }
 }
 
-export const PollComponent: FactoryComponent<PollWidgetAttrs> = () => {
+export const PollComponent = <T>(): m.Component<PollAttrs<T>> => {
   let el: HTMLElement
   let timer: number
-  let attrs: PollAttrs
+  let attrs: PollAttrs<T>
 
   return {
     oncreate({ dom }) {

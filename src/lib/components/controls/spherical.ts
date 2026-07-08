@@ -1,8 +1,8 @@
-import m, { Children, FactoryComponent, Vnode } from 'mithril'
+import m, { Children, Vnode } from 'mithril'
 
-import { getControlValue, setControlValue } from '../../core'
+import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
 import { call, clamp, dragUtil, getTouchInTarget, uiClass } from '../../core/utils'
-import { uiWidget, ValueWidgetAttrs } from '../elements'
+import { CommonWidgetAttrs, uiWidget } from '../elements'
 
 /**
  * @public
@@ -14,11 +14,13 @@ export type CartesianValue = { x: number; y: number; z: number }
  */
 export type SphericalValue = { radius: number; azimuth: number; polar: number }
 
+export type SphericalWidgetAttrs<T = unknown> = CommonWidgetAttrs & SphericalInputAttrs<T>
+
 /**
  * Spherical component model
  * @public
  */
-export type SphericalAttrs<T = unknown> = ValueWidgetAttrs<T, CartesianValue> & {
+export type SphericalInputAttrs<T = unknown> = TweakableAttrs<T, CartesianValue> & {
   /**
    * This is called when the control value has been changed.
    */
@@ -33,14 +35,43 @@ export type SphericalAttrs<T = unknown> = ValueWidgetAttrs<T, CartesianValue> & 
   onchange?: (model: T, value: unknown) => void
 }
 
-export function uiSpherical<T>(
-  attrs: SphericalAttrs<T>,
+export function uiSphericalWidget<T>(
+  attrs: SphericalWidgetAttrs<T>,
   children?: Children,
-): Vnode<SphericalAttrs<T>> {
-  return m(SphericalComponent as any, attrs as any, children)
+): Vnode<SphericalWidgetAttrs<T>> {
+  return m(SphericalWidgetComponent<T>, attrs, children)
 }
 
-export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
+export function uiSpherical<T>(
+  attrs: SphericalWidgetAttrs<T>,
+  children?: Children,
+): Vnode<SphericalWidgetAttrs<T>> {
+  return m(SphericalWidgetComponent<T>, attrs, children)
+}
+
+export function uiSphericalInput<T>(
+  attrs: SphericalInputAttrs<T>,
+  children?: Children,
+): Vnode<SphericalInputAttrs<T>> {
+  return m(SphericalInputComponent<T>, attrs, children)
+}
+
+export const SphericalWidgetComponent = <T>(): m.Component<SphericalWidgetAttrs<T>> => {
+  return {
+    view: ({ attrs: { tagName, label, class: className, ...rest } }) => {
+      return uiWidget(
+        {
+          tagName: `${tagName || 'div'}.twk-spherical-widget`,
+          label: label ?? (rest.field as any),
+          class: className,
+        },
+        [m(SphericalInputComponent<T>, rest)],
+      )
+    },
+  }
+}
+
+export const SphericalInputComponent = <T>(): m.Component<SphericalInputAttrs<T>> => {
   let radius = 1
   let azimuth = 0 // [0, 2PI]
   let polar = 0 // [0,  PI]
@@ -48,13 +79,13 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
   let paneElement: HTMLElement
 
   let dragging: 'pol' | 'azi' | null = null
-  let attrs: SphericalAttrs
+  let attrs: SphericalInputAttrs<T>
   let cartesian: CartesianValue
   function read(): SphericalValue {
     return toSpherical(getControlValue(attrs) || toCartesian(radius, azimuth, polar))
   }
 
-  function updateState(node: m.Vnode<SphericalAttrs>) {
+  function updateState(node: m.Vnode<SphericalInputAttrs<T>>) {
     attrs = node.attrs
     const value = read()
     radius = value.radius ?? 1
@@ -149,11 +180,9 @@ export const SphericalComponent: FactoryComponent<SphericalAttrs> = () => {
     onupdate: updateState,
     view: () => {
       cartesian = toCartesian(radius, azimuth, polar, cartesian)
-      return uiWidget(
+      return m(
+        'div.twk-spherical-input',
         {
-          tagName: `${attrs.tagName || 'div'}.twk-spherical`,
-          label: attrs.label ?? attrs.field,
-          class: attrs.class,
           style: {
             '--azimuth-value': `${toDeg(azimuth)}`,
             '--polar-value': `${toDeg(polar)}`,

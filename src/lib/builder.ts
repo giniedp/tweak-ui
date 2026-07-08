@@ -27,7 +27,8 @@ import {
   ImageComponent,
   MatrixInputComponent,
   MatrixWidgetComponent,
-  PointComponent,
+  PointInputComponent,
+  PointWidgetComponent,
   PollComponent,
   PollWidgetComponent,
   ScalarInputComponent,
@@ -36,7 +37,8 @@ import {
   SectionFooterComponent,
   SectionHeaderComponent,
   SelectComponent,
-  SphericalComponent,
+  SphericalInputComponent,
+  SphericalWidgetComponent,
   SplitComponent,
   SplitContentComponent,
   StringInputComponent,
@@ -114,6 +116,8 @@ export class Builder {
   public poll = widgetGenerator(this, PollWidgetComponent)
   public color = widgetGenerator(this, ColorWidgetComponent)
   public colorPicker = widgetGenerator(this, ColorPickerWidgetComponent)
+  public point = widgetGenerator(this, PointWidgetComponent)
+  public spherical = widgetGenerator(this, SphericalWidgetComponent)
 
   public boolInput = widgetGenerator(this, BoolInputComponent)
   public stringInput = widgetGenerator(this, StringInputComponent)
@@ -126,9 +130,8 @@ export class Builder {
   public pollInput = widgetGenerator(this, PollComponent)
   public colorInput = widgetGenerator(this, ColorComponent)
   public colorPickerInput = widgetGenerator(this, ColorPicker)
-
-  public point = widgetGenerator(this, PointComponent)
-  public spherical = widgetGenerator(this, SphericalComponent)
+  public pointInput = widgetGenerator(this, PointInputComponent)
+  public sphericalInput = widgetGenerator(this, SphericalInputComponent)
 
   public button(text: string, opts: ButtonAttrs = {}) {
     this.add(ButtonComponent, opts, text)
