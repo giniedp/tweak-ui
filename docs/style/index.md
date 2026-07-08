@@ -2,7 +2,7 @@
 
 Every built-in control is ultimately just HTML and a small set of CSS classes and custom
 properties. This page documents that vocabulary directly, without going through Mithril or
-the [UI Builder](/concepts#ui-builder), so you can reuse the same look for hand-written
+the [UI Builder](/concepts/#ui-builder), so you can reuse the same look for hand-written
 markup, server-rendered content, or your own framework's components.
 
 ## Root & theme
@@ -25,7 +25,7 @@ Two optional modifier classes switch the color theme. Omit both to use the defau
 ## Design tokens
 
 Sizing, spacing and color are all driven by CSS custom properties, so overriding a handful
-of variables re-themes every control at once (see the [Theme](/theme) page for a live
+of variables re-themes every control at once (see the [Theme](/theme/) page for a live
 version of this).
 
 | Variable                                    | Purpose                                      |

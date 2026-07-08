@@ -9,10 +9,10 @@ hero:
   actions:
     - theme: brand
       text: Components
-      link: /components
+      link: /components/
     - theme: alt
       text: Concepts
-      link: /concepts
+      link: /concepts/
 
 features:
   - title: Declarative Builder
