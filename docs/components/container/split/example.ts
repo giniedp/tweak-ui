@@ -2,44 +2,27 @@ import { mountUi } from 'tweak-ui'
 
 export default () => {
   mountUi('.example-frame', (ui) => {
-    ui.split(
-      {
-        style: {
-          height: '50vh',
-        },
-      },
-      () => {
-        ui.group('Group 1', () => {
-          ui.string({ value: 'Ver' })
-          ui.string({ value: 'ti' })
-          ui.string({ value: 'cal' })
+    ui.split({ style: { height: '20rem' }, flow: 'row', minSize: 80 }, () => {
+      ui.splitContent({ class: 'twk-bg-300' }, () => {
+        ui.group('Sidebar', () => {
+          ui.bool({ value: true, label: 'Visible' })
+          ui.bool({ value: false, label: 'Locked' })
+        })
+      })
+
+      ui.split({}, () => {
+        ui.splitContent({ class: 'twk-bg-200' }, () => {
+          ui.group('Editor', () => {
+            ui.widget(false, 'Hello World')
+          })
         })
 
-        ui.group('Group 2', () => {
-          ui.string({ value: 'Ver' })
-          ui.string({ value: 'ti' })
-          ui.string({ value: 'cal' })
+        ui.splitContent({ class: 'twk-bg-100', fluid: true }, () => {
+          ui.group('Console', () => {
+            ui.pre(false, 'Fluid pane: grows to fill remaining space')
+          })
         })
-
-        ui.split(
-          {
-            flow: 'row',
-          },
-          () => {
-            ui.group('Group 1', () => {
-              ui.string({ value: 'Ver' })
-              ui.string({ value: 'ti' })
-              ui.string({ value: 'cal' })
-            })
-
-            ui.group('Group 2', () => {
-              ui.string({ value: 'Ver' })
-              ui.string({ value: 'ti' })
-              ui.string({ value: 'cal' })
-            })
-          },
-        )
-      },
-    )
+      })
+    })
   })
 }

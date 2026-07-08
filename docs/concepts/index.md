@@ -2,9 +2,6 @@
 
 ## Mithril.js
 
-This library is based on [Mithril.js](https://mithril.js.org/). All key concepts of mithril
-also apply to this library. Check mithril documentation when writing custom controls for Tweak UI
-
 ## UI Builder
 
 Tweak UI provides a builder API on top of Mithril to simplify constructing control panels.
@@ -26,46 +23,48 @@ Controls receive input through the `value` property. Supported patterns:
 **Static value**
 
 ```ts
-ui.number({
-  value: 50,
-})
-```
-
-**Getter / Setter**
-
-```ts
-ui.number({
-  get value() {
-    return value
-  },
-  set value(newValue) {
-    value = newValue
-  },
+let value = 50
+ui.scalar({
+  value,
+  onchange: (v) => (value = v),
 })
 ```
 
 **Object + property binding**
 
 ```ts
-const object = {
-  myValue: 50,
+const model = {
+  value: 50,
 }
 // ...
-ui.number({
-  value: object,
-  prop: 'myValue',
+ui.scalar({
+  value: model,
+  prop: 'value',
 })
 // or better
-ui.number(object, 'myValue', {
+ui.scalar(model, 'value', {
   // other options
+})
+```
+
+**Object + custom binding**
+
+```ts
+const model = { value: 50 }
+ui.scalar({
+  value: model,
+  binding: {
+    get: (it) => it.value,
+    set: (v, it) => (it.value = v),
+  },
 })
 ```
 
 These approaches enable both simple and reactive data flows depending on the use case.
 
-## Control wrapper item
+## Widget wrapper item
 
-A `control` is a standardized UI wrapper providing label and description layout. Most tweakable controls are built on it, ensuring visual consistency. It can also be used independently to present arbitrary content.
+A `Widget` is a standardized UI wrapper providing label and content layout. Most tweakable controls are built on it, ensuring visual consistency. It can also be used independently to present arbitrary content.
 
 ## Custom controls
 

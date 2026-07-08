@@ -153,11 +153,11 @@ export class Builder {
     this.add(GraphComponent, opts)
   }
 
-  public widget(label: string, children?: ComponentChildren) {
+  public widget(label: string | false, children?: ComponentChildren) {
     this.add(WidgetComponent, { label }, children)
   }
 
-  public pre(label: string, children?: ComponentChildren) {
+  public pre(label: string | false, children?: ComponentChildren) {
     this.add(
       WidgetComponent,
       {

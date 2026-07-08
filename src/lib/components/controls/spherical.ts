@@ -74,15 +74,22 @@ export const SphericalWidgetComponent = <T>(): m.Component<SphericalWidgetAttrs<
 export const SphericalInputComponent = <T>(): m.Component<SphericalInputAttrs<T>> => {
   let radius = 1
   let azimuth = 0 // [0, 2PI]
-  let polar = 0 // [0,  PI]
-  let backface = false
+  let polar = 0 // [0,  PI], 0 = front pole, PI/2 = equator, PI = back pole
   let paneElement: HTMLElement
 
-  let dragging: 'pol' | 'azi' | null = null
+  let dragging = false
   let attrs: SphericalInputAttrs<T>
   let cartesian: CartesianValue
   function read(): SphericalValue {
     return toSpherical(getControlValue(attrs) || toCartesian(radius, azimuth, polar))
+  }
+
+  // derived fresh from `polar` everywhere it's needed - `polar` can be mutated
+  // directly (e.g. by onToggleBackface) between lifecycle hooks, so caching this
+  // in a variable that's only refreshed by updateState() risks reading a stale
+  // value the moment `view()` runs before the next onupdate.
+  function isBackface() {
+    return polar > Math.PI / 2
   }
 
   function updateState(node: m.Vnode<SphericalInputAttrs<T>>) {
@@ -91,7 +98,6 @@ export const SphericalInputComponent = <T>(): m.Component<SphericalInputAttrs<T>
     radius = value.radius ?? 1
     azimuth = value.azimuth ?? 0
     polar = value.polar ?? 0
-    backface = polar > Math.PI / 2
   }
 
   function onchange(type: 'change' | 'input') {
@@ -100,77 +106,48 @@ export const SphericalInputComponent = <T>(): m.Component<SphericalInputAttrs<T>
     call(type === 'input' ? attrs.oninput : attrs.onchange, attrs.value, value)
   }
 
-  function onStartPolar(e: MouseEvent) {
-    dragging = 'pol'
-    drag.activate(e)
-    ;(e.target as HTMLElement).focus()
-    return false
-  }
-  function onStartAzim(e: MouseEvent) {
-    dragging = 'azi'
-    drag.activate(e)
-    ;(e.target as HTMLElement).focus()
-    return false
+  // how far the knob sits from the pane center, as a fraction of the pane radius:
+  // 0 = pole (front or back, depending on `hemisphereIsBack`), 1 = equator
+  function reachOf(currentPolar: number, hemisphereIsBack: boolean) {
+    return hemisphereIsBack ? (Math.PI - currentPolar) / (Math.PI / 2) : currentPolar / (Math.PI / 2)
   }
 
+  function onPaneDown(e: MouseEvent) {
+    dragging = true
+    paneElement?.focus()
+    drag.activate(e)
+  }
+
+  function onToggleBackface() {
+    polar = Math.PI - polar
+    onchange('change')
+  }
+
+  // the hemisphere being edited for the duration of one drag gesture; only the
+  // explicit toggle (onToggleBackface) is allowed to switch hemispheres
+  let dragBackface = false
   const drag = dragUtil({
-    onStart: (e) => {},
+    onStart: () => {
+      dragBackface = isBackface()
+    },
     onMove: (e) => {
+      e.preventDefault()
       const position = getTouchInTarget(e, paneElement)
-      const px = position.normalizedX - 0.5
-      const py = position.normalizedY - 0.5
-      if (dragging === 'azi') {
-        // [-PI;PI]
-        azimuth = Math.atan2(py, px)
-        if (azimuth < 0) {
-          azimuth += 2 * Math.PI
-        }
-      } else if (dragging === 'pol') {
-        // closest point on segment
-        // p0: [0, 0], p1: vPhi
-        const ab = [Math.cos(azimuth), Math.sin(azimuth)]
-        const ac = [px, py]
-        const t = (ab[0] * ac[0] + ab[1] * ac[1]) / Math.sqrt(ab[0] * ab[0] + ab[1] * ab[1])
-
-        polar = Math.PI * clamp(t, 0, 0.5)
-        if (backface) {
-          polar = Math.PI - polar
-        }
-      }
+      const nx = (position.normalizedX - 0.5) * 2
+      const ny = (position.normalizedY - 0.5) * 2
+      const reach = clamp(Math.sqrt(nx * nx + ny * ny), 0, 1)
+      azimuth = Math.atan2(ny, nx)
+      polar = dragBackface ? Math.PI - reach * (Math.PI / 2) : reach * (Math.PI / 2)
       onchange('input')
       m.redraw()
     },
-    onEnd: (e) => {
+    onEnd: () => {
       drag.deactivate()
-      dragging = null
+      dragging = false
       onchange('change')
       m.redraw()
     },
   })
-
-  function onPhiInput(model: unknown, value: number) {
-    azimuth = toRad(value)
-    onchange('input')
-  }
-  function onPhiChange(model: unknown, value: number) {
-    azimuth = toRad(value)
-    onchange('change')
-  }
-
-  function onThetaInput(model: unknown, value: number) {
-    polar = toRad(value)
-    onchange('input')
-  }
-  function onThetaChange(model: unknown, value: number) {
-    polar = toRad(value)
-    onchange('change')
-  }
-  function onBackfaceChange(model: unknown, value: boolean) {
-    backface = value
-    polar = Math.PI - polar
-    onchange('change')
-    setTimeout(() => m.redraw())
-  }
 
   return {
     onremove: () => {
@@ -180,72 +157,51 @@ export const SphericalInputComponent = <T>(): m.Component<SphericalInputAttrs<T>
     onupdate: updateState,
     view: () => {
       cartesian = toCartesian(radius, azimuth, polar, cartesian)
-      return m(
-        'div.twk-spherical-input',
-        {
-          style: {
-            '--azimuth-value': `${toDeg(azimuth)}`,
-            '--polar-value': `${toDeg(polar)}`,
+      const backface = isBackface()
+      const reach = reachOf(polar, backface)
+      const dx = Math.cos(azimuth) * reach
+      const dy = Math.sin(azimuth) * reach
+      return m('div.twk-spherical-input', {}, [
+        m('div.twk-spherical-info', {}, [
+          m('div.twk-spherical-label', {}, `x: ${cartesian.x.toFixed(2)}`),
+          m('div.twk-spherical-label', {}, `y: ${cartesian.y.toFixed(2)}`),
+          m('div.twk-spherical-label', {}, `z: ${cartesian.z.toFixed(2)}`),
+          m("input.twk-toggle[type='checkbox']", {
+            checked: backface,
+            onchange: onToggleBackface,
+            title: 'Edit the back side of the sphere',
+          }),
+        ]),
+        m(
+          'div.twk-spherical-pane',
+          {
+            oncreate: (vnode) => (paneElement = vnode.dom as HTMLElement),
+            onmousedown: onPaneDown,
+            ontouchstart: onPaneDown,
+            tabIndex: 0,
+            class: uiClass({
+              'is-dragging': dragging,
+            }),
           },
-        },
-        [
-          m(
-            'div.twk-spherical-label',
-            {},
-            `x: ${cartesian.x.toFixed(2)} y: ${cartesian.y.toFixed(2)} z: ${cartesian.z.toFixed(2)}`,
-          ),
-          m(
-            'div.twk-spherical-pane',
-            {
-              oncreate: (vnode) => (paneElement = vnode.dom as HTMLElement),
-              class: uiClass({
-                'is-dragging': !!dragging,
-              }),
+          [
+            m('div.twk-spherical-arm', {
               style: {
-                aspectRatio: '1',
-                display: 'flex',
-                'align-items': 'center',
-                'justify-content': 'center',
-                position: 'relative',
+                width: `${reach * 50}%`,
+                transform: `rotate(${azimuth}rad)`,
               },
-            },
-            m(
-              'div.twk-spherical-arm',
-              {
-                onmousedown: onStartPolar,
-                ontouchstart: onStartPolar,
-                tabIndex: 0,
-                style: {
-                  width: '50%', // gives us the radius
-                  display: 'flex',
-                  justifyContent: 'end', // push knob to edge
-                  alignItems: 'center',
-                  transform: `translateX(50%) rotate(${azimuth}rad)`,
-                  transformOrigin: 'left center',
-                },
+            }),
+            m('div.twk-spherical-knob', {
+              class: uiClass({ 'is-back': backface }),
+              style: {
+                left: `${50 + dx * 50}%`,
+                top: `${50 + dy * 50}%`,
               },
-              m('div.twk-spherical-knob', {
-                onmousedown: onStartAzim,
-                ontouchstart: onStartAzim,
-                tabIndex: 0,
-                style: {
-                  aspectRatio: '1',
-                  transform: 'translateX(100%)',
-                },
-              }),
-            ),
-          ),
-        ],
-      )
+            }),
+          ],
+        ),
+      ])
     },
   }
-}
-
-function toDeg(value: number) {
-  return value * (180 / Math.PI)
-}
-function toRad(value: number) {
-  return value * (Math.PI / 180)
 }
 
 /**

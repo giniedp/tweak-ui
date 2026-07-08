@@ -1,9 +1,14 @@
 .twk-widget {
   display: grid;
-  grid-template-areas: 'label content';
-  grid-template-columns: 0.75fr 1fr;
+  grid-template-areas: 'content';
+  grid-template-columns: 1fr;
   gap: var(--twk-gap);
   width: 100%;
+
+  &:has(> .twk-widget-label) {
+    grid-template-areas: 'label content';
+    grid-template-columns: 0.75fr 1fr;
+  }
 }
 
 .twk-widget > * {
@@ -12,6 +17,7 @@
 }
 
 .twk-widget-label {
+  cursor: default;
   grid-area: label;
   min-height: var(--twk-size);
   flex: 0.75;

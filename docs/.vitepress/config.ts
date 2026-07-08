@@ -5,11 +5,6 @@ export default defineConfig({
   title: 'Tweak UI',
   description: 'A lightweight js library for building tweak controls with data binding',
   themeConfig: {
-    nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Components', link: '/components' },
-    ],
-
     // https://vitepress-sidebar.cdget.com/guide/getting-started
     sidebar: generateSidebar({
       documentRootPath: '/docs',

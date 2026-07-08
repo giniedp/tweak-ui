@@ -1,17 +1,20 @@
-import { h, mountUi } from 'tweak-ui'
+import { mountUi } from 'tweak-ui'
 
 export default () => {
-  mountUi('.example-frame', (b) => {
-    b.section({ style: { height: '500px' } }, () => {
-      b.sectionFooter({}, () => {
-        b.view(() => 'Footer')
+  mountUi('.example-frame', (ui) => {
+    ui.section({ style: { height: '16rem' } }, () => {
+      ui.sectionHeader({ class: 'twk-bg-300 twk-p-2' }, () => {
+        ui.view(() => 'Header')
       })
 
-      b.sectionHeader(() => {
-        b.view(() => 'Header')
+      ui.group('Settings', () => {
+        ui.bool({ value: true, label: 'Visible' })
+        ui.string({ value: 'Hello world' })
       })
 
-      b.view(() => 'Content')
+      ui.sectionFooter({ class: 'twk-bg-300 twk-p-2' }, () => {
+        ui.view(() => 'Footer')
+      })
     })
   })
 }
