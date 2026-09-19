@@ -45,6 +45,10 @@
   --twk-color-accent: #2196f3;
 }
 
+.twk-dragging * {
+  cursor: none !important;
+}
+
 .tweak-ui {
   interpolate-size: allow-keywords;
   background-color: var(--twk-color-base-200);

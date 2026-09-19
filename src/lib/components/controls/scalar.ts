@@ -1,7 +1,7 @@
 import m, { Child, Children, Vnode } from 'mithril'
 
 import { getControlValue, setControlValue, TweakableAttrs } from '../../core'
-import { clamp, dragUtil, getTouchInTarget, uiClass } from '../../core/utils'
+import { clamp, dragUtil, getTouchInTarget, TouchInfo, uiClass } from '../../core/utils'
 import { CommonWidgetAttrs, uiWidget } from '../elements'
 
 export type ScalarWidgetAttrs<T = unknown> = CommonWidgetAttrs & ScalarInputAttrs<T>
@@ -180,20 +180,30 @@ export const ScalarInputComponent = <T>(): m.Component<ScalarInputAttrs<T>> => {
     if (!canDrag || readonly) {
       return
     }
+    if (document.activeElement === e.target) {
+      return
+    }
     drag.activate(e)
   }
 
   let dragStartValue: number
-  let dragStartPos: number
+  let dragStartInfo: TouchInfo
+  let dragDidMove = false
   let drag = dragUtil({
     onStart: (e) => {
+      e.preventDefault()
+      ;(document.activeElement as HTMLElement)?.blur()
+      dragDidMove = false
       dragStartValue = value
-      dragStartPos = getTouchInTarget(e, drag.target).normalizedX
+      dragStartInfo = getTouchInTarget(e, drag.target)
     },
     onMove: (e) => {
       e.preventDefault()
+      document.body.classList.add('twk-dragging')
+      dragDidMove = true
       drag.target?.blur()
-      const d = dragStartPos - getTouchInTarget(e, drag.target).normalizedX
+      const touchInfo = getTouchInTarget(e, drag.target)
+      const d = (dragStartInfo.x - touchInfo.x) / Math.max(touchInfo.width, 200)
       let v = dragStartValue
       if (hasMinMax) {
         v -= d * (max - min)
@@ -202,8 +212,14 @@ export const ScalarInputComponent = <T>(): m.Component<ScalarInputAttrs<T>> => {
       }
       setModelValue('input', limit(v))
     },
-    onEnd: () => {
-      setModelValue('change', value)
+    onEnd: (e) => {
+      document.body.classList.remove('twk-dragging')
+      const input = drag.target as HTMLInputElement
+      if (!dragDidMove) {
+        input.focus()
+      } else {
+        setModelValue('change', value)
+      }
       drag.deactivate()
     },
   })
@@ -238,6 +254,7 @@ export const ScalarInputComponent = <T>(): m.Component<ScalarInputAttrs<T>> => {
               'twk-input-readonly': readonly,
               'twk-scalar-dragable': !readonly && (hasMinMax || hasStep),
               'twk-scalar-range': range,
+              'twk-scalar-dragging': !!drag.target,
             },
             node.attrs.class,
           ),

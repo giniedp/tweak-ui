@@ -167,6 +167,7 @@ export function getTouchPoint(e: MouseEvent | TouchEvent): [number, number] {
   return [cx, cy]
 }
 
+export type TouchInfo = ReturnType<typeof getTouchInTarget>
 export function getTouchInTarget(
   e: MouseEvent | TouchEvent,
   target?: HTMLElement | null,

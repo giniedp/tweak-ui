@@ -14,7 +14,7 @@
   }
 }
 
-.twk-scalar-dragable input {
+.twk-scalar-dragable input:not(:focus) {
   cursor: ew-resize;
 }
 
