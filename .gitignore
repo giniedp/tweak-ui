@@ -6,3 +6,10 @@ coverage
 Makefile
 __screenshots__
 __traces__
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example

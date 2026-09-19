@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 
+import { cloudflare } from '@cloudflare/vite-plugin'
+
 export default defineConfig({
   build: {
     outDir: 'dist',
@@ -31,5 +33,6 @@ export default defineConfig({
       copyDtsFiles: true,
       insertTypesEntry: true, // generates a root index.d.ts
     }),
+    cloudflare(),
   ],
 })
